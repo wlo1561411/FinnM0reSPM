@@ -2,7 +2,7 @@ import UIKit
 
 // MARK: - General
 
-extension String {
+public extension String {
     
     var attributed: NSMutableAttributedString {
         .init(string: self)
@@ -109,7 +109,7 @@ extension String {
 
 // MARK: - Regular Expression
 
-extension String {
+public extension String {
     
     enum Regex: String {
         case password
@@ -207,7 +207,7 @@ extension String {
 
 // MARK: - Mask
 
-extension String {
+public extension String {
     
     enum Mask {
         case left(Int)
@@ -271,7 +271,7 @@ extension String {
 
 // MARK: - Date
 
-extension String {
+public extension String {
 
     enum DateFormat: String {
         
@@ -321,7 +321,7 @@ extension String {
 
 // MARK: - NSMutableAttributedString
 
-extension NSMutableAttributedString {
+public extension NSMutableAttributedString {
 
     func textColor(_ color: UIColor) -> NSMutableAttributedString {
         addAttribute(

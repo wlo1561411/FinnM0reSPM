@@ -1,7 +1,7 @@
 import SnapKit
 import Foundation
 
-extension Constraint {
+public extension Constraint {
     
     var constant: CGFloat? {
         layoutConstraints.first?.constant
