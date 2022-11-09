@@ -20,7 +20,9 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
             name: "FinnM0reSPM",
-            dependencies: []),
+            dependencies: [
+                "SnapKit"
+            ]),
         .testTarget(
             name: "FinnM0reSPMTests",
             dependencies: ["FinnM0reSPM"]),
