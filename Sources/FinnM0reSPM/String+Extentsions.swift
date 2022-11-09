@@ -275,7 +275,7 @@ public extension String {
 
     enum DateFormat: String {
         
-        enum ISO8601 {
+        public enum ISO8601 {
             /// Format: 2021-05-31T11:00:00.000Z
             case standard
              
