@@ -1,3 +1,3 @@
-# FinnM0reSPM1
+# FinnM0reSPM
 
 A description of this package.

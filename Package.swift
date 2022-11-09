@@ -4,12 +4,12 @@
 import PackageDescription
 
 let package = Package(
-    name: "FinnM0reSPM1",
+    name: "FinnM0reSPM",
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
-            name: "FinnM0reSPM1",
-            targets: ["FinnM0reSPM1"]),
+            name: "FinnM0reSPM",
+            targets: ["FinnM0reSPM"]),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -19,10 +19,10 @@ let package = Package(
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
-            name: "FinnM0reSPM1",
+            name: "FinnM0reSPM",
             dependencies: []),
         .testTarget(
-            name: "FinnM0reSPM1Tests",
-            dependencies: ["FinnM0reSPM1"]),
+            name: "FinnM0reSPMTests",
+            dependencies: ["FinnM0reSPM"]),
     ]
 )

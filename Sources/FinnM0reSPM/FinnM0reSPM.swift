@@ -1,4 +1,4 @@
-public struct FinnM0reSPM1 {
+public struct FinnM0reSPM {
     public private(set) var text = "Hello, World!"
 
     public init() {
