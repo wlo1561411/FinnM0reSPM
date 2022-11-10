@@ -8,8 +8,14 @@ extension Styler where Base: UILabel {
     }
     
     @discardableResult
-    public func textColor(_ controlState: UIControl.State = .normal, _ color: UIColor) -> Self {
+    public func textColor(_ color: UIColor, state: UIControl.State = .normal) -> Self {
         base.textColor = color
+        return self
+    }
+    
+    @discardableResult
+    public func text(_ text: String?, state: UIControl.State = .normal) -> Self {
+        base.text = text
         return self
     }
 }

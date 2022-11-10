@@ -6,10 +6,16 @@ extension Styler where Base: UIButton {
         base.titleLabel?.font = font
         return self
     }
+
+    @discardableResult
+    public func textColor(_ color: UIColor, state: UIControl.State = .normal) -> Self {
+        base.setTitleColor(color, for: state)
+        return self
+    }
     
     @discardableResult
-    public func textColor(_ controlState: UIControl.State = .normal, _ color: UIColor) -> Self {
-        base.setTitleColor(color, for: controlState)
+    public func text(_ text: String?, state: UIControl.State = .normal) -> Self {
+        base.setTitle(text, for: state)
         return self
     }
 }
