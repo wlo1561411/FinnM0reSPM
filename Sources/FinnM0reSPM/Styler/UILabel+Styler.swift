@@ -1,15 +1,15 @@
 import UIKit
 
-extension Styler where Base: UIButton {
+extension Styler where Base: UILabel {
     @discardableResult
     public func font(_ font: UIFont) -> Self {
-        base.titleLabel?.font = font
+        base.font = font
         return self
     }
     
     @discardableResult
     public func textColor(_ controlState: UIControl.State = .normal, _ color: UIColor) -> Self {
-        base.setTitleColor(color, for: controlState)
+        base.textColor = color
         return self
     }
 }

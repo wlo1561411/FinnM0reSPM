@@ -27,4 +27,27 @@ extension Styler where Base: UIView {
         base.layer.cornerRadius = radius
         return self
     }
+    
+    @discardableResult
+    public func dottedBorder(
+        _ color: UIColor,
+        lineDashPattern: [Int] = [8,4],
+        lineWidth: CGFloat = 1,
+        radius: CGFloat = 5
+    ) -> Self {
+        DispatchQueue.main.async {
+            let border = CAShapeLayer()
+            border.strokeColor = color.cgColor
+            border.fillColor = .none
+            border.path = UIBezierPath(roundedRect: self.base.bounds, cornerRadius: radius).cgPath
+            border.frame = self.base.bounds
+            border.lineWidth = lineWidth
+            border.lineDashPattern = [8,4]
+            
+            self.base.layer.cornerRadius = radius
+            self.base.layer.masksToBounds = true
+            self.base.layer.addSublayer(border)
+        }
+        return self
+    }
 }
