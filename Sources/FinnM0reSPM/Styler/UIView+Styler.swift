@@ -81,4 +81,142 @@ extension Styler where Base: UIView {
         }
         return self
     }
+    
+    @discardableResult
+    public func gradient(
+        _ axis: NSLayoutConstraint.Axis,
+        colors: [CGColor],
+        completion: ((CAGradientLayer) -> Void)? = nil
+    ) -> Self {
+        let start: CGPoint
+        let end: CGPoint
+        
+        switch axis {
+        case .horizontal:
+            start = CGPoint(x: 0, y: 0.5)
+            end = CGPoint(x: 1, y: 0.5)
+        case .vertical:
+            start = CGPoint(x: 0.5, y: 0)
+            end = CGPoint(x: 0.5, y: 1)
+        @unknown default:
+            start = .zero
+            end = .zero
+        }
+        
+        completion?(
+            applyGradient(startPoint: start, endPoint: end, colors: colors)
+        )
+        
+        return self
+    }
+
+    func applyGradient(startPoint: CGPoint, endPoint: CGPoint, colors: [CGColor]) -> CAGradientLayer {
+        let layer = CAGradientLayer()
+        layer.colors = colors
+        layer.startPoint = startPoint
+        layer.endPoint = endPoint
+        
+        DispatchQueue.main.async {
+            layer.frame = self.base.bounds
+            self.base.layer.insertSublayer(layer, at: 0)
+        }
+        return layer
+    }
+    
+    /// nil means set to identity
+    @discardableResult
+    public func rotate(_ angle: CGFloat?, clockwise: Bool = true) -> Self {
+        UIView.animate(withDuration: 0.2) {
+            if let angle = angle {
+                let _angle = clockwise ? angle : -angle
+                self.base.transform = CGAffineTransform(rotationAngle: _angle / 180 * CGFloat(Double.pi))
+            }
+            else {
+                self.base.transform = .identity
+            }
+        }
+        return self
+    }
+    
+    @discardableResult
+    public func blur(alpha: CGFloat = 0.8, style: UIBlurEffect.Style = .dark) -> Self {
+        let effect = UIBlurEffect(style: style)
+        let blurView = UIVisualEffectView(effect: effect)
+        blurView.alpha = alpha
+        
+        base.addSubview(blurView)
+        blurView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+        return self
+    }
+    
+    public enum Visibility: String {
+        case visible
+        case invisible
+        case gone
+    }
+    
+    public var visibility: Visibility {
+        let constraint = base.constraints
+            .filter {
+                $0.firstAttribute == .height && $0.constant == 0
+            }
+            .first
+        
+        if let constraint = constraint, constraint.isActive {
+            return .gone
+        } else {
+            return base.isHidden ? .invisible : .visible
+        }
+    }
+    
+    @discardableResult
+    public func visibility(_ new: Visibility) -> Self {
+        guard visibility != new else { return self }
+        
+        let constraints = base.constraints
+            .filter {
+                $0.firstAttribute == .height &&
+                $0.constant == 0 &&
+                $0.secondItem == nil &&
+                ($0.firstItem as? UIView) == base
+            }
+        
+        let constraint = constraints.first
+
+        switch new {
+        case .visible:
+            constraint?.isActive = false
+            base.isHidden = false
+            
+        case .invisible:
+            constraint?.isActive = false
+            base.isHidden = true
+            
+        case .gone:
+            base.isHidden = true
+            
+            if let constraint = constraint {
+                constraint.isActive = true
+            }
+            else {
+                let constraint = NSLayoutConstraint(
+                    item: base,
+                    attribute: .height,
+                    relatedBy: .equal,
+                    toItem: nil,
+                    attribute: .height,
+                    multiplier: 1,
+                    constant: 0
+                )
+                base.addConstraint(constraint)
+                constraint.isActive = true
+            }
+            base.setNeedsLayout()
+            base.setNeedsUpdateConstraints()
+        }
+        
+        return self
+    }
 }
