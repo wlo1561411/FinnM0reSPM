@@ -22,7 +22,7 @@ extension Styler where Base: UIView {
     }
     
     @discardableResult
-    public func cornerRadius(_ radius: CGFloat) -> Self {
+    public func round(_ radius: CGFloat) -> Self {
         base.clipsToBounds = true
         base.layer.cornerRadius = radius
         return self
@@ -47,6 +47,37 @@ extension Styler where Base: UIView {
             self.base.layer.cornerRadius = radius
             self.base.layer.masksToBounds = true
             self.base.layer.addSublayer(border)
+        }
+        return self
+    }
+    
+    @discardableResult
+    public func round(at corners: CACornerMask, radius: CGFloat) -> Self {
+        base.clipsToBounds = true
+        base.layer.cornerRadius = radius
+        base.layer.maskedCorners = corners
+        return self
+    }
+    
+    @discardableResult
+    public func shadow(
+        color: UIColor = .black,
+        opacity: Float,
+        offset: CGSize,
+        shadowRadius: CGFloat,
+        cornerRadius: CGFloat,
+        scale: Bool = true
+    ) -> Self {
+        DispatchQueue.main.async {
+            self.base.clipsToBounds = false
+            self.base.layer.cornerRadius = cornerRadius
+            self.base.layer.shadowColor = color.cgColor
+            self.base.layer.shadowOpacity = opacity
+            self.base.layer.shadowOffset = offset
+            self.base.layer.shadowRadius = shadowRadius
+            self.base.layer.shadowPath =  UIBezierPath(roundedRect: self.base.bounds, cornerRadius: cornerRadius).cgPath
+            self.base.layer.shouldRasterize = true
+            self.base.layer.rasterizationScale = scale ? UIScreen.main.scale : 1
         }
         return self
     }
