@@ -8,9 +8,16 @@ protocol DefaultCodableValue {
 @propertyWrapper
 struct DefaultCodable<T: DefaultCodableValue> {
   var wrappedValue: T.Value
+  
+  init(wrappedValue: T.Value) {
+    self.wrappedValue = wrappedValue
+  }
+  
+  init(_ decodableValue: T) {
+    self.wrappedValue = T.defaultValue
+  }
 }
 
-// TODO: Add Encode
 extension DefaultCodable: Codable {
   init(from decoder: Decoder) throws {
     let container = try decoder.singleValueContainer()

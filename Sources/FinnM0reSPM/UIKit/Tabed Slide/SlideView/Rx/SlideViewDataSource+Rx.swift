@@ -1,72 +1,6 @@
 import RxCocoa
-import RxRelay
 import RxSwift
 import UIKit
-
-private extension HasDataSource {
-  /// Replace from ObservableType Extension  (DelegateProxyType.swift line 320)
-  func subscribeProxyDataSource<
-    DelegateProxy: DelegateProxyType,
-    _ObservableType: ObservableType
-  >(
-    ofObject object: DelegateProxy.ParentObject,
-    dataSource: DelegateProxy.Delegate,
-    observable: _ObservableType,
-    retainDataSource: Bool,
-    binding: @escaping (DelegateProxy, Event<_ObservableType.Element>) -> Void)
-    -> Disposable
-    where
-    DelegateProxy.ParentObject: UIView,
-    DelegateProxy.Delegate: AnyObject
-  {
-    let proxy = DelegateProxy.proxy(for: object)
-    let unregisterDelegate = DelegateProxy.installForwardDelegate(
-      dataSource,
-      retainDelegate: retainDataSource,
-      onProxyForObject: object)
-
-    if object.window != nil {
-      object.layoutIfNeeded()
-    }
-
-    let subscription = observable.asObservable()
-      .observe(on: MainScheduler())
-      .catch { error in
-        fatalError(error.localizedDescription)
-      }
-      .concat(Observable.never())
-      .take(until: object.rx.deallocated)
-      .subscribe { [weak object] (event: Event<_ObservableType.Element>) in
-
-        if let object {
-          assert(
-            proxy === DelegateProxy.currentDelegate(for: object),
-            "Proxy changed from the time it was first set.\nOriginal: \(proxy)\nExisting: \(String(describing: DelegateProxy.currentDelegate(for: object)))")
-        }
-
-        binding(proxy, event)
-
-        switch event {
-        case .error(let error):
-          fatalError(error.localizedDescription)
-        case .completed:
-          unregisterDelegate.dispose()
-        default:
-          break
-        }
-      }
-
-    return Disposables.create { [weak object] in
-      subscription.dispose()
-
-      if object?.window != nil {
-        object?.layoutIfNeeded()
-      }
-
-      unregisterDelegate.dispose()
-    }
-  }
-}
 
 extension SlideView: HasDataSource {
   public typealias DataSource = SlideViewDataSource
@@ -109,7 +43,7 @@ extension RxSlideViewDataSourceProxy: SlideViewDataSource {
   public func numberOfViewController(_ slideView: SlideView) -> Int {
     _requiredMethodsDataSource?.numberOfViewController(slideView) ?? 0
   }
-  
+
   public func viewController(_ slideView: SlideView, at index: Int) -> UIViewController {
     _requiredMethodsDataSource?.viewController(slideView, at: index) ?? .init()
   }
@@ -119,7 +53,7 @@ extension RxSlideViewDataSourceProxy: SlideViewDataSource {
 
 public protocol RxSlideViewDataSourceType {
   associatedtype Element
-  func slideView(_ slideView: SlideView, observedEvent: Event<Element>, at baseController: UIViewController? )
+  func slideView(_ slideView: SlideView, observedEvent: Event<Element>, at baseController: UIViewController?)
 }
 
 class RxSlideViewDataSourceSequenceWrapper<Sequence: Swift.Sequence>:
@@ -161,7 +95,7 @@ class RxSlideViewDataSource: SlideViewDataSource {
     factory(slideView, index)
   }
 
-  func slideView(_ slideView: SlideView, observedElements: Int) {
+  func slideView(_: SlideView, observedElements: Int) {
     self.count = observedElements
   }
 }
@@ -190,11 +124,12 @@ extension Reactive where Base: SlideView {
   public func items<
     DataSource: RxSlideViewDataSourceType & SlideViewDataSource,
     _ObservableType: ObservableType
-  >
-  (dataSource: DataSource,
-   at baseController: UIViewController)
+  >(
+    dataSource: DataSource,
+    at baseController: UIViewController)
     -> (_ source: _ObservableType)
-    -> Disposable where DataSource.Element == _ObservableType.Element
+    -> Disposable
+    where DataSource.Element == _ObservableType.Element
   {
     { source in
 

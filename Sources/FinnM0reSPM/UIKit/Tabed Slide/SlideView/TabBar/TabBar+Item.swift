@@ -1,8 +1,8 @@
 import UIKit
 
-extension ScrollTabbarView {
-  class Item: UIView {
-    struct Model {
+extension SlideView.TabBar {
+  public class Item: UIView {
+    public struct Model {
       var font = UIFont.systemFont(ofSize: 17)
       var selectedFont = UIFont.systemFont(ofSize: 17)
       var color: UIColor = .black
@@ -15,19 +15,9 @@ extension ScrollTabbarView {
 
     var tapAction: (() -> Void)?
 
-    var contentWidth: CGFloat {
-      SlideCalculator.textWidth(
-        with: titleLabel.font,
-        by: titleLabel.text ?? "")
-    }
-
-    var contentView: UIView {
-      titleLabel
-    }
-
     var model: Model = .init()
 
-    init() {
+    public init() {
       super.init(frame: .zero)
       self.commitInit()
     }
@@ -41,14 +31,11 @@ extension ScrollTabbarView {
       addGestureRecognizer(tap)
 
       titleLabel.textAlignment = .center
-      titleLabel.translatesAutoresizingMaskIntoConstraints = false
-
+      
       addSubview(titleLabel)
-      NSLayoutConstraint.activate(
-        [
-          titleLabel.centerXAnchor.constraint(equalTo: self.centerXAnchor),
-          titleLabel.centerYAnchor.constraint(equalTo: self.centerYAnchor)
-        ])
+      titleLabel.snp.makeConstraints { make in
+        make.edges.equalToSuperview()
+      }
     }
 
     func setSelected(_ isSelected: Bool) {
@@ -63,7 +50,7 @@ extension ScrollTabbarView {
       tapAction?()
     }
 
-    func prepareDeinit() {
+    func prepareReinit() {
       tapAction = nil
     }
   }
