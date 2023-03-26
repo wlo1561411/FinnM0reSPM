@@ -68,7 +68,7 @@ extension SlideView {
     public var bottomLineColor: UIColor = .clear
 
     public var itemModel = Item.Model()
-    public var itemSpace: CGFloat = 10
+    public var itemSpacing: CGFloat = 10
 
     public var itemsCount: Int {
       items.count
@@ -169,8 +169,8 @@ extension SlideView.TabBar {
         return item
       }
 
-    itemsStackView.spacing = itemSpace
-    scrollView.contentInset = .init(top: 0, left: itemSpace / 4, bottom: 0, right: itemSpace / 4)
+    itemsStackView.spacing = itemSpacing
+    scrollView.contentInset = .init(top: 0, left: itemSpacing / 4, bottom: 0, right: itemSpacing / 4)
 
     switch distribution {
     case .width(let width):
@@ -232,7 +232,7 @@ extension SlideView.TabBar {
 
     switch trackerStyle {
     case .view:
-      return (converted.origin.x - itemSpace / 2, item.frame.width + itemSpace)
+      return (converted.origin.x - itemSpacing / 2, item.frame.width + itemSpacing)
     case .content:
       return (converted.origin.x, item.frame.width)
     }

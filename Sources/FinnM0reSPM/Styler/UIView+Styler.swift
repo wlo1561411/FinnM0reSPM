@@ -4,6 +4,36 @@ extension UIView: StylerCompatible { }
 
 extension Styler where Base: UIView {
   @discardableResult
+  public func other(_ closure: @escaping (Base) -> Void) -> Self {
+    closure(base)
+    return self
+  }
+  
+  @discardableResult
+  public func add(to view: UIView) -> Self {
+    view.addSubview(base)
+    return self
+  }
+  
+  @discardableResult
+  public func add(to stackView: UIStackView) -> Self {
+    stackView.addArrangedSubview(base)
+    return self
+  }
+  
+  @discardableResult
+  public func insert(to view: UIView, at: Int) -> Self {
+    view.insertSubview(base, at: at)
+    return self
+  }
+  
+  @discardableResult
+  public func insert(to stackView: UIStackView, at: Int) -> Self {
+    stackView.insertArrangedSubview(base, at: at)
+    return self
+  }
+  
+  @discardableResult
   public func backgroundColor(_ color: UIColor) -> Self {
     base.backgroundColor = color
     return self

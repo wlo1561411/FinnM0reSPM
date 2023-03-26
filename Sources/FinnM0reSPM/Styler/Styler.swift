@@ -6,6 +6,10 @@ public struct Styler<Base> {
   }
 }
 
+extension Styler {
+  public func erased() -> Base { self.base }
+}
+
 public protocol StylerCompatible {
   associatedtype Base
 
