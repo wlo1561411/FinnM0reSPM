@@ -1,3 +1,5 @@
+import RxSwift
+import RxCocoa
 import UIKit
 
 extension Styler where Base: UIButton {
@@ -18,10 +20,31 @@ extension Styler where Base: UIButton {
     base.setTitle(text, for: state)
     return self
   }
-  
+
   @discardableResult
-  public func semanticContentAttribute(_ semanticContentAttribute: UISemanticContentAttribute) -> Self {
-    base.semanticContentAttribute = semanticContentAttribute
+  public func enable(_ enable: Bool) -> Self {
+    base.alpha = enable ? 1 : 0.2
+    base.isEnabled = enable
     return self
+  }
+}
+
+// MARK: - Rx
+
+extension Styler where Base: UIButton {
+  @discardableResult
+  public func tap(on closure: ((ControlEvent<Void>.Element) -> Void)?, dispose: DisposeBag) -> Self {
+    base.rx.tap
+      .subscribe(onNext: closure)
+      .disposed(by: dispose)
+    return self
+  }
+}
+
+extension Reactive where Base: UIButton {
+  public var enable: Binder<Bool> {
+    Binder(self.base) { button, enable in
+      button.sr.enable(enable)
+    }
   }
 }

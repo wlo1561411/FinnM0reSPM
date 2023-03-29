@@ -13,10 +13,4 @@ extension Styler where Base: UIStackView {
     base.distribution = distribution
     return self
   }
-
-  @discardableResult
-  public func axis(_ axis: NSLayoutConstraint.Axis) -> Self {
-    base.axis = axis
-    return self
-  }
 }

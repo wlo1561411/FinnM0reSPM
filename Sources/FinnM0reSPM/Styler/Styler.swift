@@ -1,3 +1,4 @@
+@dynamicMemberLookup
 public struct Styler<Base> {
   public let base: Base
 
@@ -7,7 +8,16 @@ public struct Styler<Base> {
 }
 
 extension Styler {
-  public func erased() -> Base { self.base }
+  public func unwrap() -> Base { self.base }
+
+  public subscript<Value>(dynamicMember keyPath: WritableKeyPath<Base, Value>) -> ((Value) -> Styler<Base>) {
+    var _base = self.base
+
+    return { value in
+      _base[keyPath: keyPath] = value
+      return .init(_base)
+    }
+  }
 }
 
 public protocol StylerCompatible {

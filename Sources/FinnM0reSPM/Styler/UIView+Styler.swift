@@ -32,12 +32,6 @@ extension Styler where Base: UIView {
     stackView.insertArrangedSubview(base, at: at)
     return self
   }
-  
-  @discardableResult
-  public func backgroundColor(_ color: UIColor) -> Self {
-    base.backgroundColor = color
-    return self
-  }
 
   @discardableResult
   public func borderColor(_ color: UIColor) -> Self {
