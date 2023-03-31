@@ -33,7 +33,7 @@ extension Styler where Base: UIButton {
 
 extension Styler where Base: UIButton {
   @discardableResult
-  public func tap(on closure: ((ControlEvent<Void>.Element) -> Void)?, dispose: DisposeBag) -> Self {
+  public func onTap(_ closure: ((ControlEvent<Void>.Element) -> Void)?, dispose: DisposeBag) -> Self {
     base.rx.tap
       .subscribe(onNext: closure)
       .disposed(by: dispose)
