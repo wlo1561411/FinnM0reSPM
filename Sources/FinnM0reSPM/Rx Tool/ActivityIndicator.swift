@@ -6,7 +6,7 @@ import RxSwift
 ///
 /// If there is at least one sequence computation in progress, `true` will be sent.
 /// When all activities complete `false` will be sent.
-public class ActivityIndicator: SharedSequenceConvertibleType {
+public final class ActivityIndicator: SharedSequenceConvertibleType {
   public typealias Element = Bool
   public typealias SharingStrategy = DriverSharingStrategy
 

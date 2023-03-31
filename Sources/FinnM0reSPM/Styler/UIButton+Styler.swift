@@ -1,5 +1,5 @@
-import RxSwift
 import RxCocoa
+import RxSwift
 import UIKit
 
 extension Styler where Base: UIButton {
@@ -33,7 +33,11 @@ extension Styler where Base: UIButton {
 
 extension Styler where Base: UIButton {
   @discardableResult
-  public func onTap(_ closure: ((ControlEvent<Void>.Element) -> Void)?, dispose: DisposeBag) -> Self {
+  public func onTap(
+    dispose: DisposeBag,
+    _ closure: ((ControlEvent<Void>.Element) -> Void)?)
+    -> Self
+  {
     base.rx.tap
       .subscribe(onNext: closure)
       .disposed(by: dispose)

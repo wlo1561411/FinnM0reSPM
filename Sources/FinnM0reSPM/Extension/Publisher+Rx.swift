@@ -3,7 +3,7 @@ import RxSwift
 
 @available(iOS 14.0, *)
 extension Publisher {
-  func asObservable() -> Observable<Output> {
+  public func asObservable() -> Observable<Output> {
     Observable<Output>.create { observer in
       let cancel = self
         .sink(
