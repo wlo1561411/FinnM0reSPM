@@ -1,9 +1,11 @@
 import Combine
+import RxCocoa
 import RxSwift
+import Foundation
 
 @available(iOS 14.0, *)
 extension Publisher {
-  public func asObservable() -> Observable<Output> {
+  func asObservable() -> Observable<Output> {
     Observable<Output>.create { observer in
       let cancel = self
         .sink(
@@ -21,5 +23,11 @@ extension Publisher {
 
       return Disposables.create { cancel.cancel() }
     }
+  }
+
+  func asDriver() -> Driver<Output> {
+    self.receive(on: RunLoop.main)
+      .asObservable()
+      .toDriver()
   }
 }
