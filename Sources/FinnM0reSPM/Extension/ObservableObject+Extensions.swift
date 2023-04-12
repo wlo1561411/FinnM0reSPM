@@ -3,7 +3,6 @@ import RxSwift
 extension ObservableConvertibleType {
   public func publish<Object: AnyObject, Value>(
     to object: Object,
-    while condition: ((Value) -> Bool)? = nil,
     _ keyPath: ReferenceWritableKeyPath<Object, Value>)
     -> Observable<Element>
     where Element == Value
@@ -11,14 +10,12 @@ extension ObservableConvertibleType {
     self.asObservable()
       .observe(on: MainScheduler.instance)
       .do(onNext: { [weak object] newValue in
-        if let condition, condition(newValue) { return }
         object?[keyPath: keyPath] = newValue
       })
   }
 
   public func publish<Object: AnyObject, Value>(
     to object: Object,
-    while condition: ((Value) -> Bool)? = nil,
     _ keyPath: ReferenceWritableKeyPath<Object, Value?>)
     -> Observable<Element>
     where Element == Value
@@ -26,7 +23,6 @@ extension ObservableConvertibleType {
     self.asObservable()
       .observe(on: MainScheduler.instance)
       .do(onNext: { [weak object] newValue in
-        if let condition, condition(newValue) { return }
         object?[keyPath: keyPath] = newValue
       })
   }
