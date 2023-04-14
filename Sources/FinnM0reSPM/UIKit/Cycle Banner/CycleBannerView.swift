@@ -109,6 +109,8 @@ public class CycleBannerView: UIView {
   public func reload() {
     stopTimer()
     
+    guard itemCount > 0 else { return }
+    
     /// UICollectionViewFlowLayout.automaticSize will cause error
     /// cellForItemAt will call twice at first time to swipe left
     /// Set itemSize as workaround

@@ -2,28 +2,28 @@ import RxCocoa
 import RxSwift
 import UIKit
 
-extension SlideView.TabBar: HasDataSource {
+extension SlideTabBar: HasDataSource {
   public typealias DataSource = SlideTabBarDataSource
 }
 
 // MARK: - Proxy
 
 public class RxSlideTabBarDataSourceProxy:
-  DelegateProxy<SlideView.TabBar, SlideTabBarDataSource>,
+  DelegateProxy<SlideTabBar, SlideTabBarDataSource>,
   DelegateProxyType
 {
-  public private(set) weak var tabBar: SlideView.TabBar?
+  public private(set) weak var tabBar: SlideTabBar?
 
-  public init(tabBar: SlideView.TabBar) {
+  public init(tabBar: SlideTabBar) {
     self.tabBar = tabBar
     super.init(parentObject: tabBar, delegateProxy: RxSlideTabBarDataSourceProxy.self)
   }
 
-  public static func currentDelegate(for object: SlideView.TabBar) -> SlideTabBarDataSource? {
+  public static func currentDelegate(for object: SlideTabBar) -> SlideTabBarDataSource? {
     object.dataSource
   }
 
-  public static func setCurrentDelegate(_ delegate: SlideTabBarDataSource?, to object: SlideView.TabBar) {
+  public static func setCurrentDelegate(_ delegate: SlideTabBarDataSource?, to object: SlideTabBar) {
     object.dataSource = delegate
   }
 
@@ -40,11 +40,11 @@ public class RxSlideTabBarDataSourceProxy:
 }
 
 extension RxSlideTabBarDataSourceProxy: SlideTabBarDataSource {
-  public func numberOfItems(_ sender: SlideView.TabBar) -> Int {
+  public func numberOfItems(_ sender: SlideTabBar) -> Int {
     _requiredMethodsDataSource?.numberOfItems(sender) ?? 0
   }
 
-  public func itemView(_ sender: SlideView.TabBar, at index: Int) -> SlideView.TabBar.Item {
+  public func itemView(_ sender: SlideTabBar, at index: Int) -> SlideTabBar.Item {
     _requiredMethodsDataSource?.itemView(sender, at: index) ?? .init()
   }
 }
@@ -53,8 +53,8 @@ extension RxSlideTabBarDataSourceProxy: SlideTabBarDataSource {
 
 public protocol RxSlideTabBarDataSourceType {
   associatedtype Element
-  func tabBar(_ tabBar: SlideView.TabBar, observedEvent: Event<Element>)
-  func tabBar(_ tabBar: SlideView.TabBar, observedEvent: Event<[String]>)
+  func tabBar(_ tabBar: SlideTabBar, observedEvent: Event<Element>)
+  func tabBar(_ tabBar: SlideTabBar, observedEvent: Event<[String]>)
 }
 
 class RxSlideTabBarDataSourceSequenceWrapper<Sequence: Swift.Sequence>:
@@ -71,7 +71,7 @@ class RxSlideTabBarDataSourceSequenceWrapper<Sequence: Swift.Sequence>:
     super.init()
   }
 
-  func tabBar(_ tabBar: SlideView.TabBar, observedEvent: Event<Sequence>) {
+  func tabBar(_ tabBar: SlideTabBar, observedEvent: Event<Sequence>) {
     Binder(self) { dataSource, items in
       let count = Array(items).count
       dataSource.tabBar(tabBar, observedElements: count)
@@ -80,7 +80,7 @@ class RxSlideTabBarDataSourceSequenceWrapper<Sequence: Swift.Sequence>:
     .on(observedEvent)
   }
 
-  func tabBar(_ tabBar: SlideView.TabBar, observedEvent: Event<[String]>) {
+  func tabBar(_ tabBar: SlideTabBar, observedEvent: Event<[String]>) {
     Binder(self) { dataSource, items in
       dataSource.tabBar(tabBar, observedElements: items)
       tabBar.reload()
@@ -90,7 +90,7 @@ class RxSlideTabBarDataSourceSequenceWrapper<Sequence: Swift.Sequence>:
 }
 
 class RxSlideTabBarDataSource: SlideTabBarDataSource {
-  typealias Factory = (SlideView.TabBar, Int) -> SlideView.TabBar.Item
+  typealias Factory = (SlideTabBar, Int) -> SlideTabBar.Item
 
   var count: Int?
 
@@ -103,26 +103,26 @@ class RxSlideTabBarDataSource: SlideTabBarDataSource {
   }
 
   init() {
-    self.factory = { [weak self] _, index in
-      let item = SlideView.TabBar.Item()
+    self.factory = { [weak self] tabBar, index in
+      let item = SlideTabBar.DefaultItem(model: tabBar.itemModel)
       item.titleLabel.text = self?.titles?[index]
       return item
     }
   }
 
-  func numberOfItems(_: SlideView.TabBar) -> Int {
+  func numberOfItems(_: SlideTabBar) -> Int {
     count ?? 0
   }
 
-  func itemView(_ sender: SlideView.TabBar, at index: Int) -> SlideView.TabBar.Item {
+  func itemView(_ sender: SlideTabBar, at index: Int) -> SlideTabBar.Item {
     factory(sender, index)
   }
 
-  func tabBar(_: SlideView.TabBar, observedElements: Int) {
+  func tabBar(_: SlideTabBar, observedElements: Int) {
     self.count = observedElements
   }
 
-  func tabBar(_: SlideView.TabBar, observedElements: [String]) {
+  func tabBar(_: SlideTabBar, observedElements: [String]) {
     self.titles = observedElements
     self.count = observedElements.count
   }
@@ -130,7 +130,7 @@ class RxSlideTabBarDataSource: SlideTabBarDataSource {
 
 // MARK: - Binding
 
-extension Reactive where Base: SlideView.TabBar {
+extension Reactive where Base: SlideTabBar {
   public func titles<Source: ObservableType>
   (_ source: Source)
     -> Disposable
@@ -145,7 +145,7 @@ extension Reactive where Base: SlideView.TabBar {
     Source: ObservableType
   >
   (_ source: Source)
-    -> (_ factory: @escaping (SlideView.TabBar, Int) -> SlideView.TabBar.Item)
+  -> (_ factory: @escaping (SlideTabBar, Int) -> SlideTabBar.Item)
     -> Disposable
     where Source.Element == Sequence
   {

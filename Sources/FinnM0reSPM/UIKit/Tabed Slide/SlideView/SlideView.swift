@@ -84,26 +84,6 @@ public class SlideView: UIView {
 // MARK: Animation
 
 extension SlideView {
-  private func show(at index: Int) {
-    guard
-      preIndex != index,
-      let base = baseViewController,
-      let to = viewController(with: index) else { return }
-
-    delegate?.willSwitch?(to: index, viewController: to)
-    removePreViewContoller()
-
-    base.addChild(to)
-    to.view.frame = self.bounds
-    addSubview(to.view)
-    to.didMove(toParent: base)
-
-    preIndex = index
-    preViewController = to
-
-    delegate?.didSwitch?(to: index, viewController: to)
-  }
-
   private func prepareSwitch(to index: Int) {
     if index == preIndex || index < 0 || isSwitching { return }
 
@@ -129,6 +109,27 @@ extension SlideView {
 
     toViewController = nil
     toIndex = -1
+  }
+
+  private func show(at index: Int) {
+    guard
+      preIndex != index,
+      let base = baseViewController,
+      let to = viewController(with: index)
+    else { return }
+
+    delegate?.willSwitch?(to: index, viewController: to)
+    removePreViewController()
+
+    base.addChild(to)
+    to.view.frame = self.bounds
+    addSubview(to.view)
+    to.didMove(toParent: base)
+
+    preIndex = index
+    preViewController = to
+
+    delegate?.didSwitch?(to: index, viewController: to)
   }
 
   private func animate(
@@ -194,7 +195,7 @@ extension SlideView {
 
       if self.toIndex >= 0, self.toIndex != self.preIndex, self.toIndex < self.viewControllersCount {
         self.preViewController?.beginAppearanceTransition(true, animated: false)
-        self.removeToViewContoller()
+        self.removeToViewController()
         self.preViewController?.endAppearanceTransition()
 
         if let pre = self.preViewController {
@@ -212,26 +213,26 @@ extension SlideView {
     var x: CGFloat = 0
 
     if toIndex < preIndex {
-      x = self.bounds.origin.x - self.bounds.width + offset
+      x = bounds.origin.x - bounds.width + offset
     }
     else if toIndex > preIndex {
-      x = self.bounds.origin.x + self.bounds.width + offset
+      x = bounds.origin.x + bounds.width + offset
     }
 
     preViewController?.view.frame = CGRect(
-      x: self.bounds.origin.x + offset,
-      y: self.bounds.origin.y,
-      width: self.bounds.width,
-      height: self.bounds.height)
+      x: bounds.origin.x + offset,
+      y: bounds.origin.y,
+      width: bounds.width,
+      height: bounds.height)
 
     if toIndex >= 0, toIndex < viewControllersCount {
       toViewController?.view.frame = CGRect(
         x: x,
-        y: self.bounds.origin.y,
-        width: self.bounds.width,
-        height: self.bounds.height)
+        y: bounds.origin.y,
+        width: bounds.width,
+        height: bounds.height)
     }
-    delegate?.switching?(from: preIndex, to: toIndex, with: abs(offset / self.bounds.width))
+    delegate?.switching?(from: preIndex, to: toIndex, with: abs(offset / bounds.width))
   }
 
   @objc
@@ -247,82 +248,10 @@ extension SlideView {
       preViewController?.beginAppearanceTransition(false, animated: true)
 
     case .changed:
-      var panToIndex = -1
-
-      if offset > 0 {
-        panToIndex = preIndex - 1
-      }
-      else if offset < 0 {
-        panToIndex = preIndex + 1
-      }
-
-      if panToIndex != toIndex {
-        removeToViewContoller()
-      }
-
-      if panToIndex < 0 || panToIndex >= viewControllersCount {
-        toIndex = panToIndex
-        translate(with: offset / 2)
-      }
-      else {
-        if
-          panToIndex != toIndex,
-          let to = viewController(with: panToIndex)
-        {
-          delegate?.willSwitch?(to: panToIndex, viewController: to)
-
-          toViewController = to
-          baseViewController?.addChild(to)
-          toViewController?.willMove(toParent: baseViewController)
-          toViewController?.beginAppearanceTransition(true, animated: true)
-          addSubview(to.view)
-
-          toIndex = panToIndex
-        }
-        translate(with: offset)
-      }
+      panChanged(offset)
 
     case .ended:
-      if toIndex >= 0, toIndex != preIndex, toIndex < viewControllersCount {
-        let absOffset = abs(offset)
-
-        if absOffset > swipeCancelMaxValue {
-          let animationTime = TimeInterval((abs(self.frame.width) - absOffset) / self.frame.width * 0.3)
-
-          UIView.animate(
-            withDuration: animationTime,
-            delay: 0,
-            options: .curveEaseIn)
-          { [weak self] in
-            self?.translate(with: offset > 0 ? self?.bounds.width ?? 0 : -(self?.bounds.width ?? 0))
-          }
-                completion: { [weak self] _ in
-            guard let self else { return }
-
-            self.removePreViewContoller()
-
-            if self.toIndex >= 0, self.toIndex < self.viewControllersCount {
-              self.toViewController?.endAppearanceTransition()
-              self.toViewController?.didMove(toParent: self.baseViewController)
-
-              self.preIndex = self.toIndex
-              self.preViewController = self.toViewController
-              self.toViewController = nil
-              self.toIndex = -1
-            }
-
-            if let pre = self.preViewController {
-              self.delegate?.didSwitch?(to: self.preIndex, viewController: pre)
-            }
-          }
-        }
-        else {
-          animateBack(with: offset)
-        }
-      }
-      else {
-        animateBack(with: offset)
-      }
+      panEnded(offset)
 
     case .cancelled,
          .failed,
@@ -331,6 +260,84 @@ extension SlideView {
 
     @unknown default:
       fatalError("Pan Hander Error")
+    }
+  }
+
+  private func panChanged(_ offset: CGFloat) {
+    var panToIndex = -1
+
+    if offset > 0 {
+      panToIndex = preIndex - 1
+    }
+    else if offset < 0 {
+      panToIndex = preIndex + 1
+    }
+
+    if panToIndex != toIndex {
+      removeToViewController()
+    }
+
+    if panToIndex < 0 || panToIndex >= viewControllersCount {
+      toIndex = panToIndex
+      translate(with: offset / 2)
+    }
+    else {
+      if
+        panToIndex != toIndex,
+        let to = viewController(with: panToIndex)
+      {
+        delegate?.willSwitch?(to: panToIndex, viewController: to)
+
+        toViewController = to
+        baseViewController?.addChild(to)
+        toViewController?.willMove(toParent: baseViewController)
+        toViewController?.beginAppearanceTransition(true, animated: true)
+        addSubview(to.view)
+
+        toIndex = panToIndex
+      }
+      translate(with: offset)
+    }
+  }
+
+  private func panEnded(_ offset: CGFloat) {
+    guard
+      toIndex >= 0,
+      toIndex != preIndex,
+      toIndex < viewControllersCount,
+      abs(offset) > swipeCancelMaxValue
+    else {
+      animateBack(with: offset)
+      return
+    }
+
+    let animationTime = TimeInterval((abs(frame.width) - abs(offset)) / frame.width * 0.3)
+
+    UIView.animate(
+      withDuration: animationTime,
+      delay: 0,
+      options: .curveEaseIn)
+    { [weak self] in
+      self?.translate(with: offset > 0 ? self?.bounds.width ?? 0 : -(self?.bounds.width ?? 0))
+    }
+              completion: { [weak self] _ in
+      guard let self else { return }
+
+      self.removePreViewController()
+
+      if self.toIndex >= 0, self.toIndex < self.viewControllersCount {
+        self.toViewController?.endAppearanceTransition()
+        self.toViewController?.didMove(toParent: self.baseViewController)
+
+        self.preIndex = self.toIndex
+        self.preViewController = self.toViewController
+        self.toViewController = nil
+        self.toIndex = -1
+      }
+
+      if let pre = self.preViewController {
+        self.delegate?.didSwitch?(to: self.preIndex, viewController: pre)
+      }
     }
   }
 }
@@ -354,7 +361,7 @@ extension SlideView {
     }
   }
 
-  private func removePreViewContoller() {
+  private func removePreViewController() {
     if preViewController != nil {
       remove(with: preViewController)
       preViewController?.endAppearanceTransition()
@@ -363,7 +370,7 @@ extension SlideView {
     }
   }
 
-  private func removeToViewContoller() {
+  private func removeToViewController() {
     if toViewController != nil {
       toViewController?.beginAppearanceTransition(false, animated: false)
       remove(with: toViewController)

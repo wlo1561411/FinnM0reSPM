@@ -1,6 +1,7 @@
+import Foundation
 import UIKit
 
-extension SlideView.TabBar {
+extension SlideTabBar {
   public class Item: UIView {
     public struct Model {
       var font = UIFont.systemFont(ofSize: 17)
@@ -9,15 +10,17 @@ extension SlideView.TabBar {
       var selectedColor: UIColor = .blue
     }
 
+    func setSelected(_: Bool) { }
+    func setTransformingColor(_: UIColor) { }
+  }
+
+  public class DefaultItem: Item {
     private(set) var titleLabel = UILabel()
 
-    private(set) var isSelected = false
+    private let model: Model
 
-    var tapAction: (() -> Void)?
-
-    var model: Model = .init()
-
-    public init() {
+    public init(model: Model) {
+      self.model = model
       super.init(frame: .zero)
       self.commitInit()
     }
@@ -27,31 +30,21 @@ extension SlideView.TabBar {
     }
 
     private func commitInit() {
-      let tap = UITapGestureRecognizer(target: self, action: #selector(tapped))
-      addGestureRecognizer(tap)
-
       titleLabel.textAlignment = .center
-      
+
       addSubview(titleLabel)
       titleLabel.snp.makeConstraints { make in
         make.edges.equalToSuperview()
       }
     }
 
-    func setSelected(_ isSelected: Bool) {
-      self.isSelected = isSelected
-
+    override public func setSelected(_ isSelected: Bool) {
       titleLabel.textColor = isSelected ? model.selectedColor : model.color
       titleLabel.font = isSelected ? model.selectedFont : model.font
     }
 
-    @objc
-    private func tapped() {
-      tapAction?()
-    }
-
-    func prepareReinit() {
-      tapAction = nil
+    override public func setTransformingColor(_ color: UIColor) {
+      titleLabel.textColor = color
     }
   }
 }

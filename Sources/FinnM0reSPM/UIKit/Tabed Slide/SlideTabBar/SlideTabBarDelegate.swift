@@ -4,5 +4,5 @@ import UIKit
 @objc
 public protocol SlideTabBarDelegate: AnyObject {
   @objc
-  optional func didSelected(_ sender: SlideView.TabBar, at index: Int)
+  optional func didSelected(_ sender: SlideTabBar, at index: Int)
 }

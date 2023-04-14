@@ -2,16 +2,16 @@ import RxCocoa
 import RxSwift
 import UIKit
 
-extension SlideView.TabBar: HasDelegate {
+extension SlideTabBar: HasDelegate {
   public typealias Delegate = SlideTabBarDelegate
 }
 
 public class RxSlideTabBarDelegateProxy:
-  DelegateProxy<SlideView.TabBar, SlideTabBarDelegate>,
+  DelegateProxy<SlideTabBar, SlideTabBarDelegate>,
   DelegateProxyType,
   SlideTabBarDelegate
 {
-  public init(tabBar: SlideView.TabBar) {
+  public init(tabBar: SlideTabBar) {
     super.init(parentObject: tabBar, delegateProxy: RxSlideTabBarDelegateProxy.self)
   }
 
@@ -21,27 +21,27 @@ public class RxSlideTabBarDelegateProxy:
     }
   }
 
-  public static func currentDelegate(for object: SlideView.TabBar) -> SlideTabBarDelegate? {
+  public static func currentDelegate(for object: SlideTabBar) -> SlideTabBarDelegate? {
     object.delegate
   }
 
-  public static func setCurrentDelegate(_ delegate: SlideTabBarDelegate?, to object: SlideView.TabBar) {
+  public static func setCurrentDelegate(_ delegate: SlideTabBarDelegate?, to object: SlideTabBar) {
     object.delegate = delegate
   }
 }
 
 // MARK: - Observable
 
-extension Reactive where Base: SlideView.TabBar {
-  public var delegate: DelegateProxy<SlideView.TabBar, SlideTabBarDelegate> {
+extension Reactive where Base: SlideTabBar {
+  public var delegate: DelegateProxy<SlideTabBar, SlideTabBarDelegate> {
     RxSlideTabBarDelegateProxy.proxy(for: base)
   }
 
-  public var didSelected: Observable<(sender: SlideView.TabBar, index: Int)> {
+  public var didSelected: Observable<(sender: SlideTabBar, index: Int)> {
     delegate
       .methodInvoked(#selector(SlideTabBarDelegate.didSelected(_:at:)))
       .map { a in
-        (a[0] as! SlideView.TabBar, a[1] as! Int)
+        (a[0] as! SlideTabBar, a[1] as! Int)
       }
   }
 }
