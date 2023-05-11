@@ -27,12 +27,13 @@ public class SlideTabBar: UIView {
   private var itemsCount: Int {
     items.count
   }
-  
+
   private var _selectedIndex: Int = -1 {
     willSet {
       switchTo(newValue)
     }
   }
+
   public var selectedIndex: Int {
     get {
       _selectedIndex
@@ -63,7 +64,7 @@ public class SlideTabBar: UIView {
     }
   }
 
-  public var distribution: SlideTabBarDistribution = .content
+  public var distribution: SlideTabBarDistribution = .contentLeading
   public var trackerMode: SlideTabBarTrackerMode = .byView
 
   // MARK: Initialize
@@ -130,10 +131,9 @@ extension SlideTabBar {
       }
 
     itemsStackView.spacing = itemSpacing
-    scrollView.contentInset = .init(top: 0, left: itemSpacing / 4, bottom: 0, right: itemSpacing / 4)
 
-    distribution.update(itemsStackView, fullConstraint)
-    
+    distribution.update(scrollView, itemSpacing, itemsStackView, fullConstraint)
+
     layoutIfNeeded()
 
     selectedIndex = 0
@@ -182,12 +182,12 @@ extension SlideTabBar {
     }
     return nil
   }
-  
+
   private func buildLine() {
     guard bottomLineColor != .clear, bottomLineHeight > 0, bottomLineView.superview == nil else { return }
-    
+
     bottomLineView.backgroundColor = bottomLineColor
-    
+
     scrollView.insertSubview(bottomLineView, belowSubview: trackerView)
     bottomLineView.snp.makeConstraints { make in
       make.height.equalTo(bottomLineHeight / 2)
@@ -237,8 +237,11 @@ extension SlideTabBar {
       }
     }
   }
-  
+
   private func scrollToMiddle(_ toItem: Item) {
+    guard scrollView.contentSize.width > scrollView.frame.width
+    else { return }
+
     /// Calculate scrollView center point with toItem
     let calced = CGRect(
       x: toItem.center.x - scrollView.bounds.width / 2,
@@ -248,7 +251,7 @@ extension SlideTabBar {
 
     scrollView.scrollRectToVisible(calced, animated: calced.origin.x > 0 ? true : false)
   }
-  
+
   private func animateTracker(_ toItem: Item) {
     guard trackerHeight > 0 else { return }
 
@@ -256,7 +259,7 @@ extension SlideTabBar {
       with: toItem,
       spacing: itemSpacing,
       at: scrollView)
-    
+
     let frame = CGRect(
       x: location.x,
       y: bounds.height - trackerHeight,

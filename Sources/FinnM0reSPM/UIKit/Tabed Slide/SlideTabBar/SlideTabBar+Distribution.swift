@@ -2,11 +2,27 @@ import SnapKit
 import UIKit
 
 public protocol SlideTabBarDistribution {
-  func update(_ stackView: UIStackView, _ fullConstraint: Constraint?)
+  func update(
+    _ scrollView: UIScrollView,
+    _ itemSpacing: CGFloat,
+    _ stackView: UIStackView,
+    _ fullConstraint: Constraint?)
 }
 
-extension SlideTabBarDistribution where Self == SlideTabBar.Content {
-  public static var content: SlideTabBar.Content { .init() }
+extension SlideTabBarDistribution {
+  func resetContentInset(scrollView: UIScrollView, itemSpacing: CGFloat) {
+    scrollView.contentInset = .init(
+      top: 0, left: itemSpacing / 4,
+      bottom: 0, right: itemSpacing / 4)
+  }
+}
+
+extension SlideTabBarDistribution where Self == SlideTabBar.ContentLeading {
+  public static var contentLeading: SlideTabBar.ContentLeading { .init() }
+}
+
+extension SlideTabBarDistribution where Self == SlideTabBar.ContentCenter {
+  public static var contentCenter: SlideTabBar.ContentCenter { .init() }
 }
 
 extension SlideTabBarDistribution where Self == SlideTabBar.Full {
@@ -18,15 +34,49 @@ extension SlideTabBarDistribution where Self == SlideTabBar.Width {
 }
 
 extension SlideTabBar {
-  public struct Content: SlideTabBarDistribution {
-    public func update(_ stackView: UIStackView, _ fullConstraint: SnapKit.Constraint?) {
+  public struct ContentLeading: SlideTabBarDistribution {
+    public func update(
+      _ scrollView: UIScrollView,
+      _ itemSpacing: CGFloat,
+      _ stackView: UIStackView,
+      _ fullConstraint: Constraint?)
+    {
+      resetContentInset(scrollView: scrollView, itemSpacing: itemSpacing)
       stackView.distribution = .equalSpacing
       fullConstraint?.deactivate()
     }
   }
 
+  public struct ContentCenter: SlideTabBarDistribution {
+    public func update(
+      _ scrollView: UIScrollView,
+      _ itemSpacing: CGFloat,
+      _ stackView: UIStackView,
+      _ fullConstraint: Constraint?)
+    {
+      stackView.distribution = .equalSpacing
+      fullConstraint?.deactivate()
+
+      DispatchQueue.main.async {
+        if scrollView.frame.width > stackView.frame.width + (itemSpacing / 2) {
+          let padding = (scrollView.frame.width - stackView.frame.width) / 2
+          scrollView.contentInset = .init(top: 0, left: padding, bottom: 0, right: padding)
+        }
+        else {
+          self.resetContentInset(scrollView: scrollView, itemSpacing: itemSpacing)
+        }
+      }
+    }
+  }
+
   public struct Full: SlideTabBarDistribution {
-    public func update(_ stackView: UIStackView, _ fullConstraint: SnapKit.Constraint?) {
+    public func update(
+      _ scrollView: UIScrollView,
+      _ itemSpacing: CGFloat,
+      _ stackView: UIStackView,
+      _ fullConstraint: Constraint?)
+    {
+      resetContentInset(scrollView: scrollView, itemSpacing: itemSpacing)
       stackView.distribution = .fillEqually
       fullConstraint?.activate()
     }
@@ -35,7 +85,14 @@ extension SlideTabBar {
   public struct Width: SlideTabBarDistribution {
     let value: CGFloat
 
-    public func update(_ stackView: UIStackView, _ fullConstraint: SnapKit.Constraint?) {
+    public func update(
+      _ scrollView: UIScrollView,
+      _ itemSpacing: CGFloat,
+      _ stackView: UIStackView,
+      _ fullConstraint: Constraint?)
+    {
+      resetContentInset(scrollView: scrollView, itemSpacing: itemSpacing)
+
       stackView
         .arrangedSubviews
         .first?
