@@ -2,7 +2,7 @@ import RxSwift
 import UIKit
 
 @available(iOS 14.0, *)
-class Tester: UIViewController {
+class Tester: UIViewController, Previewable {
   let bag = DisposeBag()
 
   @Stylish var tab1: SlideTabBar = .init()
@@ -47,18 +47,9 @@ class Tester: UIViewController {
   import SwiftUI
 
   @available(iOS 14.0, *)
-  struct Tester_Representable: UIViewControllerRepresentable {
-    func makeUIViewController(context _: Context) -> some UIViewController {
-      Tester()
-    }
-
-    func updateUIViewController(_: UIViewControllerType, context _: Context) { }
-  }
-
-  @available(iOS 14.0, *)
   struct TesterPreview: PreviewProvider {
     static var previews: some View {
-      Tester_Representable()
+        Tester().toPreview()
     }
   }
 #endif

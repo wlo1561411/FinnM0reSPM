@@ -1,7 +1,8 @@
 import SwiftUI
 import UIKit
 
-final class PreviewWrapper<T: UIView>: UIViewRepresentable {
+@available(iOS 13.0, *)
+struct PreviewWrapper<T: UIView>: UIViewRepresentable {
     let target: T
 
     init(_ target: T) {

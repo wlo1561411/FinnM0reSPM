@@ -1,12 +1,12 @@
 import Foundation
 
-protocol DefaultCodableValue {
+protocol DefaultValue {
   associatedtype Value: Codable
   static var defaultValue: Value { get }
 }
 
 @propertyWrapper
-struct DefaultCodable<T: DefaultCodableValue> {
+struct Default<T: DefaultValue> {
   var wrappedValue: T.Value
   
   init(wrappedValue: T.Value) {
@@ -18,7 +18,7 @@ struct DefaultCodable<T: DefaultCodableValue> {
   }
 }
 
-extension DefaultCodable: Codable {
+extension Default: Codable {
   init(from decoder: Decoder) throws {
     let container = try decoder.singleValueContainer()
     wrappedValue = (try? container.decode(T.Value.self)) ?? T.defaultValue
@@ -27,11 +27,11 @@ extension DefaultCodable: Codable {
 
 extension KeyedDecodingContainer {
   func decode<T>(
-    _ type: DefaultCodable<T>.Type,
+    _ type: Default<T>.Type,
     forKey key: Key)
-    throws -> DefaultCodable<T>
-    where T: DefaultCodableValue
+    throws -> Default<T>
+    where T: DefaultValue
   {
-    try decodeIfPresent(type, forKey: key) ?? DefaultCodable(wrappedValue: T.defaultValue)
+    try decodeIfPresent(type, forKey: key) ?? Default(wrappedValue: T.defaultValue)
   }
 }

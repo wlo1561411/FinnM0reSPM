@@ -70,7 +70,6 @@ public struct LazyImage<Success, Placeholder, Failure>: View
   }
 }
 
-// FIXME: XCode 14.2 will crash
 @available(iOS 14.0, *)
 struct LazyImage_Previews: PreviewProvider {
   static var previews: some View {
