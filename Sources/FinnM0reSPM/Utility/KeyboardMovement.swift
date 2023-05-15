@@ -1,102 +1,102 @@
-import RxCocoa
-import RxSwift
+import Combine
 import UIKit
 
 public protocol KeyboardMovement { }
 
 extension KeyboardMovement {
-  private var keyboardAboveSpacing: CGFloat { 20 }
-  
-  private var keyboardWillShow: Observable<CGFloat> {
-    NotificationCenter.default.rx
-      .notification(UIResponder.keyboardWillChangeFrameNotification)
-      .compactMap { ($0.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect)?.height }
-      .asObservable()
-  }
+    private var keyboardAboveSpacing: CGFloat { 20 }
 
-  private var keyboardWillChangeFrame: Observable<CGFloat> {
-    NotificationCenter.default.rx
-      .notification(UIResponder.keyboardWillChangeFrameNotification)
-      .compactMap { ($0.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect)?.height }
-      .asObservable()
-  }
+    private var keyboardWillShow: AnyPublisher<CGFloat, Never> {
+        NotificationCenter.default
+            .publisher(for: UIResponder.keyboardWillChangeFrameNotification)
+            .compactMap { ($0.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect)?.height }
+            .eraseToAnyPublisher()
+    }
 
-  private var keyboardWillHide: Observable<CGFloat> {
-    NotificationCenter.default.rx
-      .notification(UIResponder.keyboardWillHideNotification)
-      .compactMap { _ in 0 }
-      .asObservable()
-  }
+    private var keyboardWillChangeFrame: AnyPublisher<CGFloat, Never> {
+        NotificationCenter.default
+            .publisher(for: UIResponder.keyboardWillChangeFrameNotification)
+            .compactMap { ($0.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect)?.height }
+            .eraseToAnyPublisher()
+    }
 
-  public var keyboardHeightObservable: Observable<CGFloat> {
-    Observable.merge([keyboardWillShow, keyboardWillHide, keyboardWillChangeFrame])
-      .asObservable()
-  }
+    private var keyboardWillHide: AnyPublisher<CGFloat, Never> {
+        NotificationCenter.default
+            .publisher(for: UIResponder.keyboardWillHideNotification)
+            .compactMap { _ in 0 }
+            .eraseToAnyPublisher()
+    }
+
+    public var keyboardHeightPublisher: AnyPublisher<CGFloat, Never> {
+        Publishers.Merge3(keyboardWillHide, keyboardWillShow, keyboardWillChangeFrame)
+            .eraseToAnyPublisher()
+    }
 }
 
 extension KeyboardMovement where Self: UIViewController {
-  public var viewMovementDriver: Driver<CGFloat?> {
-    keyboardHeightObservable
-      .map { [weak self] height in
-        guard
-          let self,
-          self.isVisible,
-          let textfield = UIApplication.shared.firstResponder as? UITextField,
-          height > 0
-        else { return nil }
-        
-        let keyboardFrame = CGRect(
-          origin: .init(x: 0, y: UIScreen.main.bounds.height - height),
-          size: .init(width: UIScreen.main.bounds.width, height: height))
+    public var viewMovementDriver: AnyPublisher<CGFloat?, Never> {
+        keyboardHeightPublisher
+            .map { [weak self] height in
+                guard
+                    let self,
+                    self.isVisible,
+                    let textfield = UIApplication.shared.firstResponder as? UITextField,
+                    height > 0
+                else { return nil }
 
-        let origin = textfield.superview?
-          .convert(textfield.frame, to: nil)
-          .origin ?? .zero
+                let keyboardFrame = CGRect(
+                    origin: .init(x: 0, y: UIScreen.main.bounds.height - height),
+                    size: .init(width: UIScreen.main.bounds.width, height: height))
 
-        let maxYminXOrigin = CGPoint(
-          x: origin.x,
-          y: origin.y + textfield.frame.height + self.keyboardAboveSpacing)
+                let origin = textfield.superview?
+                    .convert(textfield.frame, to: nil)
+                    .origin ?? .zero
 
-        let estimated = origin.y - keyboardFrame.origin.y + textfield.frame.height + self.keyboardAboveSpacing
+                let maxYminXOrigin = CGPoint(
+                    x: origin.x,
+                    y: origin.y + textfield.frame.height + self.keyboardAboveSpacing)
 
-        if keyboardFrame.contains(maxYminXOrigin) {
-          return estimated
-        }
-        else if maxYminXOrigin.y > keyboardFrame.maxY {
-          return estimated - (maxYminXOrigin.y - keyboardFrame.maxY)
-        }
-        else {
-          return 0
-        }
-      }
-      .distinctUntilChanged()
-      .asDriver(onErrorJustReturn: nil)
-  }
+                let estimated = origin.y - keyboardFrame.origin.y + textfield.frame.height + self.keyboardAboveSpacing
+
+                if keyboardFrame.contains(maxYminXOrigin) {
+                    return estimated
+                }
+                else if maxYminXOrigin.y > keyboardFrame.maxY {
+                    return estimated - (maxYminXOrigin.y - keyboardFrame.maxY)
+                }
+                else {
+                    return 0
+                }
+            }
+            .removeDuplicates()
+            .receive(on: DispatchQueue.main)
+            .eraseToAnyPublisher()
+    }
 }
 
 extension UIApplication {
-  fileprivate var firstResponder: UIResponder? {
-    var _firstResponder: UIResponder?
+    fileprivate var firstResponder: UIResponder? {
+        var _firstResponder: UIResponder?
 
-    let reportAsFirstHandler = { (responder: UIResponder) in
-      _firstResponder = responder
+        let reportAsFirstHandler = { (responder: UIResponder) in
+            _firstResponder = responder
+        }
+
+        sendAction(
+            #selector(UIResponder.reportAsFirst),
+            to: nil,
+            from:
+            reportAsFirstHandler,
+            for: nil)
+        return _firstResponder
     }
-
-    sendAction(
-      #selector(UIResponder.reportAsFirst),
-      to: nil,
-      from:
-      reportAsFirstHandler,
-      for: nil)
-    return _firstResponder
-  }
 }
 
 extension UIResponder {
-  @objc
-  fileprivate func reportAsFirst(_ sender: Any) {
-    if let handler = sender as? (UIResponder) -> Void {
-      handler(self)
+    @objc
+    fileprivate func reportAsFirst(_ sender: Any) {
+        if let handler = sender as? (UIResponder) -> Void {
+            handler(self)
+        }
     }
-  }
 }

@@ -1,34 +1,35 @@
 @dynamicMemberLookup
 public struct Styler<Base> {
-  public let base: Base
+    public let base: Base
 
-  public init(_ base: Base) {
-    self.base = base
-  }
+    public init(_ base: Base) {
+        self.base = base
+    }
 }
 
 extension Styler {
-  public func unwrap() -> Base { self.base }
+    @discardableResult
+    public func unwrap() -> Base { self.base }
 
-  public subscript<Value>(dynamicMember keyPath: WritableKeyPath<Base, Value>) -> ((Value) -> Styler<Base>) {
-    var _base = self.base
+    public subscript<Value>(dynamicMember keyPath: WritableKeyPath<Base, Value>) -> ((Value) -> Styler<Base>) {
+        var _base = self.base
 
-    return { value in
-      _base[keyPath: keyPath] = value
-      return .init(_base)
+        return { value in
+            _base[keyPath: keyPath] = value
+            return .init(_base)
+        }
     }
-  }
 }
 
 public protocol StylerCompatible {
-  associatedtype Base
+    associatedtype Base
 
-  var sr: Styler<Base> { get set }
+    var sr: Styler<Base> { get set }
 }
 
 extension StylerCompatible {
-  public var sr: Styler<Self> {
-    get { Styler(self) }
-    set { }
-  }
+    public var sr: Styler<Self> {
+        get { Styler(self) }
+        set { }
+    }
 }

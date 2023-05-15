@@ -1,12 +1,12 @@
 {
   "pins" : [
     {
-      "identity" : "rxswift",
+      "identity" : "combineext",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/ReactiveX/RxSwift.git",
+      "location" : "https://github.com/CombineCommunity/CombineExt.git",
       "state" : {
-        "revision" : "b4307ba0b6425c0ba4178e138799946c3da594f8",
-        "version" : "6.5.0"
+        "revision" : "d7b896fa9ca8b47fa7bcde6b43ef9b70bf8c1f56",
+        "version" : "1.8.1"
       }
     },
     {

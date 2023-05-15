@@ -1,0 +1,86 @@
+--acronyms ID,URL,UUID
+--allman false
+--anonymousforeach convert
+--assetliterals visual-width
+--asynccapturing 
+--beforemarks 
+--binarygrouping 4,8
+--categorymark "MARK: %c"
+--classthreshold 0
+--closingparen same-line
+--closurevoid remove
+--commas always
+--conflictmarkers reject
+--decimalgrouping 3,6
+--elseposition next-line
+--emptybraces spaced
+--enumnamespaces always
+--enumthreshold 0
+--exponentcase lowercase
+--exponentgrouping disabled
+--extensionacl on-declarations
+--extensionlength 0
+--extensionmark "MARK: - %t + %c"
+--fractiongrouping disabled
+--fragment false
+--funcattributes prev-line
+--generictypes 
+--groupedextension "MARK: %c"
+--guardelse auto
+--header strip
+--hexgrouping 4,8
+--hexliteralcase uppercase
+--ifdef indent
+--importgrouping testable-last
+--indent 4
+--indentcase false
+--indentstrings false
+--lifecycle 
+--lineaftermarks true
+--linebreaks lf
+--markcategories true
+--markextensions always
+--marktypes always
+--maxwidth 130
+--modifierorder 
+--nevertrailing 
+--nospaceoperators 
+--nowrapoperators 
+--octalgrouping 4,8
+--onelineforeach ignore
+--operatorfunc spaced
+--organizetypes actor,class,enum,struct
+--patternlet inline
+--ranges no-space
+--redundanttype inferred
+--self remove
+--selfrequired 
+--semicolons inline
+--shortoptionals always
+--smarttabs enabled
+--someany false
+--stripunusedargs always
+--structthreshold 0
+--swiftversion 5.7
+--tabwidth unspecified
+--throwcapturing 
+--trailingclosures 
+--trimwhitespace nonblank-lines
+--typeattributes prev-line
+--typeblanklines remove
+--typemark "MARK: - %t"
+--varattributes prev-line
+--voidtype void
+--wraparguments before-first
+--wrapcollections before-first
+--wrapconditions before-first
+--wrapeffects preserve
+--wrapenumcases always
+--wrapparameters before-first
+--wrapreturntype if-multiline
+--wrapternary default
+--wraptypealiases preserve
+--xcodeindentation disabled
+--yodaswap always
+--disable blankLinesAroundMark,enumNamespaces,initCoderUnavailable,numberFormatting,preferKeyPath,redundantObjc,redundantSelf,sortDeclarations,strongOutlets,trailingClosures,trailingCommas
+--enable blockComments,wrapEnumCases,wrapSwitchCases
