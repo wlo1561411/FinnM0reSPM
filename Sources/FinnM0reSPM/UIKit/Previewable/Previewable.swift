@@ -6,14 +6,14 @@ protocol Previewable { }
 
 @available(iOS 13.0, *)
 extension Previewable where Self: UIView {
-    func toPreview() -> PreviewWrapper<Self> {
+    func previewable() -> PreviewWrapper<Self> {
         .init(self)
     }
 }
 
 @available(iOS 13.0, *)
 extension Previewable where Self: UIViewController {
-    func toPreview() -> PreviewWrapper<UIView> {
+    func previewable() -> PreviewWrapper<UIView> {
         .init(view)
     }
 }
@@ -30,7 +30,7 @@ struct Label_Preview: PreviewProvider {
         label.text = "Test"
         label.textAlignment = .center
         return label
-            .toPreview()
+            .previewable()
             .previewLayout(.fixed(width: 200, height: 200))
     }
 }

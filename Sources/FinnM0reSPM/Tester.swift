@@ -1,14 +1,16 @@
+import Combine
 import RxSwift
 import UIKit
 
 @available(iOS 14.0, *)
-class Tester: UIViewController, Previewable {
+public class Tester: UIViewController, Previewable {
   let bag = DisposeBag()
+  var cancellables = Set<AnyCancellable>()
 
   @Stylish var tab1: SlideTabBar = .init()
   @Stylish var tab2: SlideTabBar = .init()
 
-  override func viewDidLoad() {
+  override public func viewDidLoad() {
     super.viewDidLoad()
 
     view.backgroundColor = .lightGray
@@ -27,19 +29,22 @@ class Tester: UIViewController, Previewable {
           .disposed(by: self.bag)
       }
 
-    $tab2
+    UIButton().sr
+      .title("Press0")
+      .titleColor(.magenta)
+      .backgroundColor(.darkGray)
       .add(to: view)
       .makeConstraints { make in
-        make.top.equalToSuperview().offset(150)
-        make.left.right.equalToSuperview().inset(30)
-        make.height.equalTo(50)
+        make.center.equalToSuperview()
+        make.size.equalTo(100)
       }
-      .distribution(.contentLeading)
-      .other {
-        Observable.just((0...10).map { "Test\($0)" })
-          .bind(to: $0.rx.titles)
-          .disposed(by: self.bag)
-      }
+      .unwrap()
+      .publisher(for: .touchUpInside)
+      .sink(receiveValue: {
+          $0.tag += 1
+          $0.sr.title("Press\($0.tag)")
+      })
+      .store(in: &cancellables)
   }
 }
 
@@ -49,7 +54,7 @@ class Tester: UIViewController, Previewable {
   @available(iOS 14.0, *)
   struct TesterPreview: PreviewProvider {
     static var previews: some View {
-        Tester().toPreview()
+      Tester().previewable()
     }
   }
 #endif
