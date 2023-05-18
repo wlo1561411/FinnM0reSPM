@@ -4,7 +4,7 @@ import UIKit
 
 extension Styler where Base: UITextField {
   @discardableResult
-  public func onText<T>(
+  public func onTextChanged<T>(
     transform: (ControlProperty<String?>) -> Observable<T> = { $0.asObservable() },
     dispose: DisposeBag,
     _ closure: ((T) -> Void)?)

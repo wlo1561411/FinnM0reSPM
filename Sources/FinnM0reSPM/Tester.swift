@@ -38,13 +38,10 @@ public class Tester: UIViewController, Previewable {
         make.center.equalToSuperview()
         make.size.equalTo(100)
       }
-      .unwrap()
-      .publisher(for: .touchUpInside)
-      .sink(receiveValue: {
+      .onTap(store: &cancellables) {
         $0.tag += 1
         $0.sr.title("Press\($0.tag)")
-      })
-      .store(in: &cancellables)
+      }
 
     $label
       .textAlignment(.center)
