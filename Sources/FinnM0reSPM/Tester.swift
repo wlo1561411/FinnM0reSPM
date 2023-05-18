@@ -8,7 +8,7 @@ public class Tester: UIViewController, Previewable {
   var cancellables = Set<AnyCancellable>()
 
   @Stylish var tab1: SlideTabBar = .init()
-  @Stylish var tab2: SlideTabBar = .init()
+  @Stylish var label: UILabel = .init()
 
   override public func viewDidLoad() {
     super.viewDidLoad()
@@ -18,11 +18,11 @@ public class Tester: UIViewController, Previewable {
     $tab1
       .add(to: view)
       .makeConstraints { make in
-        make.top.equalToSuperview().offset(50)
+        make.top.equalToSuperview().offset(100)
         make.left.right.equalToSuperview().inset(30)
         make.height.equalTo(50)
       }
-      .distribution(.contentCenter)
+      .distribution(.contentLeading)
       .other {
         Observable.just((0...3).map { "Test\($0)" })
           .bind(to: $0.rx.titles)
@@ -41,10 +41,32 @@ public class Tester: UIViewController, Previewable {
       .unwrap()
       .publisher(for: .touchUpInside)
       .sink(receiveValue: {
-          $0.tag += 1
-          $0.sr.title("Press\($0.tag)")
+        $0.tag += 1
+        $0.sr.title("Press\($0.tag)")
       })
       .store(in: &cancellables)
+
+    $label
+      .textAlignment(.center)
+      .add(to: view)
+      .makeConstraints({ make in
+        make.left.right.equalToSuperview()
+        make.bottom.equalToSuperview().inset(100)
+      })
+      .assign(
+        from: Future<String, Never> { promise in
+          DispatchQueue.global().asyncAfter(deadline: .now() + 3) {
+            promise(.success("Hello, Combine!"))
+          }
+        }
+        .map(Optional.init)
+        .eraseToAnyPublisher(),
+        to: \.text,
+        cancellables: &cancellables)
+  }
+
+  deinit {
+    print("Tester dead")
   }
 }
 
@@ -53,8 +75,9 @@ public class Tester: UIViewController, Previewable {
 
   @available(iOS 14.0, *)
   struct TesterPreview: PreviewProvider {
+    static let t = Tester()
     static var previews: some View {
-      Tester().previewable()
+      t.previewable()
     }
   }
 #endif

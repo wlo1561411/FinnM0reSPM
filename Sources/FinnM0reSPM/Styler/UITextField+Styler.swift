@@ -1,6 +1,6 @@
-import UIKit
-import RxSwift
 import RxCocoa
+import RxSwift
+import UIKit
 
 extension Styler where Base: UITextField {
   @discardableResult
@@ -41,7 +41,7 @@ extension Styler where Base: UITextField {
     }
     return self
   }
-  
+
   public func remainCursor(to new: String) {
     guard let selectedTextRange = base.selectedTextRange else { return }
 
@@ -58,22 +58,5 @@ extension Styler where Base: UITextField {
         base.selectedTextRange = base.textRange(from: newCursorPosition, to: newCursorPosition)
       }
     }
-  }
-}
-
-// MARK: - Rx
-
-extension Styler where Base: UITextField {
-  @discardableResult
-  public func onText<T>(
-    transform: (ControlProperty<String?>) -> Observable<T> = { $0.asObservable() },
-    dispose: DisposeBag,
-    _ closure: ((T) -> Void)?)
-  -> Self
-  {
-    transform(base.rx.text)
-      .subscribe(onNext: closure)
-      .disposed(by: dispose)
-    return self
   }
 }
