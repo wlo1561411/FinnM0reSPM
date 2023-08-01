@@ -28,7 +28,7 @@ public class RxSlideTabBarDataSourceProxy:
   }
 
   public static func registerKnownImplementations() {
-    self.register { RxSlideTabBarDataSourceProxy(tabBar: $0) }
+    register { RxSlideTabBarDataSourceProxy(tabBar: $0) }
   }
 
   private weak var _requiredMethodsDataSource: SlideTabBarDataSource?
@@ -75,7 +75,7 @@ class RxSlideTabBarDataSourceSequenceWrapper<Sequence: Swift.Sequence>:
     Binder(self) { dataSource, items in
       let count = Array(items).count
       dataSource.tabBar(tabBar, observedElements: count)
-      tabBar.reload()
+      tabBar.reload(animated: false)
     }
     .on(observedEvent)
   }
@@ -83,7 +83,7 @@ class RxSlideTabBarDataSourceSequenceWrapper<Sequence: Swift.Sequence>:
   func tabBar(_ tabBar: SlideTabBar, observedEvent: Event<[String]>) {
     Binder(self) { dataSource, items in
       dataSource.tabBar(tabBar, observedElements: items)
-      tabBar.reload()
+      tabBar.reload(animated: false)
     }
     .on(observedEvent)
   }
@@ -119,12 +119,12 @@ class RxSlideTabBarDataSource: SlideTabBarDataSource {
   }
 
   func tabBar(_: SlideTabBar, observedElements: Int) {
-    self.count = observedElements
+    count = observedElements
   }
 
   func tabBar(_: SlideTabBar, observedElements: [String]) {
-    self.titles = observedElements
-    self.count = observedElements.count
+    titles = observedElements
+    count = observedElements.count
   }
 }
 
@@ -137,7 +137,7 @@ extension Reactive where Base: SlideTabBar {
     where Source.Element == [String]
   {
     let dataSource = RxSlideTabBarDataSourceSequenceWrapper<[String]>()
-    return self.items(dataSource: dataSource)(source)
+    return items(dataSource: dataSource)(source)
   }
 
   public func items<
@@ -145,7 +145,7 @@ extension Reactive where Base: SlideTabBar {
     Source: ObservableType
   >
   (_ source: Source)
-  -> (_ factory: @escaping (SlideTabBar, Int) -> SlideTabBar.Item)
+    -> (_ factory: @escaping (SlideTabBar, Int) -> SlideTabBar.Item)
     -> Disposable
     where Source.Element == Sequence
   {

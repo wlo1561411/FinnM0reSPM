@@ -28,6 +28,14 @@ public class SlideTabBar: UIView {
     items.count
   }
 
+  private var getNumberOfItems: (() -> Int)?
+  private var itemFactory: ((Int) -> SlideTabBar.Item)?
+  private var shouldAllowItemSelect: ((Int) -> Bool)?
+  private var onItemSelected: ((Int) -> Void)?
+
+  private var didFinishLayout = false
+  private var isReloading = false
+
   private var _selectedIndex: Int = -1 {
     willSet {
       switchTo(newValue)
@@ -39,8 +47,17 @@ public class SlideTabBar: UIView {
       _selectedIndex
     }
     set {
-      guard _selectedIndex != newValue, itemsCount > 0 else { return }
+      guard
+        _selectedIndex != newValue,
+        itemsCount > 0,
+        shouldAllowItemSelect?(newValue) ?? true
+      else { return }
+
       _selectedIndex = newValue
+
+      guard _selectedIndex >= 0 else { return }
+      onItemSelected?(_selectedIndex)
+      delegate?.didSelected?(self, at: _selectedIndex)
     }
   }
 
@@ -64,6 +81,18 @@ public class SlideTabBar: UIView {
     }
   }
 
+  public var contentInset: UIEdgeInsets = .zero {
+    didSet {
+      scrollView.contentInset = contentInset
+    }
+  }
+
+  public var alignment: UIStackView.Alignment = .fill {
+    didSet {
+      itemsStackView.alignment = alignment
+    }
+  }
+
   public var distribution: SlideTabBarDistribution = .contentLeading
   public var trackerMode: SlideTabBarTrackerMode = .byView
 
@@ -71,17 +100,17 @@ public class SlideTabBar: UIView {
 
   public init() {
     super.init(frame: .zero)
-    self.commitInit()
+    commitInit()
   }
 
   override public init(frame: CGRect) {
     super.init(frame: frame)
-    self.commitInit()
+    commitInit()
   }
 
   public required init?(coder: NSCoder) {
     super.init(coder: coder)
-    self.commitInit()
+    commitInit()
   }
 
   private func commitInit() {
@@ -106,8 +135,27 @@ public class SlideTabBar: UIView {
     scrollView.addSubview(trackerView)
   }
 
-  public func reload() {
-    buildItemViews()
+  override public func layoutSubviews() {
+    super.layoutSubviews()
+    setupUI()
+  }
+
+  public func setup(
+    numberOfItems: @escaping () -> Int,
+    factory: @escaping (Int) -> SlideTabBar.Item,
+    shouldAllowItemSelect: ((Int) -> Bool)? = nil,
+    onSelected: ((Int) -> Void)? = nil)
+  {
+    getNumberOfItems = numberOfItems
+    itemFactory = factory
+    self.shouldAllowItemSelect = shouldAllowItemSelect
+    onItemSelected = onSelected
+  }
+
+  public func reload(at index: Int = 0, animated: Bool) {
+    didFinishLayout = false
+    isReloading = !animated
+    buildItemViews(at: index)
     buildLine()
   }
 }
@@ -115,7 +163,7 @@ public class SlideTabBar: UIView {
 // MARK: UI
 
 extension SlideTabBar {
-  private func buildItemViews() {
+  private func buildItemViews(at index: Int) {
     /// For reset
     if items.count > 0 {
       reset()
@@ -132,15 +180,16 @@ extension SlideTabBar {
 
     itemsStackView.spacing = itemSpacing
 
-    distribution.update(scrollView, itemSpacing, itemsStackView, fullConstraint)
-
+    setNeedsLayout()
     layoutIfNeeded()
 
-    selectedIndex = 0
+    let _index = findAvailableIndex(by: index)
+    guard _index >= 0 else { return }
+    selectedIndex = _index
   }
 
   private func setupItem(at index: Int) -> Item? {
-    guard let item = dataSource?.itemView(self, at: index)
+    guard let item = itemFactory?(index) ?? dataSource?.itemView(self, at: index)
     else { return nil }
 
     item.tag = index
@@ -155,8 +204,8 @@ extension SlideTabBar {
   @objc
   private func onItemTapped(_ sender: UITapGestureRecognizer) {
     guard let tag = sender.view?.tag else { return }
+    isReloading = false
     selectedIndex = tag
-    delegate?.didSelected?(self, at: tag)
   }
 
   private func updateItemTitleColor(
@@ -209,6 +258,38 @@ extension SlideTabBar {
 
     items.removeAll()
   }
+
+  func select(at index: Int, animated: Bool) {
+    isReloading = !animated
+    selectedIndex = index
+  }
+
+  private func findAvailableIndex(by index: Int) -> Int {
+    guard
+      let shouldAllowItemSelect,
+      !shouldAllowItemSelect(index)
+    else { return index }
+
+    return (0..<itemsCount).first(where: { shouldAllowItemSelect($0) }) ?? -1
+  }
+
+  private func setupUI() {
+    guard
+      scrollView.frame.size != .zero,
+      itemsStackView.frame.size != .zero,
+      !didFinishLayout
+    else { return }
+
+    didFinishLayout = true
+    distribution.update(scrollView, contentInset, itemsStackView, fullConstraint)
+
+    guard
+      trackerHeight > 0,
+      let item = tabBarItem(at: selectedIndex)
+    else { return }
+
+    moveTracker(item, animated: false)
+  }
 }
 
 // MARK: Animate
@@ -232,27 +313,49 @@ extension SlideTabBar {
       tabBarItem(at: toIndex)?.setSelected(true)
 
       DispatchQueue.main.async {
-        self.scrollToMiddle(toItem)
-        self.animateTracker(toItem)
+        self.scrollToMiddle(toItem, animated: !self.isReloading)
+        self.moveTracker(toItem, animated: true)
       }
     }
   }
 
-  private func scrollToMiddle(_ toItem: Item) {
-    guard scrollView.contentSize.width > scrollView.frame.width
+  private func scrollToMiddle(_ toItem: Item, animated: Bool) {
+    guard scrollView.contentSize.width + contentInset.left + contentInset.right > scrollView.frame.width
     else { return }
 
-    /// Calculate scrollView center point with toItem
-    let calced = CGRect(
-      x: toItem.center.x - scrollView.bounds.width / 2,
-      y: toItem.frame.origin.y,
-      width: scrollView.bounds.width,
-      height: scrollView.bounds.height)
+    if contentInset == .zero {
+      /// Calculate scrollView center point with toItem
+      let calced = CGRect(
+        x: toItem.center.x - scrollView.bounds.width / 2,
+        y: toItem.frame.origin.y,
+        width: scrollView.bounds.width,
+        height: scrollView.bounds.height)
 
-    scrollView.scrollRectToVisible(calced, animated: calced.origin.x > 0 ? true : false)
+      scrollView.scrollRectToVisible(calced, animated: animated)
+    }
+
+    var offsetX = toItem.center.x - (scrollView.bounds.width / 2)
+
+    /// If item is the first, scroll to the start
+    if selectedIndex == 0 {
+      offsetX = -scrollView.contentInset.left
+    }
+    /// If item is the last, scroll to the end
+    else if selectedIndex == numberOfItems - 1 {
+      offsetX = scrollView.contentSize.width - scrollView.bounds.width + scrollView.contentInset.right
+    }
+    /// If item can be displayed in the middle, adjust offsetX to center item
+    else {
+      offsetX = min(
+        max(offsetX, -scrollView.contentInset.left),
+        scrollView.contentSize.width - scrollView.bounds.width + scrollView.contentInset.right)
+    }
+
+    let offsetPoint = CGPoint(x: offsetX, y: 0)
+    scrollView.setContentOffset(offsetPoint, animated: animated)
   }
 
-  private func animateTracker(_ toItem: Item) {
+  private func moveTracker(_ toItem: Item, animated: Bool) {
     guard trackerHeight > 0 else { return }
 
     let location = trackerMode.location(
@@ -271,6 +374,12 @@ extension SlideTabBar {
       trackerView.frame = frame
     }
     else {
+      guard animated
+      else {
+        trackerView.frame = frame
+        return
+      }
+
       UIView.animate(
         withDuration: 0.3,
         delay: 0,
