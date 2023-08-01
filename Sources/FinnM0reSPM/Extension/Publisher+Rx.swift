@@ -1,11 +1,11 @@
 import Combine
+import Foundation
 import RxCocoa
 import RxSwift
-import Foundation
 
 @available(iOS 14.0, *)
 extension Publisher {
-  func asObservable() -> Observable<Output> {
+  public func asObservable() -> Observable<Output> {
     Observable<Output>.create { observer in
       let cancel = self
         .sink(
@@ -25,9 +25,25 @@ extension Publisher {
     }
   }
 
-  func asDriver() -> Driver<Output> {
-    self.receive(on: RunLoop.main)
+  public func asDriver() -> Driver<Output> {
+    receive(on: RunLoop.main)
       .asObservable()
       .toDriver()
+  }
+
+  public func `if`(_ closure: (AnyPublisher<Output, Failure>) -> AnyPublisher<Output, Failure>)
+    -> AnyPublisher<Output, Failure>
+  {
+    closure(eraseToAnyPublisher())
+  }
+
+  public func receiveOnMain() -> AnyPublisher<Output, Failure> {
+    if Thread.isMainThread {
+      return eraseToAnyPublisher()
+    }
+    else {
+      return receive(on: DispatchQueue.main)
+        .eraseToAnyPublisher()
+    }
   }
 }

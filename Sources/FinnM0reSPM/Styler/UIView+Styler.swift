@@ -8,25 +8,25 @@ extension Styler where Base: UIView {
     closure(base)
     return self
   }
-  
+
   @discardableResult
   public func add(to view: UIView) -> Self {
     view.addSubview(base)
     return self
   }
-  
+
   @discardableResult
   public func add(to stackView: UIStackView) -> Self {
     stackView.addArrangedSubview(base)
     return self
   }
-  
+
   @discardableResult
   public func insert(to view: UIView, at: Int) -> Self {
     view.insertSubview(base, at: at)
     return self
   }
-  
+
   @discardableResult
   public func insert(to stackView: UIStackView, at: Int) -> Self {
     stackView.insertArrangedSubview(base, at: at)
@@ -149,9 +149,22 @@ extension Styler where Base: UIView {
     return layer
   }
 
+  @discardableResult
+  public func blur(alpha: CGFloat = 0.8, style: UIBlurEffect.Style = .dark) -> Self {
+    let effect = UIBlurEffect(style: style)
+    let blurView = UIVisualEffectView(effect: effect)
+    blurView.alpha = alpha
+
+    base.addSubview(blurView)
+    blurView.snp.makeConstraints { make in
+      make.edges.equalToSuperview()
+    }
+    return self
+  }
+
   /// nil means set to identity
   @discardableResult
-  public func rotate(_ angle: CGFloat?, clockwise: Bool = true) -> Self {
+  public func rotating(_ angle: CGFloat?, clockwise: Bool = true) -> Self {
     UIView.animate(withDuration: 0.2) {
       if let angle {
         let _angle = clockwise ? angle : -angle
@@ -164,16 +177,65 @@ extension Styler where Base: UIView {
     return self
   }
 
+  /// nil means set to identity
   @discardableResult
-  public func blur(alpha: CGFloat = 0.8, style: UIBlurEffect.Style = .dark) -> Self {
-    let effect = UIBlurEffect(style: style)
-    let blurView = UIVisualEffectView(effect: effect)
-    blurView.alpha = alpha
-
-    base.addSubview(blurView)
-    blurView.snp.makeConstraints { make in
-      make.edges.equalToSuperview()
+  public func rotated(_ angle: CGFloat?, clockwise: Bool = true) -> Self {
+    if let angle {
+      let _angle = clockwise ? angle : -angle
+      base.transform = CGAffineTransform(rotationAngle: _angle / 180 * CGFloat(Double.pi))
     }
+    else {
+      base.transform = .identity
+    }
+    return self
+  }
+
+  @discardableResult
+  public func separator(
+    _ axis: NSLayoutConstraint.Axis,
+    _ color: UIColor)
+    -> Self
+  {
+    base.backgroundColor = color
+    makeConstraints { make in
+      switch axis {
+      case .vertical:
+        make.width.equalTo(1)
+      case .horizontal:
+        make.height.equalTo(1)
+      @unknown default:
+        break
+      }
+    }
+    return self
+  }
+
+  @discardableResult
+  public func space(
+    _ axis: NSLayoutConstraint.Axis,
+    _ height: CGFloat)
+    -> Self
+  {
+    makeConstraints { make in
+      switch axis {
+      case .vertical:
+        make.height.equalTo(height)
+      case .horizontal:
+        make.width.equalTo(height)
+      @unknown default:
+        break
+      }
+    }
+    return self
+  }
+
+  @discardableResult
+  public func hugging(
+    _ priority: UILayoutPriority,
+    for axis: NSLayoutConstraint.Axis)
+    -> Self
+  {
+    base.setContentHuggingPriority(priority, for: axis)
     return self
   }
 

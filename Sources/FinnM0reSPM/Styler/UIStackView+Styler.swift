@@ -13,4 +13,12 @@ extension Styler where Base: UIStackView {
     base.distribution = distribution
     return self
   }
+
+  @discardableResult
+  public func addArranged(_ view: [UIView]) -> Self {
+    view.forEach {
+      base.addArrangedSubview($0)
+    }
+    return self
+  }
 }
