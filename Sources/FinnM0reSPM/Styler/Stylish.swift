@@ -1,10 +1,11 @@
 @propertyWrapper
 public struct Stylish<Value: StylerCompatible> {
-  public var wrappedValue: Value
-  
+  private let _wrappedValue: Value
+  public var wrappedValue: Value { _wrappedValue }
+
   public var projectedValue: Styler<Value> { wrappedValue.sr }
-  
+
   public init(wrappedValue: Value) {
-    self.wrappedValue = wrappedValue
+    self._wrappedValue = wrappedValue
   }
 }

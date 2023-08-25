@@ -103,8 +103,8 @@ class RxSlideTabBarDataSource: SlideTabBarDataSource {
   }
 
   init() {
-    self.factory = { [weak self] tabBar, index in
-      let item = SlideTabBar.DefaultItem(model: tabBar.itemModel)
+    self.factory = { [weak self] _, index in
+      let item = SlideTabBar.DefaultItem()
       item.titleLabel.text = self?.titles?[index]
       return item
     }

@@ -11,7 +11,7 @@ public protocol SlideTabBarDistribution {
 
 extension SlideTabBarDistribution {
   func resetContentInset(scrollView: UIScrollView, contentInset: UIEdgeInsets) {
-    scrollView.contentInset = contentInset
+    scrollView.contentInset = .init(top: 0, left: contentInset.left, bottom: 0, right: contentInset.right)
   }
 }
 

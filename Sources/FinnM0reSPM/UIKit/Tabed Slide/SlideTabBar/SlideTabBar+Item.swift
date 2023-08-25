@@ -2,27 +2,31 @@ import Foundation
 import UIKit
 
 extension SlideTabBar {
-  public class Item: UIView {
-    public struct Model {
-      var font = UIFont.systemFont(ofSize: 17)
-      var selectedFont = UIFont.systemFont(ofSize: 17)
-      var color: UIColor = .black
-      var selectedColor: UIColor = .blue
+  public typealias Settings = [SlideTabBar.ItemSetting.Status: SlideTabBar.ItemSetting]
+
+  public struct ItemSetting {
+    public enum Status {
+      case normal
+      case selected
+      case disable
     }
 
-    func setSelected(_: Bool) { }
-    func setTransformingColor(_: UIColor) { }
+    var font: UIFont?
+    var color: UIColor?
   }
 
-  public class DefaultItem: Item {
+  public class Item: UIView {
+    public func setSelected(_: Bool, settings _: Settings) { }
+    public func setEnable(_: Bool, settings _: Settings) { }
+    public func setTransformingColor(_: UIColor) { }
+  }
+
+  public class DefaultItem: SlideTabBar.Item {
     private(set) var titleLabel = UILabel()
 
-    private let model: Model
-
-    public init(model: Model) {
-      self.model = model
+    init() {
       super.init(frame: .zero)
-      self.commitInit()
+      commitInit()
     }
 
     required init?(coder _: NSCoder) {
@@ -38,9 +42,24 @@ extension SlideTabBar {
       }
     }
 
-    override public func setSelected(_ isSelected: Bool) {
-      titleLabel.textColor = isSelected ? model.selectedColor : model.color
-      titleLabel.font = isSelected ? model.selectedFont : model.font
+    override public func setSelected(_ isSelected: Bool, settings: Settings) {
+      if let color = isSelected ? settings[.selected]?.color : settings[.normal]?.color {
+        titleLabel.textColor = color
+      }
+
+      if let font = isSelected ? settings[.selected]?.font : settings[.normal]?.font {
+        titleLabel.font = font
+      }
+    }
+
+    override public func setEnable(_ isEnable: Bool, settings: Settings) {
+      if let color = isEnable ? settings[.normal]?.color : settings[.disable]?.color {
+        titleLabel.textColor = color
+      }
+
+      if let font = settings[.normal]?.font {
+        titleLabel.font = font
+      }
     }
 
     override public func setTransformingColor(_ color: UIColor) {

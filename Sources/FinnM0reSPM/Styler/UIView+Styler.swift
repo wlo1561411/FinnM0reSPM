@@ -55,7 +55,7 @@ extension Styler where Base: UIView {
   @discardableResult
   public func dottedBorder(
     _ color: UIColor,
-    lineDashPattern _: [Int] = [8, 4],
+    lineDashPattern: [Int] = [8, 4],
     lineWidth: CGFloat = 1,
     radius: CGFloat = 5)
     -> Self
@@ -67,12 +67,47 @@ extension Styler where Base: UIView {
       border.path = UIBezierPath(roundedRect: self.base.bounds, cornerRadius: radius).cgPath
       border.frame = self.base.bounds
       border.lineWidth = lineWidth
-      border.lineDashPattern = [8, 4]
+      border.lineDashPattern = lineDashPattern.map { .init(integerLiteral: $0) }
 
       self.base.layer.cornerRadius = radius
       self.base.layer.masksToBounds = true
       self.base.layer.addSublayer(border)
     }
+    return self
+  }
+
+  @discardableResult
+  public func dottedLine(
+    _ color: UIColor,
+    lineDashPattern: [Int] = [8, 4],
+    lineWidth: CGFloat = 1)
+    -> Self
+  {
+    func updatePath(_ layer: CAShapeLayer) {
+      let path = UIBezierPath()
+      path.move(to: CGPoint(x: 0, y: base.frame.height / 2))
+      path.addLine(to: CGPoint(x: base.frame.width, y: base.frame.height / 2))
+      layer.path = path.cgPath
+    }
+
+    DispatchQueue.main.async {
+      if let layer = base.layer.sublayers?.first(where: { $0.name == "Dotted" }) as? CAShapeLayer {
+        updatePath(layer)
+      }
+      else {
+        let layer = CAShapeLayer()
+        layer.name = "Dotted"
+        layer.strokeColor = color.cgColor
+        layer.fillColor = .none
+        layer.lineWidth = lineWidth
+        layer.lineDashPattern = lineDashPattern.map { .init(integerLiteral: $0) }
+
+        updatePath(layer)
+
+        base.layer.addSublayer(layer)
+      }
+    }
+
     return self
   }
 
@@ -236,75 +271,6 @@ extension Styler where Base: UIView {
     -> Self
   {
     base.setContentHuggingPriority(priority, for: axis)
-    return self
-  }
-
-  public enum Visibility: String {
-    case visible
-    case invisible
-    case gone
-  }
-
-  public var visibility: Visibility {
-    let constraint = base.constraints
-      .filter {
-        $0.firstAttribute == .height && $0.constant == 0
-      }
-      .first
-
-    if let constraint, constraint.isActive {
-      return .gone
-    }
-    else {
-      return base.isHidden ? .invisible : .visible
-    }
-  }
-
-  @discardableResult
-  public func visibility(_ new: Visibility) -> Self {
-    guard visibility != new else { return self }
-
-    let constraints = base.constraints
-      .filter {
-        $0.firstAttribute == .height &&
-          $0.constant == 0 &&
-          $0.secondItem == nil &&
-          ($0.firstItem as? UIView) == base
-      }
-
-    let constraint = constraints.first
-
-    switch new {
-    case .visible:
-      constraint?.isActive = false
-      base.isHidden = false
-
-    case .invisible:
-      constraint?.isActive = false
-      base.isHidden = true
-
-    case .gone:
-      base.isHidden = true
-
-      if let constraint {
-        constraint.isActive = true
-      }
-      else {
-        let constraint = NSLayoutConstraint(
-          item: base,
-          attribute: .height,
-          relatedBy: .equal,
-          toItem: nil,
-          attribute: .height,
-          multiplier: 1,
-          constant: 0)
-        base.addConstraint(constraint)
-        constraint.isActive = true
-      }
-      base.setNeedsLayout()
-      base.setNeedsUpdateConstraints()
-    }
-
     return self
   }
 }

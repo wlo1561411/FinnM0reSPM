@@ -2,7 +2,7 @@ import SnapKit
 import UIKit
 
 public class SlideTabBar: UIView {
-  private(set) lazy var trackerView: UIView = {
+  private lazy var trackerView: UIView = {
     let view = UIView()
     view.isHidden = true
     view.backgroundColor = trackerColor
@@ -23,32 +23,25 @@ public class SlideTabBar: UIView {
 
   private var fullConstraint: Constraint?
 
-  private var items: [Item] = []
+  private var items: [SlideTabBar.Item] = []
   private var itemsCount: Int {
     items.count
   }
 
-  private var getNumberOfItems: (() -> Int)?
-  private var itemFactory: ((Int) -> SlideTabBar.Item)?
-  private var shouldAllowItemSelect: ((Int) -> Bool)?
-  private var onItemSelected: ((Int) -> Void)?
-
-  private var didFinishLayout = false
-  private var isReloading = false
-
   private var _selectedIndex: Int = -1 {
     willSet {
+      guard _selectedIndex != newValue else { return }
       switchTo(newValue)
     }
   }
 
-  public var selectedIndex: Int {
+  private var selectedIndex: Int {
     get {
       _selectedIndex
     }
     set {
       guard
-        _selectedIndex != newValue,
+        _selectedIndex != newValue || allowDuplicateTap,
         itemsCount > 0,
         shouldAllowItemSelect?(newValue) ?? true
       else { return }
@@ -64,42 +57,61 @@ public class SlideTabBar: UIView {
   public weak var delegate: SlideTabBarDelegate?
   public weak var dataSource: SlideTabBarDataSource?
 
-  public var numberOfItems: Int {
-    dataSource?.numberOfItems(self) ?? 0
+  private var getNumberOfItems: (() -> Int)?
+  private var itemFactory: ((Int) -> SlideTabBar.Item)?
+  private var shouldAllowItemSelect: ((Int) -> Bool)?
+  private var onItemSelected: ((Int) -> Void)?
+
+  private var didFinishLayout = false
+  private var isReloading = false
+
+  private var numberOfItems: Int {
+    getNumberOfItems?() ?? dataSource?.numberOfItems(self) ?? 0
   }
 
-  public var bottomLineHeight: CGFloat = 1
+  public var numberOfTabs: Int {
+    itemsCount
+  }
+
+  public var bottomLineHeight: CGFloat = 0
   public var bottomLineColor: UIColor = .clear
 
-  public var itemModel = Item.Model()
+  public var itemSettings: SlideTabBar.Settings = [:]
   public var itemSpacing: CGFloat = 10
 
-  public var trackerHeight: CGFloat = 2
+  public var contentInset: UIEdgeInsets = .zero {
+    didSet {
+      distribution.resetContentInset(scrollView: scrollView, contentInset: contentInset)
+    }
+  }
+
+  public var trackerHeight: CGFloat = 0
   public var trackerColor: UIColor = .blue {
     didSet {
       trackerView.backgroundColor = trackerColor
     }
   }
 
-  public var contentInset: UIEdgeInsets = .zero {
-    didSet {
-      scrollView.contentInset = contentInset
-    }
-  }
-
-  public var alignment: UIStackView.Alignment = .fill {
-    didSet {
-      itemsStackView.alignment = alignment
-    }
-  }
-
   public var distribution: SlideTabBarDistribution = .contentLeading
   public var trackerMode: SlideTabBarTrackerMode = .byView
+
+  public var allowDuplicateTap = false
+  public var extraScrollingWidth: CGFloat = 0
 
   // MARK: Initialize
 
   public init() {
     super.init(frame: .zero)
+    commitInit()
+  }
+
+  public init(
+    numberOfItems: @escaping () -> Int,
+    factory: @escaping (Int) -> SlideTabBar.Item,
+    onSelected: ((Int) -> Void)?)
+  {
+    super.init(frame: .zero)
+    setup(numberOfItems: numberOfItems, factory: factory, onSelected: onSelected)
     commitInit()
   }
 
@@ -126,7 +138,9 @@ public class SlideTabBar: UIView {
 
     contentView.addSubview(itemsStackView)
     itemsStackView.snp.makeConstraints { make in
-      make.edges.equalToSuperview()
+      make.left.right.equalToSuperview()
+      make.centerY.equalToSuperview()
+
       fullConstraint = make.width.equalTo(self.snp.width).constraint
     }
 
@@ -158,11 +172,62 @@ public class SlideTabBar: UIView {
     buildItemViews(at: index)
     buildLine()
   }
+
+  public func select(
+    at index: Int?,
+    animated: Bool,
+    justUpdateUI: Bool = false)
+  {
+    if let index {
+      isReloading = !animated
+
+      if justUpdateUI {
+        items.forEach { $0.setSelected(false, settings: itemSettings) }
+        _selectedIndex = index
+        items[safe: index]?.setSelected(true, settings: itemSettings)
+      }
+      else {
+        selectedIndex = index
+      }
+    }
+    else {
+      selectedIndex = -1
+      items.forEach { $0.setSelected(false, settings: itemSettings) }
+    }
+  }
+
+  public func reloadStatus() {
+    items.forEach {
+      updateItem($0, isSelected: $0.tag == selectedIndex)
+    }
+  }
 }
 
 // MARK: UI
 
 extension SlideTabBar {
+  private func setupUI() {
+    guard
+      scrollView.frame.size != .zero,
+      !didFinishLayout
+    else { return }
+
+    didFinishLayout = true
+    distribution.update(scrollView, contentInset, itemsStackView, fullConstraint)
+
+    if
+      trackerHeight > 0,
+      let item = tabBarItem(at: selectedIndex)
+    {
+      moveTracker(item, animated: false)
+    }
+
+    itemsStackView.snp.makeConstraints { make in
+      make.top.equalTo(contentInset.top)
+      make.bottom.equalTo(-contentInset.bottom)
+    }
+  }
+
   private func buildItemViews(at index: Int) {
     /// For reset
     if items.count > 0 {
@@ -188,17 +253,31 @@ extension SlideTabBar {
     selectedIndex = _index
   }
 
-  private func setupItem(at index: Int) -> Item? {
+  private func setupItem(at index: Int) -> SlideTabBar.Item? {
     guard let item = itemFactory?(index) ?? dataSource?.itemView(self, at: index)
     else { return nil }
 
     item.tag = index
-    item.setSelected(false)
+    updateItem(item, isSelected: false)
 
     let tap = UITapGestureRecognizer(target: self, action: #selector(onItemTapped(_:)))
     item.addGestureRecognizer(tap)
 
     return item
+  }
+
+  private func updateItem(_ item: SlideTabBar.Item?, isSelected: Bool) {
+    guard let item else { return }
+
+    if
+      let shouldAllowItemSelect,
+      !shouldAllowItemSelect(item.tag)
+    {
+      item.setEnable(false, settings: itemSettings)
+    }
+    else {
+      item.setSelected(isSelected, settings: itemSettings)
+    }
   }
 
   @objc
@@ -209,24 +288,27 @@ extension SlideTabBar {
   }
 
   private func updateItemTitleColor(
-    from fromItem: Item?,
-    to toItem: Item? = nil,
+    from fromItem: SlideTabBar.Item?,
+    to toItem: SlideTabBar.Item? = nil,
     by percentage: CGFloat)
   {
     toItem?.setTransformingColor(
       SlideCalculator
         .color(
           by: 1 - percentage,
-          between: itemModel.color, itemModel.selectedColor))
+          between: itemSettings[.normal]?.color ?? .clear,
+          itemSettings[.selected]?.color ?? .clear))
+
     fromItem?.setTransformingColor(
       SlideCalculator
         .color(
           by: percentage,
-          between: itemModel.color, itemModel.selectedColor))
+          between: itemSettings[.normal]?.color ?? .clear,
+          itemSettings[.selected]?.color ?? .clear))
   }
 
-  private func tabBarItem(at index: Int) -> Item? {
-    if let item = itemsStackView.arrangedSubviews[index] as? Item {
+  private func tabBarItem(at index: Int) -> SlideTabBar.Item? {
+    if let item = itemsStackView.arrangedSubviews[safe: index] as? SlideTabBar.Item {
       return item
     }
     return nil
@@ -239,15 +321,13 @@ extension SlideTabBar {
 
     scrollView.insertSubview(bottomLineView, belowSubview: trackerView)
     bottomLineView.snp.makeConstraints { make in
-      make.height.equalTo(bottomLineHeight / 2)
-      make.left.equalToSuperview().offset(itemsStackView.layoutMargins.left)
-      make.right.equalToSuperview().offset(-itemsStackView.layoutMargins.right)
-      make.centerY.equalTo(trackerView.snp.centerY)
+      make.left.right.bottom.equalTo(self)
+      make.height.equalTo(bottomLineHeight)
     }
   }
 
   private func reset() {
-    selectedIndex = -1
+    _selectedIndex = -1
 
     trackerView.isHidden = true
 
@@ -259,11 +339,6 @@ extension SlideTabBar {
     items.removeAll()
   }
 
-  func select(at index: Int, animated: Bool) {
-    isReloading = !animated
-    selectedIndex = index
-  }
-
   private func findAvailableIndex(by index: Int) -> Int {
     guard
       let shouldAllowItemSelect,
@@ -272,29 +347,18 @@ extension SlideTabBar {
 
     return (0..<itemsCount).first(where: { shouldAllowItemSelect($0) }) ?? -1
   }
-
-  private func setupUI() {
-    guard
-      scrollView.frame.size != .zero,
-      itemsStackView.frame.size != .zero,
-      !didFinishLayout
-    else { return }
-
-    didFinishLayout = true
-    distribution.update(scrollView, contentInset, itemsStackView, fullConstraint)
-
-    guard
-      trackerHeight > 0,
-      let item = tabBarItem(at: selectedIndex)
-    else { return }
-
-    moveTracker(item, animated: false)
-  }
 }
 
 // MARK: Animate
 
 extension SlideTabBar {
+  func scrollToHead(animated: Bool) {
+    guard scrollView.contentSize.width + contentInset.left + contentInset.right > scrollView.frame.width
+    else { return }
+
+    scrollView.setContentOffset(.init(x: contentInset.left, y: 0), animated: animated)
+  }
+
   private func switchTo(_ selectedIndex: Int) {
     guard itemsCount > 0 else { return }
 
@@ -303,14 +367,14 @@ extension SlideTabBar {
 
     /// For Reset
     if preIndex >= 0 {
-      tabBarItem(at: preIndex)?.setSelected(false)
+      updateItem(tabBarItem(at: preIndex), isSelected: false)
     }
 
     if
       toIndex >= 0, toIndex < itemsCount,
       let toItem = tabBarItem(at: toIndex)
     {
-      tabBarItem(at: toIndex)?.setSelected(true)
+      updateItem(toItem, isSelected: true)
 
       DispatchQueue.main.async {
         self.scrollToMiddle(toItem, animated: !self.isReloading)
@@ -319,14 +383,14 @@ extension SlideTabBar {
     }
   }
 
-  private func scrollToMiddle(_ toItem: Item, animated: Bool) {
+  private func scrollToMiddle(_ toItem: SlideTabBar.Item, animated: Bool) {
     guard scrollView.contentSize.width + contentInset.left + contentInset.right > scrollView.frame.width
     else { return }
 
     if contentInset == .zero {
       /// Calculate scrollView center point with toItem
       let calced = CGRect(
-        x: toItem.center.x - scrollView.bounds.width / 2,
+        x: toItem.center.x - scrollView.bounds.width / 2 + (extraScrollingWidth / 2),
         y: toItem.frame.origin.y,
         width: scrollView.bounds.width,
         height: scrollView.bounds.height)
@@ -334,7 +398,7 @@ extension SlideTabBar {
       scrollView.scrollRectToVisible(calced, animated: animated)
     }
 
-    var offsetX = toItem.center.x - (scrollView.bounds.width / 2)
+    var offsetX = toItem.center.x - (scrollView.bounds.width / 2) + (extraScrollingWidth / 2)
 
     /// If item is the first, scroll to the start
     if selectedIndex == 0 {
@@ -355,7 +419,7 @@ extension SlideTabBar {
     scrollView.setContentOffset(offsetPoint, animated: animated)
   }
 
-  private func moveTracker(_ toItem: Item, animated: Bool) {
+  private func moveTracker(_ toItem: SlideTabBar.Item, animated: Bool) {
     guard trackerHeight > 0 else { return }
 
     let location = trackerMode.location(
@@ -429,3 +493,52 @@ extension SlideTabBar {
       height: trackerHeight)
   }
 }
+
+// MARK: - Preview
+
+#if DEBUG
+  import SwiftUI
+
+  @available(iOS 15.0, *)
+  extension SlideTabBar: Previewable { }
+
+  @available(iOS 15.0, *)
+  struct SlideTabBar_Preview: PreviewProvider {
+    static var previews: some View {
+      let title = (0...5).map { "This is Test \($0)" }
+      SlideTabBar()
+        .sr
+        .trackerHeight(5)
+        .trackerColor(.blue)
+        .bottomLineHeight(10)
+        .bottomLineColor(.red)
+        .distribution(.contentLeading)
+        .contentInset(.init(top: 10, left: 16, bottom: 10, right: 16))
+        .itemSpacing(40)
+        .other { tabBar in
+          tabBar.setup(
+            numberOfItems: { title.count },
+            factory: { index in
+              let item = SlideTabBar.DefaultItem()
+              item.backgroundColor = .lightGray
+              item.titleLabel.text = title[index]
+              return item
+            },
+            shouldAllowItemSelect: {
+              $0 != 10
+            },
+            onSelected: {
+              if $0 == 10 {
+                tabBar.reload(at: 2, animated: true)
+              }
+              print("Tap", $0)
+            })
+          tabBar.reload(animated: true)
+        }
+        .unwrap()
+        .previewable()
+        .background(Color.orange)
+        .frame(width: 300, height: 100)
+    }
+  }
+#endif
