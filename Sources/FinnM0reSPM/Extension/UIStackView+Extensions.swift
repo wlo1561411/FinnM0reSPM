@@ -15,11 +15,6 @@ extension UIStackView {
     self.alignment = alignment
   }
 
-  public func reAddArrangedSubviews(_ views: [UIView]) {
-    removeAllFully()
-    views.forEach { addArrangedSubview($0) }
-  }
-
   public func removeFully(_ view: UIView) {
     removeArrangedSubview(view)
     view.removeFromSuperview()

@@ -11,12 +11,24 @@ extension String {
     isEmpty ? nil : self
   }
 
+  public var urlEncoded: String? {
+    addingPercentEncoding(withAllowedCharacters: NSCharacterSet(charactersIn: "!*'();:@&=+$,/?%#[] ").inverted)
+  }
+
+  public var urlDecoded: String? {
+    removingPercentEncoding
+  }
+
+  public var urlQueryFormatted: String? {
+    addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed)?.replacingOccurrences(of: "+", with: "%2b")
+  }
+
   public var halfWidth: String {
     let string = NSMutableString(string: self) as CFMutableString
     CFStringTransform(string, nil, kCFStringTransformFullwidthHalfwidth, false)
     return string as String
   }
-  
+
   public func formated(_ arguments: [CVarArg?] = []) -> String {
     if arguments.count > 0 {
       return String(format: self, arguments: arguments.compactMap { $0 })
@@ -253,7 +265,7 @@ extension String {
     case .allMasked:
       let currency = "$"
 
-      return self.map { characters -> String in
+      return map { characters -> String in
         if "\(characters)" == " " || currency == "\(characters)" {
           return "\(characters)"
         }
@@ -319,7 +331,7 @@ extension NSMutableAttributedString {
     addAttribute(
       .foregroundColor,
       value: color,
-      range: .init(location: 0, length: self.length))
+      range: .init(location: 0, length: length))
     return self
   }
 
@@ -327,7 +339,7 @@ extension NSMutableAttributedString {
     addAttribute(
       .font,
       value: font,
-      range: .init(location: 0, length: self.length))
+      range: .init(location: 0, length: length))
     return self
   }
 
@@ -335,7 +347,7 @@ extension NSMutableAttributedString {
     addAttribute(
       .kern,
       value: spacing,
-      range: .init(location: 0, length: self.length - 1))
+      range: .init(location: 0, length: length - 1))
     return self
   }
 
@@ -351,7 +363,7 @@ extension NSMutableAttributedString {
     addAttribute(
       .paragraphStyle,
       value: paragraphStyle,
-      range: .init(location: 0, length: self.length))
+      range: .init(location: 0, length: length))
     return self
   }
 
@@ -367,7 +379,7 @@ extension NSMutableAttributedString {
     addAttribute(
       NSAttributedString.Key.paragraphStyle,
       value: paragraphStyle,
-      range: NSMakeRange(0, self.length))
+      range: NSMakeRange(0, length))
     return self
   }
 

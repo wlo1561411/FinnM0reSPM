@@ -41,7 +41,7 @@ public class SlideTabBar: UIView {
     }
     set {
       guard
-        _selectedIndex != newValue || allowDuplicateTap,
+        _selectedIndex != newValue || configurations.contains(.duplicateTap(true)),
         itemsCount > 0,
         shouldAllowItemSelect?(newValue) ?? true
       else { return }
@@ -94,9 +94,10 @@ public class SlideTabBar: UIView {
 
   public var distribution: SlideTabBarDistribution = .contentLeading
   public var trackerMode: SlideTabBarTrackerMode = .byView
-
-  public var allowDuplicateTap = false
-  public var extraScrollingWidth: CGFloat = 0
+  public var configurations: Set<Configuration> = [
+    .duplicateTap(false),
+    .selectionWithEvent(true)
+  ]
 
   // MARK: Initialize
 
@@ -176,12 +177,12 @@ public class SlideTabBar: UIView {
   public func select(
     at index: Int?,
     animated: Bool,
-    justUpdateUI: Bool = false)
+    withEvent: Bool = false)
   {
     if let index {
       isReloading = !animated
 
-      if justUpdateUI {
+      if withEvent {
         items.forEach { $0.setSelected(false, settings: itemSettings) }
         _selectedIndex = index
         items[safe: index]?.setSelected(true, settings: itemSettings)
@@ -196,10 +197,17 @@ public class SlideTabBar: UIView {
     }
   }
 
-  public func reloadStatus() {
+  public func reloadUI() {
     items.forEach {
       updateItem($0, isSelected: $0.tag == selectedIndex)
     }
+  }
+
+  public func scrollToHead(animated: Bool) {
+    guard scrollView.contentSize.width + contentInset.left + contentInset.right > scrollView.frame.width
+    else { return }
+
+    scrollView.setContentOffset(.init(x: -contentInset.left, y: 0), animated: animated)
   }
 }
 
@@ -249,7 +257,7 @@ extension SlideTabBar {
     layoutIfNeeded()
 
     let _index = findAvailableIndex(by: index)
-    guard _index >= 0 else { return }
+    guard _index >= 0, !configurations.contains(.selectionWithEvent(false)) else { return }
     selectedIndex = _index
   }
 
@@ -352,13 +360,6 @@ extension SlideTabBar {
 // MARK: Animate
 
 extension SlideTabBar {
-  func scrollToHead(animated: Bool) {
-    guard scrollView.contentSize.width + contentInset.left + contentInset.right > scrollView.frame.width
-    else { return }
-
-    scrollView.setContentOffset(.init(x: contentInset.left, y: 0), animated: animated)
-  }
-
   private func switchTo(_ selectedIndex: Int) {
     guard itemsCount > 0 else { return }
 
@@ -390,7 +391,7 @@ extension SlideTabBar {
     if contentInset == .zero {
       /// Calculate scrollView center point with toItem
       let calced = CGRect(
-        x: toItem.center.x - scrollView.bounds.width / 2 + (extraScrollingWidth / 2),
+        x: toItem.center.x - scrollView.bounds.width / 2,
         y: toItem.frame.origin.y,
         width: scrollView.bounds.width,
         height: scrollView.bounds.height)
@@ -398,7 +399,7 @@ extension SlideTabBar {
       scrollView.scrollRectToVisible(calced, animated: animated)
     }
 
-    var offsetX = toItem.center.x - (scrollView.bounds.width / 2) + (extraScrollingWidth / 2)
+    var offsetX = toItem.center.x - (scrollView.bounds.width / 2)
 
     /// If item is the first, scroll to the start
     if selectedIndex == 0 {
@@ -496,49 +497,44 @@ extension SlideTabBar {
 
 // MARK: - Preview
 
-#if DEBUG
-  import SwiftUI
+#if swift(>=5.9)
+  @available(iOS 17.0, *)
+  #Preview {
+    let title = (0...5).map { "This is Test \($0)" }
 
-  @available(iOS 15.0, *)
-  extension SlideTabBar: Previewable { }
-
-  @available(iOS 15.0, *)
-  struct SlideTabBar_Preview: PreviewProvider {
-    static var previews: some View {
-      let title = (0...5).map { "This is Test \($0)" }
-      SlideTabBar()
-        .sr
-        .trackerHeight(5)
-        .trackerColor(.blue)
-        .bottomLineHeight(10)
-        .bottomLineColor(.red)
-        .distribution(.contentLeading)
-        .contentInset(.init(top: 10, left: 16, bottom: 10, right: 16))
-        .itemSpacing(40)
-        .other { tabBar in
-          tabBar.setup(
-            numberOfItems: { title.count },
-            factory: { index in
-              let item = SlideTabBar.DefaultItem()
-              item.backgroundColor = .lightGray
-              item.titleLabel.text = title[index]
-              return item
-            },
-            shouldAllowItemSelect: {
-              $0 != 10
-            },
-            onSelected: {
-              if $0 == 10 {
-                tabBar.reload(at: 2, animated: true)
-              }
-              print("Tap", $0)
-            })
-          tabBar.reload(animated: true)
-        }
-        .unwrap()
-        .previewable()
-        .background(Color.orange)
-        .frame(width: 300, height: 100)
-    }
+    return SlideTabBar()
+      .sr
+      .trackerHeight(5)
+      .trackerColor(.blue)
+      .bottomLineHeight(10)
+      .bottomLineColor(.red)
+      .distribution(.contentLeading)
+      .contentInset(.init(top: 10, left: 16, bottom: 10, right: 16))
+      .itemSpacing(40)
+      .makeConstraints({ make in
+        make.width.equalTo(300)
+        make.height.equalTo(100)
+      })
+      .other { tabBar in
+        tabBar.setup(
+          numberOfItems: { title.count },
+          factory: { index in
+            let item = SlideTabBar.DefaultItem()
+            item.backgroundColor = .lightGray
+            item.titleLabel.text = title[index]
+            return item
+          },
+          shouldAllowItemSelect: {
+            $0 != 1
+          },
+          onSelected: {
+            if $0 == 4 {
+              tabBar.reload(at: 2, animated: true)
+            }
+            print("Tap", $0)
+          })
+        tabBar.reload(animated: true)
+      }
+      .unwrap()
   }
 #endif
