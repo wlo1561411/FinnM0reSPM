@@ -1,17 +1,14 @@
 import SwiftUI
 import UIKit
 
-@available(iOS 13.0, *)
 protocol Previewable { }
 
-@available(iOS 13.0, *)
 extension Previewable where Self: UIView {
     func previewable() -> PreviewWrapper<Self> {
         .init(self)
     }
 }
 
-@available(iOS 13.0, *)
 extension Previewable where Self: UIViewController {
     func previewable() -> PreviewWrapper<UIView> {
         .init(view)
@@ -20,10 +17,8 @@ extension Previewable where Self: UIViewController {
 
 // MARK: - Example
 
-@available(iOS 13.0, *)
 class Label_Example: UILabel, Previewable { }
 
-@available(iOS 13.0, *)
 struct Label_Preview: PreviewProvider {
     static var previews: some View {
         let label = Label_Example()

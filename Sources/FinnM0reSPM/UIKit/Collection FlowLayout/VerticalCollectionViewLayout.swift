@@ -1,6 +1,5 @@
 import UIKit
 
-@available(iOS 13.0, *)
 open class VerticalCollectionViewLayout: BaseCollectionViewFlowLayout {
   public var numberOfItemsPerColumn = 2
   public var itemLayoutSize: NSCollectionLayoutSize = .init(widthDimension: .absolute(0), heightDimension: .absolute(0))
@@ -47,7 +46,6 @@ open class VerticalCollectionViewLayout: BaseCollectionViewFlowLayout {
   }
 }
 
-@available(iOS 13.0, *)
 extension NSCollectionLayoutDimension {
   public func value(_ collectionView: UICollectionView?) -> CGFloat {
     guard let collectionView else { return 0 }

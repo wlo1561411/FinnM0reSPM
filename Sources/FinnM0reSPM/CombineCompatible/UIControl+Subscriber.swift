@@ -1,7 +1,6 @@
 import Combine
 import UIKit
 
-@available(iOS 13.0, *)
 extension UIControl {
   public final class Subscription<
     SubscriberType: Subscriber,

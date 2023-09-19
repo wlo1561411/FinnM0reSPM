@@ -2,7 +2,7 @@ import UIKit
 
 public protocol SlideTabBarTrackerMode {
   func location(
-    with item: SlideTabBar.Item,
+    with item: SlideTabBarItem,
     spacing: CGFloat,
     at scrollView: UIScrollView) -> (x: CGFloat, width: CGFloat)
 }
@@ -18,7 +18,7 @@ extension SlideTabBarTrackerMode where Self == SlideTabBar.ByContent {
 extension SlideTabBar {
   public struct ByView: SlideTabBarTrackerMode {
     public func location(
-      with item: SlideTabBar.Item,
+      with item: SlideTabBarItem,
       spacing: CGFloat,
       at scrollView: UIScrollView) -> (x: CGFloat, width: CGFloat)
     {
@@ -29,7 +29,7 @@ extension SlideTabBar {
 
   public struct ByContent: SlideTabBarTrackerMode {
     public func location(
-      with item: SlideTabBar.Item,
+      with item: SlideTabBarItem,
       spacing _: CGFloat,
       at scrollView: UIScrollView) -> (x: CGFloat, width: CGFloat)
     {

@@ -1,19 +1,18 @@
 import AVFoundation
+import Combine
 import Photos
-import RxCocoa
-import RxSwift
 import UIKit
 
-// TODO: Need to check UIImagePickerController
+#warning("Need to check UIImagePickerController")
 public final class ImagePicker: NSObject {
   public typealias ImageResult = (type: UIImagePickerController.SourceType, status: ImagePicker.Status)
-  typealias Source = (imgResult: ImageResult?, authorization: ImagePicker.Error.Authorization?)
+  public typealias Source = (imgResult: ImageResult?, authorization: ImagePicker.Error.Authorization?)
 
-  let resultSubject = PublishSubject<Source>()
+  let resultSubject = PassthroughSubject<Source, Never>()
 
-  public var resultDriver: Driver<ImageResult> {
+  public var resultDriver: AnyPublisher<ImageResult, ImagePicker.Error> {
     resultSubject
-      .map { result, authorization -> ImageResult in
+      .tryMap { result, authorization -> ImageResult in
         if let result {
           return result
         }
@@ -24,7 +23,11 @@ public final class ImagePicker: NSObject {
           throw ImagePicker.Error.fail(authorization)
         }
       }
-      .asDriver(onErrorJustReturn: (type: .camera, status: .cancel))
+      .mapError { error -> ImagePicker.Error in
+        (error as? ImagePicker.Error) ?? ImagePicker.Error.typeError
+      }
+      .receive(on: DispatchQueue.main)
+      .eraseToAnyPublisher()
   }
 
   func present(
@@ -75,27 +78,26 @@ extension ImagePicker {
 }
 
 // MARK: UIImagePickerControllerDelegate, UINavigationControllerDelegate
-
 extension ImagePicker: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
   public func imagePickerController(
     _ picker: UIImagePickerController,
     didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any])
   {
     if let image = info[.editedImage] as? UIImage {
-      resultSubject.onNext((imgResult: (type: picker.sourceType, status: .success(image)), authorization: nil))
+      resultSubject.send((imgResult: (type: picker.sourceType, status: .success(image)), authorization: nil))
     }
     else if let image = info[.originalImage] as? UIImage {
-      resultSubject.onNext((imgResult: (type: picker.sourceType, status: .success(image)), authorization: nil))
+      resultSubject.send((imgResult: (type: picker.sourceType, status: .success(image)), authorization: nil))
     }
     else {
       print("Other source")
     }
-    
+
     picker.dismiss(animated: true, completion: nil)
   }
 
   public func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-    resultSubject.onNext((imgResult: (type: picker.sourceType, status: .cancel), authorization: nil))
+    resultSubject.send((imgResult: (type: picker.sourceType, status: .cancel), authorization: nil))
     picker.dismiss(animated: true, completion: nil)
   }
 }

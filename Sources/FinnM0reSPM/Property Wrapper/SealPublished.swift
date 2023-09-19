@@ -1,6 +1,5 @@
 import Combine
 
-@available(iOS 13.0, *)
 @propertyWrapper
 public struct SealPublished<T> {
     public typealias Publisher = AnyPublisher<T, Never>

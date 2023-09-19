@@ -1,9 +1,7 @@
 import UIKit
 
-@available(iOS 13.0, *)
 public protocol CompositionalLayoutBuildable { }
 
-@available(iOS 13.0, *)
 extension CompositionalLayoutBuildable {
   public func layoutSize(
     width: NSCollectionLayoutDimension,

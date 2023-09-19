@@ -1,7 +1,6 @@
 import Combine
 import Foundation
 
-@available(iOS 13.0, *)
 extension Styler {
   @discardableResult
   public func assign<

@@ -1,9 +1,19 @@
 import Foundation
 import UIKit
 
-extension SlideTabBar {
-  public typealias Settings = [SlideTabBar.ItemSetting.Status: SlideTabBar.ItemSetting]
+public protocol SlideTabBarItem: UIView {
+  typealias Settings = [SlideTabBar.ItemSetting.Status: SlideTabBar.ItemSetting]
 
+  func setSelected(_ isSelected: Bool, settings: Settings)
+  func setEnable(_ isEnable: Bool, settings: Settings)
+  func setTransformingColor(_ color: UIColor)
+}
+
+extension SlideTabBarItem where Self == SlideTabBar.DefaultItem {
+  public static var empty: SlideTabBar.DefaultItem { .init() }
+}
+
+extension SlideTabBar {
   public struct ItemSetting {
     public enum Status {
       case normal
@@ -15,13 +25,7 @@ extension SlideTabBar {
     var color: UIColor?
   }
 
-  public class Item: UIView {
-    public func setSelected(_: Bool, settings _: Settings) { }
-    public func setEnable(_: Bool, settings _: Settings) { }
-    public func setTransformingColor(_: UIColor) { }
-  }
-
-  public class DefaultItem: SlideTabBar.Item {
+  public class DefaultItem: UIView, SlideTabBarItem {
     private(set) var titleLabel = UILabel()
 
     init() {
@@ -42,7 +46,7 @@ extension SlideTabBar {
       }
     }
 
-    override public func setSelected(_ isSelected: Bool, settings: Settings) {
+    public func setSelected(_ isSelected: Bool, settings: Settings) {
       if let color = isSelected ? settings[.selected]?.color : settings[.normal]?.color {
         titleLabel.textColor = color
       }
@@ -52,7 +56,7 @@ extension SlideTabBar {
       }
     }
 
-    override public func setEnable(_ isEnable: Bool, settings: Settings) {
+    public func setEnable(_ isEnable: Bool, settings: Settings) {
       if let color = isEnable ? settings[.normal]?.color : settings[.disable]?.color {
         titleLabel.textColor = color
       }
@@ -62,7 +66,7 @@ extension SlideTabBar {
       }
     }
 
-    override public func setTransformingColor(_ color: UIColor) {
+    public func setTransformingColor(_ color: UIColor) {
       titleLabel.textColor = color
     }
   }

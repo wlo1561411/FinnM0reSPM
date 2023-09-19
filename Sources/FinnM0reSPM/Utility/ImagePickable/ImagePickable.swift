@@ -1,7 +1,6 @@
 import AVFoundation
+import Combine
 import Photos
-import RxCocoa
-import RxSwift
 import UIKit
 
 public protocol ImagePickable {
@@ -23,7 +22,7 @@ extension ImagePickable where Self: UIViewController {
           self.imagePicker.present(sourceType: .camera, to: self)
         }
         else {
-          self.imagePicker.resultSubject.onNext((imgResult: nil, authorization: .camera(status)))
+          self.imagePicker.resultSubject.send((imgResult: nil, authorization: .camera(status)))
         }
       }
     }
@@ -37,7 +36,7 @@ extension ImagePickable where Self: UIViewController {
         self.imagePicker.present(sourceType: .photoLibrary, to: self)
       }
       else {
-        self.imagePicker.resultSubject.onNext((imgResult: nil, authorization: .photo(status)))
+        self.imagePicker.resultSubject.send((imgResult: nil, authorization: .photo(status)))
       }
     }
   }

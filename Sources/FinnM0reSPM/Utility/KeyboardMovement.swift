@@ -1,42 +1,41 @@
-import RxCocoa
-import RxSwift
+import Combine
 import UIKit
 
 public protocol KeyboardMovement { }
 
 extension KeyboardMovement {
   private var keyboardAboveSpacing: CGFloat { 20 }
-  
-  private var keyboardWillShow: Observable<CGFloat> {
-    NotificationCenter.default.rx
-      .notification(UIResponder.keyboardWillChangeFrameNotification)
+
+  private var keyboardWillShow: AnyPublisher<CGFloat, Never> {
+    NotificationCenter.default
+      .publisher(for: UIResponder.keyboardWillChangeFrameNotification)
       .compactMap { ($0.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect)?.height }
-      .asObservable()
+      .eraseToAnyPublisher()
   }
 
-  private var keyboardWillChangeFrame: Observable<CGFloat> {
-    NotificationCenter.default.rx
-      .notification(UIResponder.keyboardWillChangeFrameNotification)
+  private var keyboardWillChangeFrame: AnyPublisher<CGFloat, Never> {
+    NotificationCenter.default
+      .publisher(for: UIResponder.keyboardWillChangeFrameNotification)
       .compactMap { ($0.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect)?.height }
-      .asObservable()
+      .eraseToAnyPublisher()
   }
 
-  private var keyboardWillHide: Observable<CGFloat> {
-    NotificationCenter.default.rx
-      .notification(UIResponder.keyboardWillHideNotification)
+  private var keyboardWillHide: AnyPublisher<CGFloat, Never> {
+    NotificationCenter.default
+      .publisher(for: UIResponder.keyboardWillHideNotification)
       .compactMap { _ in 0 }
-      .asObservable()
+      .eraseToAnyPublisher()
   }
 
-  public var keyboardHeightObservable: Observable<CGFloat> {
-    Observable.merge([keyboardWillShow, keyboardWillHide, keyboardWillChangeFrame])
-      .asObservable()
+  public var keyboardHeightPublisher: AnyPublisher<CGFloat, Never> {
+    Publishers.Merge3(keyboardWillHide, keyboardWillShow, keyboardWillChangeFrame)
+      .eraseToAnyPublisher()
   }
 }
 
 extension KeyboardMovement where Self: UIViewController {
-  public var viewMovementDriver: Driver<CGFloat?> {
-    keyboardHeightObservable
+  public var viewMovementDriver: AnyPublisher<CGFloat?, Never> {
+    keyboardHeightPublisher
       .map { [weak self] height in
         guard
           let self,
@@ -44,7 +43,7 @@ extension KeyboardMovement where Self: UIViewController {
           let textfield = UIApplication.shared.firstResponder as? UITextField,
           height > 0
         else { return nil }
-        
+
         let keyboardFrame = CGRect(
           origin: .init(x: 0, y: UIScreen.main.bounds.height - height),
           size: .init(width: UIScreen.main.bounds.width, height: height))
@@ -69,8 +68,9 @@ extension KeyboardMovement where Self: UIViewController {
           return 0
         }
       }
-      .distinctUntilChanged()
-      .asDriver(onErrorJustReturn: nil)
+      .removeDuplicates()
+      .receive(on: DispatchQueue.main)
+      .eraseToAnyPublisher()
   }
 }
 

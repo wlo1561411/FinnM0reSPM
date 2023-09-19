@@ -1,7 +1,6 @@
 import Combine
 import UIKit
 
-@available(iOS 13.0, *)
 extension Styler where Base: UIButton {
   @discardableResult
   public func onTap(

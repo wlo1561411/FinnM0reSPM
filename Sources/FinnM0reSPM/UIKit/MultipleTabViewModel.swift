@@ -16,7 +16,6 @@ extension MultipleTabViewModel {
   public var tabsPublisher: AnyPublisher<[Tab], Never> {
     tabsSubject
       .removeDuplicates()
-      .receiveOnMain()
       .eraseToAnyPublisher()
   }
 

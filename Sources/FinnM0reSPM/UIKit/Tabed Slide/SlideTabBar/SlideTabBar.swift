@@ -23,7 +23,7 @@ public class SlideTabBar: UIView {
 
   private var fullConstraint: Constraint?
 
-  private var items: [SlideTabBar.Item] = []
+  private var items: [SlideTabBarItem] = []
   private var itemsCount: Int {
     items.count
   }
@@ -58,7 +58,7 @@ public class SlideTabBar: UIView {
   public weak var dataSource: SlideTabBarDataSource?
 
   private var getNumberOfItems: (() -> Int)?
-  private var itemFactory: ((Int) -> SlideTabBar.Item)?
+  private var itemFactory: ((Int) -> SlideTabBarItem)?
   private var shouldAllowItemSelect: ((Int) -> Bool)?
   private var onItemSelected: ((Int) -> Void)?
 
@@ -76,7 +76,7 @@ public class SlideTabBar: UIView {
   public var bottomLineHeight: CGFloat = 0
   public var bottomLineColor: UIColor = .clear
 
-  public var itemSettings: SlideTabBar.Settings = [:]
+  public var itemSettings: SlideTabBarItem.Settings = [:]
   public var itemSpacing: CGFloat = 10
 
   public var contentInset: UIEdgeInsets = .zero {
@@ -107,7 +107,7 @@ public class SlideTabBar: UIView {
 
   public init(
     numberOfItems: @escaping () -> Int,
-    factory: @escaping (Int) -> SlideTabBar.Item,
+    factory: @escaping (Int) -> SlideTabBarItem,
     onSelected: ((Int) -> Void)?)
   {
     super.init(frame: .zero)
@@ -156,7 +156,7 @@ public class SlideTabBar: UIView {
 
   public func setup(
     numberOfItems: @escaping () -> Int,
-    factory: @escaping (Int) -> SlideTabBar.Item,
+    factory: @escaping (Int) -> SlideTabBarItem,
     shouldAllowItemSelect: ((Int) -> Bool)? = nil,
     onSelected: ((Int) -> Void)? = nil)
   {
@@ -253,7 +253,7 @@ extension SlideTabBar {
     selectedIndex = _index
   }
 
-  private func setupItem(at index: Int) -> SlideTabBar.Item? {
+  private func setupItem(at index: Int) -> SlideTabBarItem? {
     guard let item = itemFactory?(index) ?? dataSource?.itemView(self, at: index)
     else { return nil }
 
@@ -266,7 +266,7 @@ extension SlideTabBar {
     return item
   }
 
-  private func updateItem(_ item: SlideTabBar.Item?, isSelected: Bool) {
+  private func updateItem(_ item: SlideTabBarItem?, isSelected: Bool) {
     guard let item else { return }
 
     if
@@ -288,8 +288,8 @@ extension SlideTabBar {
   }
 
   private func updateItemTitleColor(
-    from fromItem: SlideTabBar.Item?,
-    to toItem: SlideTabBar.Item? = nil,
+    from fromItem: SlideTabBarItem?,
+    to toItem: SlideTabBarItem? = nil,
     by percentage: CGFloat)
   {
     toItem?.setTransformingColor(
@@ -307,8 +307,8 @@ extension SlideTabBar {
           itemSettings[.selected]?.color ?? .clear))
   }
 
-  private func tabBarItem(at index: Int) -> SlideTabBar.Item? {
-    if let item = itemsStackView.arrangedSubviews[safe: index] as? SlideTabBar.Item {
+  private func tabBarItem(at index: Int) -> SlideTabBarItem? {
+    if let item = itemsStackView.arrangedSubviews[safe: index] as? SlideTabBarItem {
       return item
     }
     return nil
@@ -383,7 +383,7 @@ extension SlideTabBar {
     }
   }
 
-  private func scrollToMiddle(_ toItem: SlideTabBar.Item, animated: Bool) {
+  private func scrollToMiddle(_ toItem: SlideTabBarItem, animated: Bool) {
     guard scrollView.contentSize.width + contentInset.left + contentInset.right > scrollView.frame.width
     else { return }
 
@@ -419,7 +419,7 @@ extension SlideTabBar {
     scrollView.setContentOffset(offsetPoint, animated: animated)
   }
 
-  private func moveTracker(_ toItem: SlideTabBar.Item, animated: Bool) {
+  private func moveTracker(_ toItem: SlideTabBarItem, animated: Bool) {
     guard trackerHeight > 0 else { return }
 
     let location = trackerMode.location(
