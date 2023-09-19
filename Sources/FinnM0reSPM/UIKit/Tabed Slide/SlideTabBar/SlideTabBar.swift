@@ -496,49 +496,44 @@ extension SlideTabBar {
 
 // MARK: - Preview
 
-#if DEBUG
-  import SwiftUI
+#if swift(>=5.9)
+  @available(iOS 17.0, *)
+  #Preview {
+    let title = (0...5).map { "This is Test \($0)" }
 
-  @available(iOS 15.0, *)
-  extension SlideTabBar: Previewable { }
-
-  @available(iOS 15.0, *)
-  struct SlideTabBar_Preview: PreviewProvider {
-    static var previews: some View {
-      let title = (0...5).map { "This is Test \($0)" }
-      SlideTabBar()
-        .sr
-        .trackerHeight(5)
-        .trackerColor(.blue)
-        .bottomLineHeight(10)
-        .bottomLineColor(.red)
-        .distribution(.contentLeading)
-        .contentInset(.init(top: 10, left: 16, bottom: 10, right: 16))
-        .itemSpacing(40)
-        .other { tabBar in
-          tabBar.setup(
-            numberOfItems: { title.count },
-            factory: { index in
-              let item = SlideTabBar.DefaultItem()
-              item.backgroundColor = .lightGray
-              item.titleLabel.text = title[index]
-              return item
-            },
-            shouldAllowItemSelect: {
-              $0 != 10
-            },
-            onSelected: {
-              if $0 == 10 {
-                tabBar.reload(at: 2, animated: true)
-              }
-              print("Tap", $0)
-            })
-          tabBar.reload(animated: true)
-        }
-        .unwrap()
-        .previewable()
-        .background(Color.orange)
-        .frame(width: 300, height: 100)
-    }
+    return SlideTabBar()
+      .sr
+      .trackerHeight(5)
+      .trackerColor(.blue)
+      .bottomLineHeight(10)
+      .bottomLineColor(.red)
+      .distribution(.contentLeading)
+      .contentInset(.init(top: 10, left: 16, bottom: 10, right: 16))
+      .itemSpacing(40)
+      .makeConstraints({ make in
+        make.width.equalTo(300)
+        make.height.equalTo(100)
+      })
+      .other { tabBar in
+        tabBar.setup(
+          numberOfItems: { title.count },
+          factory: { index in
+            let item = SlideTabBar.DefaultItem()
+            item.backgroundColor = .lightGray
+            item.titleLabel.text = title[index]
+            return item
+          },
+          shouldAllowItemSelect: {
+            $0 != 1
+          },
+          onSelected: {
+            if $0 == 4 {
+              tabBar.reload(at: 2, animated: true)
+            }
+            print("Tap", $0)
+          })
+        tabBar.reload(animated: true)
+      }
+      .unwrap()
   }
 #endif
