@@ -1,7 +1,8 @@
 import Combine
+import CombineExt
 import Foundation
 
-extension Styler {
+extension Styler where Base: AnyObject {
   @discardableResult
   public func assign<
     PublisherType: Publisher,
@@ -17,7 +18,7 @@ extension Styler {
   {
     publisher
       .receive(on: DispatchQueue.main)
-      .assign(to: keyPath, on: base)
+      .assign(to: keyPath, on: base, ownership: .weak)
       .store(in: &cancellables)
 
     return self

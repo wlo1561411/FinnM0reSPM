@@ -1,6 +1,5 @@
 import Foundation
 
-#warning("Need to refactor")
 protocol DefaultValue {
   associatedtype Value: Codable
   static var defaultValue: Value { get }
@@ -13,10 +12,6 @@ struct Default<T: DefaultValue> {
   init(wrappedValue: T.Value) {
     self.wrappedValue = wrappedValue
   }
-
-  init(_: T) {
-    self.wrappedValue = T.defaultValue
-  }
 }
 
 extension Default: Codable {
@@ -24,6 +19,11 @@ extension Default: Codable {
     let container = try decoder.singleValueContainer()
     self.wrappedValue = (try? container.decode(T.Value.self)) ?? T.defaultValue
   }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(wrappedValue)
+    }
 }
 
 extension KeyedDecodingContainer {

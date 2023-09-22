@@ -273,4 +273,63 @@ extension Styler where Base: UIView {
     base.setContentHuggingPriority(priority, for: axis)
     return self
   }
+
+  public func addTransition(
+    duration: CFTimeInterval = 0.25,
+    timingFunction: CAMediaTimingFunctionName = .easeIn,
+    type: CATransitionType,
+    from: CATransitionSubtype)
+  {
+    let animation = CATransition()
+    animation.timingFunction = CAMediaTimingFunction(name: timingFunction)
+    animation.type = type
+    animation.subtype = from
+    animation.duration = duration
+    base.layer.add(animation, forKey: type.rawValue)
+  }
 }
+
+#if swift(>=5.9)
+  import Combine
+
+  private class TransitionDemo: UIViewController, HasCancellable {
+    var tag = 0
+    var cancellable: Set<AnyCancellable> = []
+
+    init(tag: Int = 0) {
+      self.tag = tag
+      super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder _: NSCoder) {
+      fatalError("init(coder:) has not been implemented")
+    }
+
+    override func viewDidLoad() {
+      super.viewDidLoad()
+      view.backgroundColor = tag == 0 ? .systemPink : .systemGreen
+
+      UIButton().sr
+        .title(tag == 0 ? "push" : "back")
+        .add(to: view)
+        .makeConstraints { make in
+          make.edges.equalToSuperview()
+        }
+        .onTap(store: &cancellable, { _ in
+          if self.tag == 0 {
+            self.navigationController?.view.sr.addTransition(type: .moveIn, from: .fromLeft)
+            self.navigationController?.pushViewController(TransitionDemo(tag: 1), animated: false)
+          }
+          else {
+            self.navigationController?.view.sr.addTransition(type: .reveal, from: .fromRight)
+            self.navigationController?.popViewController(animated: false)
+          }
+        })
+    }
+  }
+
+  @available(iOS 17.0, *)
+  #Preview {
+    UINavigationController(rootViewController: TransitionDemo())
+  }
+#endif

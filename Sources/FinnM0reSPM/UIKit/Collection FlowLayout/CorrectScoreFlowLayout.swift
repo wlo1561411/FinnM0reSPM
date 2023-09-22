@@ -221,7 +221,7 @@ extension CorrectScoreFlowLayout {
 
 #if swift(>=5.9)
   @available(iOS 14.0, *)
-  private class CollectionViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
+  private class CorrectScoreFlowLayoutDemo: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
     typealias Supply = CorrectScoreFlowLayout.Supply
 
     lazy var collectionView = UICollectionView(
@@ -329,6 +329,6 @@ extension CorrectScoreFlowLayout {
 
   @available(iOS 17.0, *)
   #Preview {
-    UINavigationController(rootViewController: CollectionViewController())
+    UINavigationController(rootViewController: CorrectScoreFlowLayoutDemo())
   }
 #endif
