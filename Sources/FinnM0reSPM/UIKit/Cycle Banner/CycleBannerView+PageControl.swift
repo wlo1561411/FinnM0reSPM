@@ -2,7 +2,7 @@ import UIKit
 
 extension CycleBannerView {
   // TODO: Too many count will wrong, maybe can use UIPageControl
-  class PageControl: UIView {
+  public class PageControl: UIView {
     private let stackView = UIStackView()
 
     private var selectedImageName = ""
@@ -10,7 +10,7 @@ extension CycleBannerView {
 
     private var _selectedIndex = 0
 
-    var selectedIndex: Int {
+    public var selectedIndex: Int {
       get { _selectedIndex }
       set {
         for (key, view) in stackView.arrangedSubviews.enumerated() {
@@ -32,12 +32,12 @@ extension CycleBannerView {
       configItems(count: count, selectedImageName: selectedImageName, unselectedImageName: unselectedImageName)
     }
 
-    override init(frame: CGRect) {
+    override public init(frame: CGRect) {
       super.init(frame: frame)
       commitInit()
     }
 
-    required init?(coder _: NSCoder) {
+    public required init?(coder _: NSCoder) {
       fatalError("init(coder:) has not been implemented")
     }
 
@@ -54,14 +54,14 @@ extension CycleBannerView {
       }
     }
 
-    func configItems(
+    public func configItems(
       count: Int,
       selectedImageName: String,
       unselectedImageName: String)
     {
       _selectedIndex = 0
 
-      self.isHidden = count <= 1
+      isHidden = count <= 1
       self.selectedImageName = selectedImageName
       self.unselectedImageName = unselectedImageName
 

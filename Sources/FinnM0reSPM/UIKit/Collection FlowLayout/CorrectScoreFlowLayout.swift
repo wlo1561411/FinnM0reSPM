@@ -218,3 +218,117 @@ extension CorrectScoreFlowLayout {
     }
   }
 }
+
+#if swift(>=5.9)
+  @available(iOS 14.0, *)
+  private class CorrectScoreFlowLayoutDemo: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
+    typealias Supply = CorrectScoreFlowLayout.Supply
+
+    lazy var collectionView = UICollectionView(
+      frame: .zero,
+      collectionViewLayout: flowLayout)
+
+    let flowLayout = CorrectScoreFlowLayout(
+      supremacy: .home,
+      titleHeight: 24,
+      shouldDisplayFooter: true)
+
+    let cellRegistration = UICollectionView.CellRegistration<UICollectionViewCell, String>.init { cell, indexPath, _ in
+      cell.backgroundColor = .gray
+      cell.contentView.tag = indexPath.row
+    }
+
+    lazy var headerRegistration = collectionView.sr
+      .supplementaryRegistration(type: .custom(Supply.header.rawValue)) {
+        $0.backgroundColor = .systemPink
+        return $0
+      }
+
+    lazy var footerRegistration = collectionView.sr
+      .supplementaryRegistration(type: .custom(Supply.footer.rawValue)) {
+        $0.backgroundColor = .systemBlue
+        return $0
+      }
+
+    override func viewDidLoad() {
+      super.viewDidLoad()
+
+      view.backgroundColor = .white
+
+      _ = headerRegistration
+      _ = footerRegistration
+
+      collectionView.sr
+        .dataSource(self)
+        .delegate(self)
+        .add(to: view)
+        .makeConstraints { make in
+          make.top.equalTo(view.snp.topMargin)
+          make.bottom.equalTo(view.snp.bottomMargin)
+          make.right.left.equalToSuperview()
+        }
+
+      setOption()
+    }
+
+    func collectionView(_: UICollectionView, numberOfItemsInSection _: Int) -> Int {
+      31
+    }
+
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+      collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: "")
+    }
+
+    func collectionView(
+      _ collectionView: UICollectionView,
+      viewForSupplementaryElementOfKind kind: String,
+      at indexPath: IndexPath)
+      -> UICollectionReusableView
+    {
+      switch Supply(rawValue: kind) {
+      case .header:
+        return collectionView.dequeueConfiguredReusableSupplementary(using: headerRegistration, for: indexPath)
+      case .footer:
+        return collectionView.dequeueConfiguredReusableSupplementary(using: footerRegistration, for: indexPath)
+      default:
+        return .init()
+      }
+    }
+
+    func setOption() {
+      navigationItem.rightBarButtonItem = .init(
+        title: "Supremacy",
+        style: .plain,
+        target: self,
+        action: #selector(alert))
+    }
+
+    @objc
+    func alert() {
+      let actionSheet = UIAlertController(title: "Choose Option", message: nil, preferredStyle: .actionSheet)
+
+      actionSheet.addAction(UIAlertAction(title: "Home", style: .default, handler: { [weak self] _ in
+        self?.flowLayout.setSupremacy(.home)
+      }))
+
+      actionSheet.addAction(UIAlertAction(title: "Draw", style: .default, handler: { [weak self] _ in
+        self?.flowLayout.setSupremacy(.draw)
+      }))
+
+      actionSheet.addAction(UIAlertAction(title: "Away", style: .default, handler: { [weak self] _ in
+        self?.flowLayout.setSupremacy(.away)
+      }))
+
+      actionSheet.addAction(UIAlertAction(title: "Trimmed", style: .default, handler: { [weak self] _ in
+        self?.flowLayout.toggleTrimmed()
+      }))
+
+      present(actionSheet, animated: true, completion: nil)
+    }
+  }
+
+  @available(iOS 17.0, *)
+  #Preview {
+    UINavigationController(rootViewController: CorrectScoreFlowLayoutDemo())
+  }
+#endif

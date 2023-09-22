@@ -8,21 +8,22 @@ protocol DefaultValue {
 @propertyWrapper
 struct Default<T: DefaultValue> {
   var wrappedValue: T.Value
-  
+
   init(wrappedValue: T.Value) {
     self.wrappedValue = wrappedValue
-  }
-  
-  init(_ decodableValue: T) {
-    self.wrappedValue = T.defaultValue
   }
 }
 
 extension Default: Codable {
   init(from decoder: Decoder) throws {
     let container = try decoder.singleValueContainer()
-    wrappedValue = (try? container.decode(T.Value.self)) ?? T.defaultValue
+    self.wrappedValue = (try? container.decode(T.Value.self)) ?? T.defaultValue
   }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(wrappedValue)
+    }
 }
 
 extension KeyedDecodingContainer {

@@ -3,7 +3,7 @@ import RxSwift
 import UIKit
 
 @available(iOS 14.0, *)
-public class Tester: UIViewController, Previewable {
+public class Tester: UIViewController {
   let bag = DisposeBag()
   var cancellables = Set<AnyCancellable>()
 
@@ -66,15 +66,3 @@ public class Tester: UIViewController, Previewable {
     print("Tester dead")
   }
 }
-
-#if canImport(SwiftUI) && DEBUG
-  import SwiftUI
-
-  @available(iOS 14.0, *)
-  struct TesterPreview: PreviewProvider {
-    static let t = Tester()
-    static var previews: some View {
-      t.previewable()
-    }
-  }
-#endif
