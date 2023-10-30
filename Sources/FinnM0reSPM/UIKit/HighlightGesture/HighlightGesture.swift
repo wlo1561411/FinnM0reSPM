@@ -1,7 +1,7 @@
 import UIKit
 
 public class HighlightGesture: UIGestureRecognizer {
-  typealias OnHighlight = (_ isHighlight: Bool) -> Void
+  public typealias OnHighlight = (_ isHighlight: Bool) -> Void
 
   private var onHighlight: OnHighlight?
   private var onClick: (() -> Void)?
@@ -146,7 +146,7 @@ extension HighlightGesture {
 }
 
 extension UIView {
-  func appendHighlightGesture(onHighlight: HighlightGesture.OnHighlight? = nil, onClick: (() -> Void)? = nil) {
+  public func appendHighlightGesture(onHighlight: HighlightGesture.OnHighlight? = nil, onClick: (() -> Void)? = nil) {
     if onHighlight == nil, onClick == nil {
       return
     }
@@ -157,7 +157,7 @@ extension UIView {
     addGestureRecognizer(gesture)
   }
 
-  func triggerNonHighlightEvent() {
+  public func triggerNonHighlightEvent() {
     guard let oldGesture = gestureRecognizers?.first(where: { $0 is HighlightGesture }) as? HighlightGesture
     else { return }
 

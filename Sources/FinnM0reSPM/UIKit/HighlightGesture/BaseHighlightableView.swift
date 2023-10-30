@@ -1,16 +1,16 @@
 import UIKit
 
-class BaseHighlightableView: UIView {
+public class BaseHighlightableView: UIView {
   typealias UISettings = [Status: Setting]
 
-  enum Status {
+  public enum Status {
     case normal
     case highlight
     case selected
     case disable
   }
 
-  struct Setting {
+  public struct Setting {
     var text: String?
     var textColor: UIColor?
     var backgroundColor: UIColor?
@@ -21,53 +21,37 @@ class BaseHighlightableView: UIView {
 
   private var settingDictionary: UISettings = [:]
 
-  var onTap: ((BaseHighlightableView) -> Void)?
+  public var onTap: ((BaseHighlightableView) -> Void)?
 
-  var isHighlight = false {
+  public var isHighlight = false {
     didSet {
       setupViewsFromStatus()
     }
   }
 
-  var isSelected = false {
+  public var isSelected = false {
     didSet {
       setupViewsFromStatus()
     }
   }
 
-  var isEnable = true {
+  public var isEnable = true {
     didSet {
       setupViewsFromStatus()
     }
   }
 
-  var currentStatus: Status {
-    if isEnable == false {
-      return .disable
-    }
-
-    if isHighlight {
-      return .highlight
-    }
-
-    if isSelected {
-      return .selected
-    }
-
-    return .normal
-  }
-
-  override init(frame: CGRect) {
+  override public init(frame: CGRect) {
     super.init(frame: frame)
     commitInit()
   }
 
-  required init?(coder: NSCoder) {
+  public required init?(coder: NSCoder) {
     super.init(coder: coder)
     commitInit()
   }
 
-  init(onTap: ((BaseHighlightableView) -> Void)?) {
+  public init(onTap: ((BaseHighlightableView) -> Void)?) {
     super.init(frame: .zero)
     self.onTap = onTap
     commitInit()
@@ -77,7 +61,7 @@ class BaseHighlightableView: UIView {
     backgroundColor = .clear
   }
 
-  func setupGesture() {
+  public func setupGesture() {
     appendHighlightGesture(
       onHighlight: { [weak self] isHighlight in
         guard self?.isEnable == true else { return }
@@ -94,14 +78,48 @@ class BaseHighlightableView: UIView {
       })
   }
 
-  func addSetting(_ setting: Setting, at status: Status = .normal) {
+  /// Override this function to update UI
+  public func setupViewsFromStatus() { }
+
+  public func dispose() {
+    removeAllSetting()
+    onTap = nil
+  }
+
+  deinit {
+    dispose()
+  }
+}
+
+// MARK: - Setting
+
+extension BaseHighlightableView {
+  public var currentStatus: Status {
+    if isEnable == false {
+      return .disable
+    }
+
+    if isHighlight {
+      return .highlight
+    }
+
+    if isSelected {
+      return .selected
+    }
+
+    return .normal
+  }
+
+  public var currentSetting: Setting? {
+    settingDictionary[currentStatus]
+  }
+
+  public func addSetting(_ setting: Setting, at status: Status = .normal) {
     settingDictionary[status] = setting
     setupViewsFromStatus()
   }
 
-  func setupViewsFromStatus() { }
-
-  func getSetting(from status: Status) -> Setting? {
+  public func getSetting(from status: Status) -> Setting? {
     if let setting = settingDictionary[status] {
       return setting
     }
@@ -116,35 +134,28 @@ class BaseHighlightableView: UIView {
     }
   }
 
-  func setSettings(_ setting: [Status: Setting]) {
+  public func setSettings(_ setting: [Status: Setting]) {
     settingDictionary = setting
     setupViewsFromStatus()
   }
 
-  func removeAllSetting() {
+  public func removeAllSetting() {
     settingDictionary = [:]
-  }
-
-  func dispose() {
-    removeAllSetting()
-    onTap = nil
-  }
-
-  deinit {
-    dispose()
   }
 }
 
+// MARK: - SlideTabBarItem
+
 extension BaseHighlightableView: SlideTabBarItem {
-  func setSelected(_ isSelected: Bool, settings _: Settings) {
+  public func setSelected(_ isSelected: Bool, settings _: Settings) {
     isHighlight = false
     self.isSelected = isSelected
   }
 
-  func setEnable(_ isEnable: Bool, settings _: Settings) {
+  public func setEnable(_ isEnable: Bool, settings _: Settings) {
     isHighlight = false
     self.isEnable = isEnable
   }
 
-  func setTransformingColor(_: UIColor) { }
+  public func setTransformingColor(_: UIColor) { }
 }
