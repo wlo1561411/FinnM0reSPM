@@ -274,6 +274,28 @@ extension Styler where Base: UIView {
     return self
   }
 
+  @discardableResult
+  public func compressionResistance(
+    _ priority: UILayoutPriority,
+    for axis: NSLayoutConstraint.Axis)
+    -> Self
+  {
+    base.setContentCompressionResistancePriority(priority, for: axis)
+    return self
+  }
+
+  @discardableResult
+  public func mask(by image: UIImage?) -> Self {
+    guard image != nil else { return self }
+
+    let mask = CALayer()
+    mask.contents = image?.cgImage
+    mask.frame = base.bounds
+    base.layer.mask = mask
+
+    return self
+  }
+
   public func addTransition(
     duration: CFTimeInterval = 0.25,
     timingFunction: CAMediaTimingFunctionName = .easeIn,

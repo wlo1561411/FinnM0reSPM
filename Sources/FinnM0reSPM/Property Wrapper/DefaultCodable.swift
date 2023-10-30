@@ -19,11 +19,11 @@ extension Default: Codable {
     let container = try decoder.singleValueContainer()
     self.wrappedValue = (try? container.decode(T.Value.self)) ?? T.defaultValue
   }
-    
-    func encode(to encoder: Encoder) throws {
-        var container = encoder.singleValueContainer()
-        try container.encode(wrappedValue)
-    }
+
+  func encode(to encoder: Encoder) throws {
+    var container = encoder.singleValueContainer()
+    try container.encode(wrappedValue)
+  }
 }
 
 extension KeyedDecodingContainer {

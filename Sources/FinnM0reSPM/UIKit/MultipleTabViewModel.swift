@@ -27,8 +27,10 @@ extension MultipleTabViewModel {
     displayTabs.firstIndex(where: { $0 == currentTab }) ?? 0
   }
 
-  public func forceUpdateTabs(_ tabs: [Tab]) {
-    tabsSubject.send([])
+  public func updateTabs(_ tabs: [Tab], force: Bool = false) {
+    if force {
+      tabsSubject.send([])
+    }
     tabsSubject.send(tabs)
   }
 

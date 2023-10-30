@@ -41,7 +41,7 @@ public class SlideTabBar: UIView {
     }
     set {
       guard
-        _selectedIndex != newValue || allowDuplicateTap,
+        _selectedIndex != newValue || configurations.contains(.duplicateTap(true)),
         itemsCount > 0,
         shouldAllowItemSelect?(newValue) ?? true
       else { return }
@@ -94,9 +94,10 @@ public class SlideTabBar: UIView {
 
   public var distribution: SlideTabBarDistribution = .contentLeading
   public var trackerMode: SlideTabBarTrackerMode = .byView
-
-  public var allowDuplicateTap = false
-  public var extraScrollingWidth: CGFloat = 0
+  public var configurations: Set<Configuration> = [
+    .duplicateTap(false),
+    .selectionWithEvent(true)
+  ]
 
   // MARK: Initialize
 
@@ -176,12 +177,12 @@ public class SlideTabBar: UIView {
   public func select(
     at index: Int?,
     animated: Bool,
-    justUpdateUI: Bool = false)
+    withEvent: Bool = false)
   {
     if let index {
       isReloading = !animated
 
-      if justUpdateUI {
+      if withEvent {
         items.forEach { $0.setSelected(false, settings: itemSettings) }
         _selectedIndex = index
         items[safe: index]?.setSelected(true, settings: itemSettings)
@@ -196,10 +197,17 @@ public class SlideTabBar: UIView {
     }
   }
 
-  public func reloadStatus() {
+  public func reloadUI() {
     items.forEach {
       updateItem($0, isSelected: $0.tag == selectedIndex)
     }
+  }
+
+  public func scrollToHead(animated: Bool) {
+    guard scrollView.contentSize.width + contentInset.left + contentInset.right > scrollView.frame.width
+    else { return }
+
+    scrollView.setContentOffset(.init(x: -contentInset.left, y: 0), animated: animated)
   }
 }
 
@@ -249,7 +257,7 @@ extension SlideTabBar {
     layoutIfNeeded()
 
     let _index = findAvailableIndex(by: index)
-    guard _index >= 0 else { return }
+    guard _index >= 0, !configurations.contains(.selectionWithEvent(false)) else { return }
     selectedIndex = _index
   }
 
@@ -352,13 +360,6 @@ extension SlideTabBar {
 // MARK: Animate
 
 extension SlideTabBar {
-  func scrollToHead(animated: Bool) {
-    guard scrollView.contentSize.width + contentInset.left + contentInset.right > scrollView.frame.width
-    else { return }
-
-    scrollView.setContentOffset(.init(x: contentInset.left, y: 0), animated: animated)
-  }
-
   private func switchTo(_ selectedIndex: Int) {
     guard itemsCount > 0 else { return }
 
@@ -390,7 +391,7 @@ extension SlideTabBar {
     if contentInset == .zero {
       /// Calculate scrollView center point with toItem
       let calced = CGRect(
-        x: toItem.center.x - scrollView.bounds.width / 2 + (extraScrollingWidth / 2),
+        x: toItem.center.x - scrollView.bounds.width / 2,
         y: toItem.frame.origin.y,
         width: scrollView.bounds.width,
         height: scrollView.bounds.height)
@@ -398,7 +399,7 @@ extension SlideTabBar {
       scrollView.scrollRectToVisible(calced, animated: animated)
     }
 
-    var offsetX = toItem.center.x - (scrollView.bounds.width / 2) + (extraScrollingWidth / 2)
+    var offsetX = toItem.center.x - (scrollView.bounds.width / 2)
 
     /// If item is the first, scroll to the start
     if selectedIndex == 0 {

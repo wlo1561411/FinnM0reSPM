@@ -8,4 +8,14 @@ extension Publisher {
   {
     closure(eraseToAnyPublisher())
   }
+
+  public func receiveOnMainIfNeeded() -> AnyPublisher<Output, Failure> {
+    if Thread.isMainThread {
+      return eraseToAnyPublisher()
+    }
+    else {
+      return receive(on: DispatchQueue.main)
+        .eraseToAnyPublisher()
+    }
+  }
 }
