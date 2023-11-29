@@ -9,7 +9,7 @@ extension Styler where Base: UIScrollView {
     return self
   }
 
-    public func scrollablePublisher() -> AnyPublisher<Bool, Never> {
+  public func scrollablePublisher() -> AnyPublisher<Bool, Never> {
     base
       .publisher(for: \.contentSize)
       .receive(on: DispatchQueue.main)
@@ -23,7 +23,7 @@ extension Styler where Base: UIScrollView {
       .eraseToAnyPublisher()
   }
 
-    @discardableResult
+  @discardableResult
   public func automaticScrollable(storeIn: inout Set<AnyCancellable>) -> Self {
     scrollablePublisher()
       .sink(receiveValue: { [weak base] in
