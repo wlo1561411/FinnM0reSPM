@@ -36,3 +36,15 @@ extension KeyedDecodingContainer {
     try decodeIfPresent(type, forKey: key) ?? Default(wrappedValue: T.defaultValue)
   }
 }
+
+// MARK: - Proxy
+
+extension Int {
+  struct Zero: DefaultValue {
+    static var defaultValue = 0
+  }
+}
+
+extension Optional: DefaultValue where Wrapped: Codable {
+  static var defaultValue: Self { .none }
+}
