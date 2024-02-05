@@ -43,7 +43,7 @@ final class DefaultCodableTests: XCTestCase {
   }
 
   func testEncoding() {
-    let model = TestModel(status: Status.closed)
+    let model = TestModel(status: DefaultCodableTests.Status.closed)
     do {
       let jsonData = try JSONEncoder().encode(model)
       let jsonDict = try JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: Any]
