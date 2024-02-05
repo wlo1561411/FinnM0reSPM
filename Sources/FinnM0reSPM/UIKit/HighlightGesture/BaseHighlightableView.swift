@@ -86,19 +86,19 @@ public class BaseHighlightableView: SlideTabBar.Item {
     onTap = nil
   }
 
-    // MARK: - SlideTabBarItem
+  // MARK: - SlideTabBarItem
 
-    public override func setSelected(_ isSelected: Bool, settings _: SlideTabBar.Settings) {
-      isHighlight = false
-      self.isSelected = isSelected
-    }
+  override public func setSelected(_ isSelected: Bool, settings _: SlideTabBar.Settings) {
+    isHighlight = false
+    self.isSelected = isSelected
+  }
 
-    public override func setEnable(_ isEnable: Bool, settings _: SlideTabBar.Settings) {
-      isHighlight = false
-      self.isEnable = isEnable
-    }
+  override public func setEnable(_ isEnable: Bool, settings _: SlideTabBar.Settings) {
+    isHighlight = false
+    self.isEnable = isEnable
+  }
 
-    public override func setTransformingColor(_: UIColor) { }
+  override public func setTransformingColor(_: UIColor) { }
 
   deinit {
     dispose()
