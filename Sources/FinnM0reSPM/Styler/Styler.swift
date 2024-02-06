@@ -8,6 +8,7 @@ public struct Styler<Base> {
 }
 
 extension Styler {
+  @discardableResult
   public func unwrap() -> Base { self.base }
 
   public subscript<Value>(dynamicMember keyPath: WritableKeyPath<Base, Value>) -> ((Value) -> Styler<Base>) {
