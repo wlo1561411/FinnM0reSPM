@@ -43,11 +43,6 @@ public class HighlightGesture: UIGestureRecognizer {
   override public func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent) {
     super.touchesEnded(touches, with: event)
 
-//    if let touch = touches.first, let view = view {
-//      let superview = getOutermostSuperview(of: view)
-//      let end = touch.location(in: superview)
-//    }
-
     if delayHighlightWorkItem != nil {
       performClickEvent()
       return
