@@ -7,9 +7,9 @@ public class SlideView: UIView {
 
   public var currentViewController: UIViewController? { preViewController }
 
-  public var isAnimation = true
+  public var animatable = true
 
-  public lazy var swipeCancelMaxValue: CGFloat = self.frame.width / 2
+  public lazy var cancelSwipeValue: CGFloat = self.frame.width / 2
 
   override public var isHidden: Bool {
     didSet {
@@ -162,17 +162,17 @@ extension SlideView {
       endRect = rightRect
     }
 
-    if isAnimation { toViewController.view.frame = startRect }
+    if animatable { toViewController.view.frame = startRect }
 
     toViewController.willMove(toParent: baseViewController)
 
     baseViewController?.transition(
       from: preViewController,
       to: toViewController,
-      duration: isAnimation ? 0.4 : 0,
+      duration: animatable ? 0.4 : 0,
       animations: { [weak self] in
         toViewController.view.frame = preRect
-        if self?.isAnimation ?? false { preViewController.view.frame = endRect }
+        if self?.animatable ?? false { preViewController.view.frame = endRect }
       },
       completion: { [weak self] _ in
         preViewController.removeFromParent()
@@ -305,7 +305,7 @@ extension SlideView {
       toIndex >= 0,
       toIndex != preIndex,
       toIndex < viewControllersCount,
-      abs(offset) > swipeCancelMaxValue
+      abs(offset) > cancelSwipeValue
     else {
       animateBack(with: offset)
       return
