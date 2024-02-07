@@ -102,6 +102,7 @@ extension NotifyAnimator {
 #if swift(>=5.9)
   import Combine
 
+  @available(iOS 13.0, *)
   fileprivate class NotifyAnimator_Preview: UIView {
     @Stylish
     private var plusButton = UIButton()

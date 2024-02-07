@@ -1,5 +1,6 @@
 import UIKit
 
+@available(iOS 13.0, *)
 final class FavorAnimator {
   private weak var imageView: UIImageView?
   private weak var fullImageView: UIImageView?
@@ -42,6 +43,7 @@ final class FavorAnimator {
 
 // MARK: - UI
 
+@available(iOS 13.0, *)
 extension FavorAnimator {
   func setupFullImage() {
     guard let imageView else { return }
@@ -105,6 +107,7 @@ extension FavorAnimator {
 // MARK: - Preview
 
 #if swift(>=5.9)
+  @available(iOS 13.0, *)
   fileprivate class FavorAnimator_Preview: BaseHighlightableView {
     @Stylish
     private var imageView = UIImageView()
