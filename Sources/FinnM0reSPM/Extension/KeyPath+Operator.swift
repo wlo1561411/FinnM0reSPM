@@ -48,6 +48,14 @@ func ~= <Structure, Value: Comparable>(
   { $0[keyPath: lhs] >= rhs.0 && $0[keyPath: lhs] <= rhs.1 }
 }
 
+func ~= <Structure, _String: StringProtocol>(
+  lhs: KeyPath<Structure, _String>,
+  rhs: _String)
+  -> (Structure) -> Bool
+{
+    { $0[keyPath: lhs].contains(rhs) }
+}
+
 func && <Structure>(
   lhs: @escaping (Structure) -> Bool,
   rhs: @escaping (Structure) -> Bool)
