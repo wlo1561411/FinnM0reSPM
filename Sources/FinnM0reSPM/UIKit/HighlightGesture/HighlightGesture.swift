@@ -1,161 +1,161 @@
 import UIKit
 
 public class HighlightGesture: UIGestureRecognizer {
-  public typealias OnHighlight = (_ isHighlight: Bool) -> Void
+    public typealias OnHighlight = (_ isHighlight: Bool) -> Void
 
-  private var onHighlight: OnHighlight?
-  private var onClick: (() -> Void)?
+    private var onHighlight: OnHighlight?
+    private var onClick: (() -> Void)?
 
-  private var touchBeganPoint: CGPoint?
+    private var touchBeganPoint: CGPoint?
 
-  // Will delay highlight for 0.1 second
-  private var delayHighlightWorkItem: DispatchWorkItem?
+    // Will delay highlight for 0.1 second
+    private var delayHighlightWorkItem: DispatchWorkItem?
 
-  private(set) var isHighlight = false
+    private(set) var isHighlight = false
 
-  fileprivate func setupGestureClosure(onHighlight: OnHighlight? = nil, onClick: (() -> Void)? = nil) {
-    self.onHighlight = onHighlight
-    self.onClick = onClick
-  }
-
-  override public func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent) {
-    super.touchesBegan(touches, with: event)
-    if let touch = touches.first, let vTmp = view {
-      let superview = getOutermostSuperview(of: vTmp)
-      let point = touch.location(in: superview)
-      touchBeganPoint = point
+    fileprivate func setupGestureClosure(onHighlight: OnHighlight? = nil, onClick: (() -> Void)? = nil) {
+        self.onHighlight = onHighlight
+        self.onClick = onClick
     }
 
-    cancelDelayHighlightWorkItem()
+    override public func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent) {
+        super.touchesBegan(touches, with: event)
+        if let touch = touches.first, let vTmp = view {
+            let superview = getOutermostSuperview(of: vTmp)
+            let point = touch.location(in: superview)
+            touchBeganPoint = point
+        }
 
-    let item = DispatchWorkItem(block: { [weak self] in
-      guard let self else { return }
-      self.cancelDelayHighlightWorkItem()
+        cancelDelayHighlightWorkItem()
 
-      self.isHighlight = true
-      self.changeToHighlight()
-    })
+        let item = DispatchWorkItem(block: { [weak self] in
+            guard let self else { return }
+            self.cancelDelayHighlightWorkItem()
 
-    delayHighlightWorkItem = item
-    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: item)
-  }
+            self.isHighlight = true
+            self.changeToHighlight()
+        })
 
-  override public func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent) {
-    super.touchesEnded(touches, with: event)
-
-    if delayHighlightWorkItem != nil {
-      performClickEvent()
-      return
+        delayHighlightWorkItem = item
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: item)
     }
 
-    if isHighlight == false {
-      return
+    override public func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent) {
+        super.touchesEnded(touches, with: event)
+
+        if delayHighlightWorkItem != nil {
+            performClickEvent()
+            return
+        }
+
+        if isHighlight == false {
+            return
+        }
+
+        performClickEvent()
     }
 
-    performClickEvent()
-  }
-
-  override public func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent) {
-    super.touchesCancelled(touches, with: event)
-    cancelHighlight()
-  }
-
-  override public func canBePrevented(by preventingGestureRecognizer: UIGestureRecognizer) -> Bool {
-    cancelHighlight()
-    return super.canBePrevented(by: preventingGestureRecognizer)
-  }
-
-  override public func touchesMoved(_ touches: Set<UITouch>, with _: UIEvent?) {
-    guard let vTmp = view, let touchPoint = touches.first?.location(in: vTmp) else {
-      return
+    override public func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent) {
+        super.touchesCancelled(touches, with: event)
+        cancelHighlight()
     }
 
-    if delayHighlightWorkItem == nil, isHighlight == false {
-      return
+    override public func canBePrevented(by preventingGestureRecognizer: UIGestureRecognizer) -> Bool {
+        cancelHighlight()
+        return super.canBePrevented(by: preventingGestureRecognizer)
     }
 
-    if
-      touchPoint.x < -10 || touchPoint.y < -10 || touchPoint.x > vTmp.bounds.width + 10 || touchPoint.y > vTmp.bounds
-        .height + 10
-    {
-      forceCancelGesture()
-    }
-    else { }
-  }
+    override public func touchesMoved(_ touches: Set<UITouch>, with _: UIEvent?) {
+        guard let vTmp = view, let touchPoint = touches.first?.location(in: vTmp) else {
+            return
+        }
 
-  deinit {
-    onHighlight = nil
-    onClick = nil
-  }
+        if delayHighlightWorkItem == nil, isHighlight == false {
+            return
+        }
+
+        if
+            touchPoint.x < -10 || touchPoint.y < -10 || touchPoint.x > vTmp.bounds.width + 10 || touchPoint.y > vTmp.bounds
+                .height + 10
+        {
+            forceCancelGesture()
+        }
+        else { }
+    }
+
+    deinit {
+        onHighlight = nil
+        onClick = nil
+    }
 }
 
 extension HighlightGesture {
-  private func changeToHighlight() {
-    guard isTouchWithinCurrentFrame() else { return }
-    onHighlight?(true)
-  }
-
-  fileprivate func cancelHighlight() {
-    cancelDelayHighlightWorkItem()
-    isHighlight = false
-    onHighlight?(false)
-  }
-
-  private func performClickEvent() {
-    cancelDelayHighlightWorkItem()
-    isHighlight = false
-    onHighlight?(false)
-
-    if isTouchWithinCurrentFrame() {
-      onClick?()
-      forceCancelGesture()
+    private func changeToHighlight() {
+        guard isTouchWithinCurrentFrame() else { return }
+        onHighlight?(true)
     }
-    touchBeganPoint = nil
-  }
 
-  private func forceCancelGesture() {
-    isEnabled = false
-    isEnabled = true
-  }
-
-  private func getOutermostSuperview(of view: UIView) -> UIView {
-    if let parentView = view.superview {
-      return getOutermostSuperview(of: parentView)
+    fileprivate func cancelHighlight() {
+        cancelDelayHighlightWorkItem()
+        isHighlight = false
+        onHighlight?(false)
     }
-    return view
-  }
 
-  private func isTouchWithinCurrentFrame() -> Bool {
-    guard let beganPoint = touchBeganPoint, let vTmp = view else { return false }
+    private func performClickEvent() {
+        cancelDelayHighlightWorkItem()
+        isHighlight = false
+        onHighlight?(false)
 
-    let superview = getOutermostSuperview(of: vTmp)
-    let endFrame = vTmp.convert(vTmp.bounds, to: superview)
+        if isTouchWithinCurrentFrame() {
+            onClick?()
+            forceCancelGesture()
+        }
+        touchBeganPoint = nil
+    }
 
-    return endFrame.contains(beganPoint)
-  }
+    private func forceCancelGesture() {
+        isEnabled = false
+        isEnabled = true
+    }
 
-  private func cancelDelayHighlightWorkItem() {
-    delayHighlightWorkItem?.cancel()
-    delayHighlightWorkItem = nil
-  }
+    private func getOutermostSuperview(of view: UIView) -> UIView {
+        if let parentView = view.superview {
+            return getOutermostSuperview(of: parentView)
+        }
+        return view
+    }
+
+    private func isTouchWithinCurrentFrame() -> Bool {
+        guard let beganPoint = touchBeganPoint, let vTmp = view else { return false }
+
+        let superview = getOutermostSuperview(of: vTmp)
+        let endFrame = vTmp.convert(vTmp.bounds, to: superview)
+
+        return endFrame.contains(beganPoint)
+    }
+
+    private func cancelDelayHighlightWorkItem() {
+        delayHighlightWorkItem?.cancel()
+        delayHighlightWorkItem = nil
+    }
 }
 
 extension UIView {
-  public func appendHighlightGesture(onHighlight: HighlightGesture.OnHighlight? = nil, onClick: (() -> Void)? = nil) {
-    if onHighlight == nil, onClick == nil {
-      return
+    public func appendHighlightGesture(onHighlight: HighlightGesture.OnHighlight? = nil, onClick: (() -> Void)? = nil) {
+        if onHighlight == nil, onClick == nil {
+            return
+        }
+
+        isUserInteractionEnabled = true
+        let gesture = HighlightGesture()
+        gesture.setupGestureClosure(onHighlight: onHighlight, onClick: onClick)
+        addGestureRecognizer(gesture)
     }
 
-    isUserInteractionEnabled = true
-    let gesture = HighlightGesture()
-    gesture.setupGestureClosure(onHighlight: onHighlight, onClick: onClick)
-    addGestureRecognizer(gesture)
-  }
+    public func triggerNonHighlightEvent() {
+        guard let oldGesture = gestureRecognizers?.first(where: { $0 is HighlightGesture }) as? HighlightGesture
+        else { return }
 
-  public func triggerNonHighlightEvent() {
-    guard let oldGesture = gestureRecognizers?.first(where: { $0 is HighlightGesture }) as? HighlightGesture
-    else { return }
-
-    oldGesture.cancelHighlight()
-  }
+        oldGesture.cancelHighlight()
+    }
 }
