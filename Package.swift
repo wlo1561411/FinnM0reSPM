@@ -9,12 +9,13 @@ let package = Package(
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
             name: "FinnM0reSPM",
-            targets: ["FinnM0reSPM"]),
+            targets: ["FinnM0reSPM"]
+        ),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
         .package(url: "https://github.com/SnapKit/SnapKit.git", .upToNextMajor(from: "5.0.1")),
-        .package(url: "https://github.com/ReactiveX/RxSwift.git", from: "6.5.0")
+        .package(url: "https://github.com/ReactiveX/RxSwift.git", from: "6.5.0"),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -24,10 +25,12 @@ let package = Package(
             dependencies: [
                 "SnapKit",
                 "RxSwift",
-                .product(name: "RxCocoa", package: "RxSwift")
-            ]),
+                .product(name: "RxCocoa", package: "RxSwift"),
+            ]
+        ),
         .testTarget(
             name: "FinnM0reSPMTests",
-            dependencies: ["FinnM0reSPM"]),
+            dependencies: ["FinnM0reSPM"]
+        ),
     ]
 )

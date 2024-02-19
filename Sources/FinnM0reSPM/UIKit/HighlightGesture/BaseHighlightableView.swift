@@ -1,159 +1,160 @@
 import UIKit
 
 public class BaseHighlightableView: SlideTabBar.Item {
-  typealias UISettings = [Status: Setting]
+    typealias UISettings = [Status: Setting]
 
-  public enum Status {
-    case normal
-    case highlight
-    case selected
-    case disable
-  }
-
-  public struct Setting {
-    var text: String?
-    var textColor: UIColor?
-    var backgroundColor: UIColor?
-    var borderWidth: CGFloat?
-    var borderColor: UIColor?
-    var imageColor: UIColor?
-  }
-
-  private var settingDictionary: UISettings = [:]
-
-  public var onTap: ((BaseHighlightableView) -> Void)?
-
-  public var isHighlight = false {
-    didSet {
-      setupViewsFromStatus()
+    public enum Status {
+        case normal
+        case highlight
+        case selected
+        case disable
     }
-  }
 
-  public var isSelected = false {
-    didSet {
-      setupViewsFromStatus()
+    public struct Setting {
+        var text: String?
+        var textColor: UIColor?
+        var backgroundColor: UIColor?
+        var borderWidth: CGFloat?
+        var borderColor: UIColor?
+        var imageColor: UIColor?
     }
-  }
 
-  public var isEnable = true {
-    didSet {
-      setupViewsFromStatus()
+    private var settingDictionary: UISettings = [:]
+
+    public var onTap: ((BaseHighlightableView) -> Void)?
+
+    public var isHighlight = false {
+        didSet {
+            setupViewsFromStatus()
+        }
     }
-  }
 
-  override public init(frame: CGRect) {
-    super.init(frame: frame)
-    commitInit()
-  }
+    public var isSelected = false {
+        didSet {
+            setupViewsFromStatus()
+        }
+    }
 
-  public required init?(coder: NSCoder) {
-    super.init(coder: coder)
-    commitInit()
-  }
+    public var isEnable = true {
+        didSet {
+            setupViewsFromStatus()
+        }
+    }
 
-  public init(onTap: ((BaseHighlightableView) -> Void)?) {
-    super.init(frame: .zero)
-    self.onTap = onTap
-    commitInit()
-  }
+    override public init(frame: CGRect) {
+        super.init(frame: frame)
+        commitInit()
+    }
 
-  private func commitInit() {
-    backgroundColor = .clear
-  }
+    public required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        commitInit()
+    }
 
-  public func setupGesture() {
-    appendHighlightGesture(
-      onHighlight: { [weak self] isHighlight in
-        guard self?.isEnable == true else { return }
-        self?.isHighlight = isHighlight
-      },
-      onClick: { [weak self] in
-        guard
-          let self,
-          self.isEnable
-        else { return }
+    public init(onTap: ((BaseHighlightableView) -> Void)?) {
+        super.init(frame: .zero)
+        self.onTap = onTap
+        commitInit()
+    }
 
-        self.isHighlight = false
-        self.onTap?(self)
-      })
-  }
+    private func commitInit() {
+        backgroundColor = .clear
+    }
 
-  /// Override this function to update UI
-  public func setupViewsFromStatus() { }
+    public func setupGesture() {
+        appendHighlightGesture(
+            onHighlight: { [weak self] isHighlight in
+                guard self?.isEnable == true else { return }
+                self?.isHighlight = isHighlight
+            },
+            onClick: { [weak self] in
+                guard
+                    let self,
+                    self.isEnable
+                else { return }
 
-  public func dispose() {
-    removeAllSetting()
-    onTap = nil
-  }
+                self.isHighlight = false
+                self.onTap?(self)
+            }
+        )
+    }
 
-  // MARK: - SlideTabBarItem
+    /// Override this function to update UI
+    public func setupViewsFromStatus() {}
 
-  override public func setSelected(_ isSelected: Bool, settings _: SlideTabBar.Settings) {
-    isHighlight = false
-    self.isSelected = isSelected
-  }
+    public func dispose() {
+        removeAllSetting()
+        onTap = nil
+    }
 
-  override public func setEnable(_ isEnable: Bool, settings _: SlideTabBar.Settings) {
-    isHighlight = false
-    self.isEnable = isEnable
-  }
+    // MARK: - SlideTabBarItem
 
-  override public func setTransformingColor(_: UIColor) { }
+    override public func setSelected(_ isSelected: Bool, settings _: SlideTabBar.Settings) {
+        isHighlight = false
+        self.isSelected = isSelected
+    }
 
-  deinit {
-    dispose()
-  }
+    override public func setEnable(_ isEnable: Bool, settings _: SlideTabBar.Settings) {
+        isHighlight = false
+        self.isEnable = isEnable
+    }
+
+    override public func setTransformingColor(_: UIColor) {}
+
+    deinit {
+        dispose()
+    }
 }
 
 // MARK: - Setting
 
-extension BaseHighlightableView {
-  public var currentStatus: Status {
-    if isEnable == false {
-      return .disable
+public extension BaseHighlightableView {
+    var currentStatus: Status {
+        if isEnable == false {
+            return .disable
+        }
+
+        if isHighlight {
+            return .highlight
+        }
+
+        if isSelected {
+            return .selected
+        }
+
+        return .normal
     }
 
-    if isHighlight {
-      return .highlight
+    var currentSetting: Setting? {
+        settingDictionary[currentStatus]
     }
 
-    if isSelected {
-      return .selected
+    func addSetting(_ setting: Setting, at status: Status = .normal) {
+        settingDictionary[status] = setting
+        setupViewsFromStatus()
     }
 
-    return .normal
-  }
+    func getSetting(from status: Status) -> Setting? {
+        if let setting = settingDictionary[status] {
+            return setting
+        }
 
-  public var currentSetting: Setting? {
-    settingDictionary[currentStatus]
-  }
-
-  public func addSetting(_ setting: Setting, at status: Status = .normal) {
-    settingDictionary[status] = setting
-    setupViewsFromStatus()
-  }
-
-  public func getSetting(from status: Status) -> Setting? {
-    if let setting = settingDictionary[status] {
-      return setting
+        switch status {
+        case .selected:
+            return getSetting(from: .highlight)
+        case .disable:
+            return getSetting(from: .normal)
+        default:
+            return nil
+        }
     }
 
-    switch status {
-    case .selected:
-      return getSetting(from: .highlight)
-    case .disable:
-      return getSetting(from: .normal)
-    default:
-      return nil
+    func setSettings(_ setting: [Status: Setting]) {
+        settingDictionary = setting
+        setupViewsFromStatus()
     }
-  }
 
-  public func setSettings(_ setting: [Status: Setting]) {
-    settingDictionary = setting
-    setupViewsFromStatus()
-  }
-
-  public func removeAllSetting() {
-    settingDictionary = [:]
-  }
+    func removeAllSetting() {
+        settingDictionary = [:]
+    }
 }

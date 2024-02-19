@@ -3,60 +3,58 @@ import XCTest
 @testable import FinnM0reSPM
 
 final class ReadWriteTests: XCTestCase {
-  private struct ComplexStruct: Equatable {
-    struct InnerStruct: Equatable {
-      var a: Int = .zero
-      var b: Int = .zero
-    }
-
-    var c: Int = .zero
-    var x: InnerStruct = .init()
-  }
-
-  func testPropertyWrapperAPI() {
-    let initialValue = ComplexStruct()
-
-    let ts = ThreadSafe(wrappedValue: initialValue)
-
-    DispatchQueue.concurrentPerform(iterations: 10000) { _ in
-      _ = ts.read { $0 }
-
-      ts.write {
-        _ = $0.c
-        _ = $0.x.a
-        _ = $0.x.b
-
-        if Bool.random() {
-          $0.c = .random(in: 0...1000)
-        }
-        else {
-          if Bool.random() {
-            $0.x.a = .random(in: 0...1000)
-          }
-          else {
-            $0.x.b = .random(in: 0...1000)
-          }
+    private struct ComplexStruct: Equatable {
+        struct InnerStruct: Equatable {
+            var a: Int = .zero
+            var b: Int = .zero
         }
 
-        $0.c += 1
-        $0.x.b += 1
-        $0.x.a += 1
-      }
+        var c: Int = .zero
+        var x: InnerStruct = .init()
     }
 
-    XCTAssertNotEqual(ts.wrappedValue, initialValue)
-  }
+    func testPropertyWrapperAPI() {
+        let initialValue = ComplexStruct()
 
-  func testLockThrowing() {
-    struct Err: Swift.Error { }
+        let ts = ThreadSafe(wrappedValue: initialValue)
 
-    let lock = UnfairLock()
+        DispatchQueue.concurrentPerform(iterations: 10000) { _ in
+            _ = ts.read { $0 }
 
-    lock.lock()
-    // ...
-    lock.unlock()
+            ts.write {
+                _ = $0.c
+                _ = $0.x.a
+                _ = $0.x.b
 
-    XCTAssertThrowsError(try lock.tryExecute { throw Err() } as Int)
-    XCTAssert((try? lock.tryExecute { 5 }) == 5)
-  }
+                if Bool.random() {
+                    $0.c = .random(in: 0 ... 1000)
+                } else {
+                    if Bool.random() {
+                        $0.x.a = .random(in: 0 ... 1000)
+                    } else {
+                        $0.x.b = .random(in: 0 ... 1000)
+                    }
+                }
+
+                $0.c += 1
+                $0.x.b += 1
+                $0.x.a += 1
+            }
+        }
+
+        XCTAssertNotEqual(ts.wrappedValue, initialValue)
+    }
+
+    func testLockThrowing() {
+        struct Err: Swift.Error {}
+
+        let lock = UnfairLock()
+
+        lock.lock()
+        // ...
+        lock.unlock()
+
+        XCTAssertThrowsError(try lock.tryExecute { throw Err() } as Int)
+        XCTAssert((try? lock.tryExecute { 5 }) == 5)
+    }
 }

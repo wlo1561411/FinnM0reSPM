@@ -3,42 +3,42 @@ import SwiftUI
 
 @available(iOS 14, *)
 public class GeneralType: InputType {
-  private let maxLength: Int?
+    private let maxLength: Int?
 
-  public let regex: GeneralRegex
-  public let keyboardType: UIKeyboardType
-  public let disablePaste: Bool
+    public let regex: GeneralRegex
+    public let keyboardType: UIKeyboardType
+    public let disablePaste: Bool
 
-  public init(
-    regex: GeneralRegex = .all,
-    keyboardType: UIKeyboardType = .default,
-    disablePaste: Bool = false,
-    maxLength: Int? = nil)
-  {
-    self.regex = regex
-    self.keyboardType = keyboardType
-    self.disablePaste = disablePaste
-    self.maxLength = maxLength
-  }
-
-  public func format(_ oldText: String, _ newText: String, _ text: Binding<String>) {
-    var newText = newText
-
-    guard newText ~= regex.pattern
-    else {
-      text.wrappedValue = oldText
-      return
+    public init(
+        regex: GeneralRegex = .all,
+        keyboardType: UIKeyboardType = .default,
+        disablePaste: Bool = false,
+        maxLength: Int? = nil
+    ) {
+        self.regex = regex
+        self.keyboardType = keyboardType
+        self.disablePaste = disablePaste
+        self.maxLength = maxLength
     }
 
-    if
-      let maxLength,
-      newText.count >= maxLength
-    {
-      newText = String(newText[..<newText.index(newText.startIndex, offsetBy: maxLength)])
+    public func format(_ oldText: String, _ newText: String, _ text: Binding<String>) {
+        var newText = newText
+
+        guard newText ~= regex.pattern
+        else {
+            text.wrappedValue = oldText
+            return
+        }
+
+        if
+            let maxLength,
+            newText.count >= maxLength
+        {
+            newText = String(newText[..<newText.index(newText.startIndex, offsetBy: maxLength)])
+        }
+
+        text.wrappedValue = newText
     }
 
-    text.wrappedValue = newText
-  }
-
-  public func onEditEnd(_: Binding<String>) { }
+    public func onEditEnd(_: Binding<String>) {}
 }

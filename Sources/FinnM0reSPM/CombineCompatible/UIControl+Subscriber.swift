@@ -2,31 +2,31 @@ import Combine
 import UIKit
 
 @available(iOS 13.0, *)
-extension UIControl {
-  public final class Subscription<
-    SubscriberType: Subscriber,
-    Control: UIControl
-  >: Combine.Subscription
-    where SubscriberType.Input == Control
-  {
-    private var subscriber: SubscriberType?
-    private let control: Control
+public extension UIControl {
+    final class Subscription<
+        SubscriberType: Subscriber,
+        Control: UIControl
+    >: Combine.Subscription
+        where SubscriberType.Input == Control
+    {
+        private var subscriber: SubscriberType?
+        private let control: Control
 
-    init(subscriber: SubscriberType, control: Control, event: UIControl.Event) {
-      self.subscriber = subscriber
-      self.control = control
-      control.addTarget(self, action: #selector(eventHandler), for: event)
+        init(subscriber: SubscriberType, control: Control, event: UIControl.Event) {
+            self.subscriber = subscriber
+            self.control = control
+            control.addTarget(self, action: #selector(eventHandler), for: event)
+        }
+
+        public func request(_: Subscribers.Demand) {}
+
+        public func cancel() {
+            subscriber = nil
+        }
+
+        @objc
+        private func eventHandler() {
+            _ = subscriber?.receive(control)
+        }
     }
-
-      public func request(_: Subscribers.Demand) { }
-
-      public func cancel() {
-      subscriber = nil
-    }
-
-    @objc
-    private func eventHandler() {
-      _ = subscriber?.receive(control)
-    }
-  }
 }
