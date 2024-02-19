@@ -24,7 +24,8 @@ final class DefaultCodableTests: XCTestCase {
         do {
             let model = try JSONDecoder().decode(TestModel.self, from: jsonData)
             XCTAssertEqual(model.status, Status.open)
-        } catch {
+        }
+        catch {
             XCTFail("Decoding failed: \(error)")
         }
     }
@@ -35,7 +36,8 @@ final class DefaultCodableTests: XCTestCase {
         do {
             let model = try JSONDecoder().decode(TestModel.self, from: jsonData)
             XCTAssertEqual(model.status, .pending)
-        } catch {
+        }
+        catch {
             XCTFail("Decoding failed: \(error)")
         }
     }
@@ -46,7 +48,8 @@ final class DefaultCodableTests: XCTestCase {
             let jsonData = try JSONEncoder().encode(model)
             let jsonDict = try JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: Any]
             XCTAssertEqual(jsonDict?["status"] as? String, Status.closed.rawValue)
-        } catch {
+        }
+        catch {
             XCTFail("Encoding failed: \(error)")
         }
     }

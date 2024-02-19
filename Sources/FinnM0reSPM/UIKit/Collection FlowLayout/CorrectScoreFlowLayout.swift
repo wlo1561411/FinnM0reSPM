@@ -43,8 +43,8 @@ public class CorrectScoreFlowLayout: BaseCollectionViewFlowLayout {
     public init(
         supremacy: Supremacy? = nil,
         titleHeight: CGFloat,
-        shouldDisplayFooter: Bool
-    ) {
+        shouldDisplayFooter: Bool)
+    {
         self.supremacy = supremacy
         self.titleHeight = titleHeight
         self.shouldDisplayFooter = shouldDisplayFooter
@@ -98,15 +98,13 @@ extension CorrectScoreFlowLayout {
 
                 let attributes = UICollectionViewLayoutAttributes(
                     forDecorationViewOfKind: "Line",
-                    with: indexPath
-                )
+                    with: indexPath)
 
                 attributes.frame = .init(
                     x: x,
                     y: supplementaryHeight,
                     width: width,
-                    height: titleHeight
-                )
+                    height: titleHeight)
 
                 decorationAttributes[indexPath] = attributes
 
@@ -128,8 +126,7 @@ extension CorrectScoreFlowLayout {
         let indexPath = IndexPath(row: index + 2, section: 0)
         let attributes = UICollectionViewLayoutAttributes(
             forDecorationViewOfKind: "Line",
-            with: indexPath
-        )
+            with: indexPath)
 
         attributes.zIndex = 5
 
@@ -137,8 +134,7 @@ extension CorrectScoreFlowLayout {
             x: x,
             y: 0,
             width: 1,
-            height: height
-        )
+            height: height)
 
         decorationAttributes[indexPath] = attributes
     }
@@ -146,7 +142,7 @@ extension CorrectScoreFlowLayout {
     private func setupItemAttributes() {
         let count = isTrimmed ? ([itemsCount, 10].min() ?? 0) : itemsCount
 
-        for item in 0 ..< count {
+        for item in 0..<count {
             let indexPath = IndexPath(row: item, section: 0)
             let attributes = UICollectionViewLayoutAttributes(forCellWith: indexPath)
             attributes.frame = getOddsFrame(at: indexPath)
@@ -159,8 +155,7 @@ extension CorrectScoreFlowLayout {
         Supply.allCases.forEach {
             let attributes = UICollectionViewLayoutAttributes(
                 forSupplementaryViewOfKind: $0.rawValue,
-                with: [0, 0]
-            )
+                with: [0, 0])
 
             attributes.zIndex = 10
 
@@ -170,8 +165,7 @@ extension CorrectScoreFlowLayout {
                     x: 0,
                     y: 0,
                     width: collectionViewSize.width,
-                    height: supplementaryHeight
-                )
+                    height: supplementaryHeight)
 
             case .footer:
                 guard shouldDisplayFooter else { return }
@@ -181,8 +175,7 @@ extension CorrectScoreFlowLayout {
                         .map(\.frame.maxY)
                         .max() ?? 0,
                     width: collectionViewSize.width,
-                    height: supplementaryHeight
-                )
+                    height: supplementaryHeight)
             }
 
             supplementaryAttributes[$0.rawValue] = attributes
@@ -208,8 +201,7 @@ extension CorrectScoreFlowLayout {
             x: x,
             y: y,
             width: width,
-            height: height
-        )
+            height: height)
     }
 }
 
@@ -236,14 +228,12 @@ extension CorrectScoreFlowLayout {
 
         lazy var collectionView = UICollectionView(
             frame: .zero,
-            collectionViewLayout: flowLayout
-        )
+            collectionViewLayout: flowLayout)
 
         let flowLayout = CorrectScoreFlowLayout(
             supremacy: .home,
             titleHeight: 24,
-            shouldDisplayFooter: true
-        )
+            shouldDisplayFooter: true)
 
         let cellRegistration = UICollectionView.CellRegistration<UICollectionViewCell, String>.init { cell, indexPath, _ in
             cell.backgroundColor = .gray
@@ -294,8 +284,7 @@ extension CorrectScoreFlowLayout {
         func collectionView(
             _ collectionView: UICollectionView,
             viewForSupplementaryElementOfKind kind: String,
-            at indexPath: IndexPath
-        )
+            at indexPath: IndexPath)
             -> UICollectionReusableView
         {
             switch Supply(rawValue: kind) {
@@ -313,8 +302,7 @@ extension CorrectScoreFlowLayout {
                 title: "Supremacy",
                 style: .plain,
                 target: self,
-                action: #selector(alert)
-            )
+                action: #selector(alert))
         }
 
         @objc

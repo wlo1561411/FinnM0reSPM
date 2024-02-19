@@ -2,16 +2,15 @@ import Combine
 import Foundation
 
 @available(iOS 13.0, *)
-public extension Styler {
+extension Styler {
     @discardableResult
-    func assign<
+    public func assign<
         PublisherType: Publisher,
         Output
     >(
         from publisher: PublisherType,
         to keyPath: ReferenceWritableKeyPath<Base, Output>,
-        cancellables: inout Set<AnyCancellable>
-    )
+        cancellables: inout Set<AnyCancellable>)
         -> Self
         where
         PublisherType.Output == Output,

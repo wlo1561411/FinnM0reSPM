@@ -6,8 +6,8 @@ public protocol HasCancellable: AnyObject {
 }
 
 @available(iOS 14.0, *)
-public extension HasCancellable {
-    func removeAllSubscriptions() {
+extension HasCancellable {
+    public func removeAllSubscriptions() {
         cancellable.forEach { $0.cancel() }
         cancellable.removeAll()
     }

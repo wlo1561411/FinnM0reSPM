@@ -1,16 +1,15 @@
 import UIKit
 
-public extension UIColor {
-    convenience init(red: Int = 0xFF, green: Int = 0xFF, blue: Int = 0xFF, a: Int = 0xFF) {
+extension UIColor {
+    public convenience init(red: Int = 0xFF, green: Int = 0xFF, blue: Int = 0xFF, a: Int = 0xFF) {
         self.init(
             red: CGFloat(red) / 255.0,
             green: CGFloat(green) / 255.0,
             blue: CGFloat(blue) / 255.0,
-            alpha: CGFloat(a) / 255.0
-        )
+            alpha: CGFloat(a) / 255.0)
     }
 
-    convenience init?(hex: String?) {
+    public convenience init?(hex: String?) {
         guard let hex else { return nil }
 
         let r, g, b, a: CGFloat

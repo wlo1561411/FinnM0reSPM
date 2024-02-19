@@ -17,8 +17,8 @@ final class FavorAnimator {
     init(
         imageView: UIImageView,
         fullImageView: UIImageView,
-        shouldFadeOut: Bool
-    ) {
+        shouldFadeOut: Bool)
+    {
         self.imageView = imageView
         self.fullImageView = fullImageView
         self.shouldFadeOut = shouldFadeOut
@@ -60,8 +60,8 @@ extension FavorAnimator {
 
     func updateColors(
         normalColor: UIColor? = nil,
-        selectedColor: UIColor? = nil
-    ) {
+        selectedColor: UIColor? = nil)
+    {
         if let normalColor {
             imageView?.image = .init(systemName: "heart")?.masked(normalColor)
         }
@@ -93,7 +93,8 @@ extension FavorAnimator {
                 }
 
             scale.nextAnimation(fadeOut)
-        } else {
+        }
+        else {
             scale.onCompleted { [weak self] _ in
                 self?.onCompleted?()
             }

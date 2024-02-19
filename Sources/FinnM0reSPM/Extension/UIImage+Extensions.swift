@@ -1,7 +1,7 @@
 import UIKit
 
-public extension UIImage {
-    func fixedOrientation() -> UIImage? {
+extension UIImage {
+    public func fixedOrientation() -> UIImage? {
         switch imageOrientation {
         case .up:
             return self
@@ -14,7 +14,7 @@ public extension UIImage {
         }
     }
 
-    func masked(_ color: UIColor) -> UIImage? {
+    public func masked(_ color: UIColor) -> UIImage? {
         UIGraphicsBeginImageContextWithOptions(size, false, scale)
         color.setFill()
 
@@ -25,8 +25,7 @@ public extension UIImage {
 
         let rect = CGRect(
             origin: .zero,
-            size: CGSize(width: size.width, height: size.height)
-        )
+            size: CGSize(width: size.width, height: size.height))
         context?.clip(to: rect, mask: cgImage!)
         context?.fill(rect)
 
@@ -35,12 +34,13 @@ public extension UIImage {
 
         if let resultImage = newImage {
             return resultImage
-        } else {
+        }
+        else {
             return nil
         }
     }
 
-    func compress() -> (size: Double, imgData: String)? {
+    public func compress() -> (size: Double, imgData: String)? {
         let fixedImage: UIImage = fixedOrientation() ?? self
         guard let data = fixedImage.jpegData(compressionQuality: 0.6) else { return nil }
 
@@ -50,15 +50,14 @@ public extension UIImage {
         return (size: imageSize, imgData: imgDataBase64)
     }
 
-    enum ResizeAlignment {
+    public enum ResizeAlignment {
         case bottom
         case none
     }
 
-    func resize(
+    public func resize(
         to targetSize: CGSize,
-        alignment: ResizeAlignment = .none
-    )
+        alignment: ResizeAlignment = .none)
         -> UIImage?
     {
         let aspectRatio = size.width / size.height

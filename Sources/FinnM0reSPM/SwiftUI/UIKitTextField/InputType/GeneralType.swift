@@ -13,8 +13,8 @@ public class GeneralType: InputType {
         regex: GeneralRegex = .all,
         keyboardType: UIKeyboardType = .default,
         disablePaste: Bool = false,
-        maxLength: Int? = nil
-    ) {
+        maxLength: Int? = nil)
+    {
         self.regex = regex
         self.keyboardType = keyboardType
         self.disablePaste = disablePaste
@@ -40,5 +40,5 @@ public class GeneralType: InputType {
         text.wrappedValue = newText
     }
 
-    public func onEditEnd(_: Binding<String>) {}
+    public func onEditEnd(_: Binding<String>) { }
 }

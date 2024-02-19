@@ -23,8 +23,7 @@ open class BaseCollectionViewFlowLayout: UICollectionViewFlowLayout {
                 .max() ?? 0,
             height: allAttributes
                 .map(\.frame.maxY)
-                .max() ?? 0
-        )
+                .max() ?? 0)
     }
 
     override public func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
@@ -33,8 +32,7 @@ open class BaseCollectionViewFlowLayout: UICollectionViewFlowLayout {
 
     override public func layoutAttributesForDecorationView(
         ofKind _: String,
-        at indexPath: IndexPath
-    )
+        at indexPath: IndexPath)
         -> UICollectionViewLayoutAttributes?
     {
         decorationAttributes[indexPath]
@@ -42,8 +40,7 @@ open class BaseCollectionViewFlowLayout: UICollectionViewFlowLayout {
 
     override public func layoutAttributesForSupplementaryView(
         ofKind elementKind: String,
-        at _: IndexPath
-    )
+        at _: IndexPath)
         -> UICollectionViewLayoutAttributes?
     {
         supplementaryAttributes[elementKind]
@@ -56,25 +53,24 @@ open class BaseCollectionViewFlowLayout: UICollectionViewFlowLayout {
 
 // MARK: - Data Handle
 
-public extension BaseCollectionViewFlowLayout {
-    var collectionViewSize: CGSize {
+extension BaseCollectionViewFlowLayout {
+    public var collectionViewSize: CGSize {
         collectionView?.frame.size ?? .zero
     }
 
-    var itemsCount: Int {
+    public var itemsCount: Int {
         collectionView?.numberOfItems(inSection: 0) ?? 0
     }
 
-    var allAttributes: [UICollectionViewLayoutAttributes] {
+    public var allAttributes: [UICollectionViewLayoutAttributes] {
         Array(itemAttributes.values) +
             Array(supplementaryAttributes.values) +
             Array(decorationAttributes.values)
     }
 
-    func getFractionalWidth(
+    public func getFractionalWidth(
         numberOfColumn: Int,
-        spacing: CGFloat
-    )
+        spacing: CGFloat)
         -> CGFloat
     {
         // Remove leading, trailing, items spacing

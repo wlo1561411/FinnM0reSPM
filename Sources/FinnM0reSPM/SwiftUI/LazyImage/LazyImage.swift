@@ -29,8 +29,8 @@ public struct LazyImage<Success, Placeholder, Failure>: View
         downloader: LazyImageDownloader? = nil,
         @ViewBuilder success: @escaping (UIImage) -> Success,
         @ViewBuilder placeholder: @escaping () -> Placeholder = { EmptyView() },
-        @ViewBuilder failure: @escaping (Error?) -> Failure = { _ in EmptyView() }
-    ) {
+        @ViewBuilder failure: @escaping (Error?) -> Failure = { _ in EmptyView() })
+    {
         self.url = url
         self.success = success
         self.placeholder = placeholder
@@ -44,10 +44,10 @@ public struct LazyImage<Success, Placeholder, Failure>: View
     public var body: some View {
         VStack {
             switch repository.phase {
-            case let .success(image):
+            case .success(let image):
                 success(image)
 
-            case let .failure(error):
+            case .failure(let error):
                 failure(error)
 
             case .placeholder:
@@ -56,7 +56,8 @@ public struct LazyImage<Success, Placeholder, Failure>: View
             default:
                 if havePlaceholderContent {
                     placeholder()
-                } else { Color.clear }
+                }
+                else { Color.clear }
             }
         }
         .if(!haveFailureContent) {
@@ -87,10 +88,9 @@ struct LazyImage_Previews: PreviewProvider {
                 Image("Failed")
                     .resizable()
                     .scaledToFit()
-            }
-        )
-        .frame(width: 300, height: 300)
-        .backgroundColor(.darkGray)
+            })
+            .frame(width: 300, height: 300)
+            .backgroundColor(.darkGray)
 
         LazyImage(
             url: "https://store.storeimages.cdn-apple.com/8756/as-images.apple.com/is/store-card-14-16-mac-nav-202301?wid=200&hei=130&fmt=png-alpha&.v=1670959891635",
@@ -103,10 +103,9 @@ struct LazyImage_Previews: PreviewProvider {
                 Image("Failed")
                     .resizable()
                     .scaledToFit()
-            }
-        )
-        .frame(width: 300, height: 300)
-        .backgroundColor(.darkGray)
+            })
+            .frame(width: 300, height: 300)
+            .backgroundColor(.darkGray)
 
         HStack {
             LazyImage(
@@ -115,10 +114,9 @@ struct LazyImage_Previews: PreviewProvider {
                     Image(uiImage: $0)
                         .resizable()
                         .scaledToFit()
-                }
-            )
-            .frame(width: 300, height: 300)
-            .backgroundColor(.darkGray)
+                })
+                .frame(width: 300, height: 300)
+                .backgroundColor(.darkGray)
         }
     }
 }

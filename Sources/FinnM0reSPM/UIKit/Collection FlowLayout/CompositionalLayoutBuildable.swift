@@ -1,31 +1,28 @@
 import UIKit
 
 @available(iOS 13.0, *)
-public protocol CompositionalLayoutBuildable {}
+public protocol CompositionalLayoutBuildable { }
 
 @available(iOS 13.0, *)
-public extension CompositionalLayoutBuildable {
-    func layoutSize(
+extension CompositionalLayoutBuildable {
+    public func layoutSize(
         width: NSCollectionLayoutDimension,
-        height: NSCollectionLayoutDimension
-    )
+        height: NSCollectionLayoutDimension)
         -> NSCollectionLayoutSize
     {
         .init(widthDimension: width, heightDimension: height)
     }
 
-    func item(
+    public func item(
         width: NSCollectionLayoutDimension,
         height: NSCollectionLayoutDimension,
         supplementaryItems: [NSCollectionLayoutSupplementaryItem] = [],
-        contentInset: NSDirectionalEdgeInsets? = nil
-    )
+        contentInset: NSDirectionalEdgeInsets? = nil)
         -> NSCollectionLayoutItem
     {
         let item = NSCollectionLayoutItem(
             layoutSize: layoutSize(width: width, height: height),
-            supplementaryItems: supplementaryItems
-        )
+            supplementaryItems: supplementaryItems)
 
         if let contentInset {
             item.contentInsets = contentInset
@@ -34,14 +31,13 @@ public extension CompositionalLayoutBuildable {
         return item
     }
 
-    func group(
+    public func group(
         axis: NSLayoutConstraint.Axis,
         width: NSCollectionLayoutDimension,
         height: NSCollectionLayoutDimension,
         subitems: [NSCollectionLayoutItem],
         spacing: NSCollectionLayoutSpacing? = nil,
-        contentInset: NSDirectionalEdgeInsets? = nil
-    )
+        contentInset: NSDirectionalEdgeInsets? = nil)
         -> NSCollectionLayoutGroup
     {
         let group: NSCollectionLayoutGroup
@@ -64,15 +60,14 @@ public extension CompositionalLayoutBuildable {
         return group
     }
 
-    func group(
+    public func group(
         axis: NSLayoutConstraint.Axis,
         width: NSCollectionLayoutDimension,
         height: NSCollectionLayoutDimension,
         repeatingSubitem: NSCollectionLayoutItem,
         count: Int,
         spacing: NSCollectionLayoutSpacing? = nil,
-        contentInset: NSDirectionalEdgeInsets? = nil
-    )
+        contentInset: NSDirectionalEdgeInsets? = nil)
         -> NSCollectionLayoutGroup
     {
         let group: NSCollectionLayoutGroup
@@ -94,28 +89,25 @@ public extension CompositionalLayoutBuildable {
         return group
     }
 
-    func supplementaryItem(
+    public func supplementaryItem(
         width: NSCollectionLayoutDimension,
         height: NSCollectionLayoutDimension,
         elementKind: String,
         alignment: NSRectAlignment = .top,
-        absoluteOffset: CGPoint = .zero
-    )
+        absoluteOffset: CGPoint = .zero)
         -> NSCollectionLayoutBoundarySupplementaryItem
     {
         .init(
             layoutSize: layoutSize(width: width, height: height),
             elementKind: elementKind,
             alignment: alignment,
-            absoluteOffset: absoluteOffset
-        )
+            absoluteOffset: absoluteOffset)
     }
 
-    func section(
+    public func section(
         group: NSCollectionLayoutGroup,
         spacing: CGFloat? = nil,
-        contentInset: NSDirectionalEdgeInsets? = nil
-    )
+        contentInset: NSDirectionalEdgeInsets? = nil)
         -> NSCollectionLayoutSection
     {
         let section = NSCollectionLayoutSection(group: group)

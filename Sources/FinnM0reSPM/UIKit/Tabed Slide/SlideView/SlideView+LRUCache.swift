@@ -20,7 +20,8 @@ extension SlideView.LRUCache {
             /// Change key's position by LRU
             keys.removeAll(where: { $0 == key })
             keys.append(key)
-        } else {
+        }
+        else {
             if keys.count < capacity {
                 cacheDictionary.updateValue(object, forKey: key)
                 keys.append(key)
@@ -45,7 +46,8 @@ extension SlideView.LRUCache {
             keys.append(key)
 
             return cacheDictionary[key]
-        } else { return nil }
+        }
+        else { return nil }
     }
 
     func removeAll() {

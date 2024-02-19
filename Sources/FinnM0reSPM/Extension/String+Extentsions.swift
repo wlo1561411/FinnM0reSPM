@@ -2,53 +2,53 @@ import UIKit
 
 // MARK: - General
 
-public extension String {
-    var attributed: NSMutableAttributedString {
+extension String {
+    public var attributed: NSMutableAttributedString {
         .init(string: self)
     }
 
-    var orEmpty: String? {
+    public var orEmpty: String? {
         isEmpty ? nil : self
     }
 
-    var urlEncoded: String? {
+    public var urlEncoded: String? {
         addingPercentEncoding(withAllowedCharacters: NSCharacterSet(charactersIn: "!*'();:@&=+$,/?%#[] ").inverted)
     }
 
-    var urlDecoded: String? {
+    public var urlDecoded: String? {
         removingPercentEncoding
     }
 
-    var urlQueryFormatted: String? {
+    public var urlQueryFormatted: String? {
         addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed)?.replacingOccurrences(of: "+", with: "%2b")
     }
 
-    var halfWidth: String {
+    public var halfWidth: String {
         let string = NSMutableString(string: self) as CFMutableString
         CFStringTransform(string, nil, kCFStringTransformFullwidthHalfwidth, false)
         return string as String
     }
 
-    func formated(_ arguments: [CVarArg?] = []) -> String {
+    public func formated(_ arguments: [CVarArg?] = []) -> String {
         if arguments.count > 0 {
             return String(format: self, arguments: arguments.compactMap { $0 })
-        } else {
+        }
+        else {
             return self
         }
     }
 
-    func ranges(of occurrence: String) -> [Range<String.Index>] {
+    public func ranges(of occurrence: String) -> [Range<String.Index>] {
         var indices = [Int]()
         var position = startIndex
 
-        while let range = range(of: occurrence, range: position ..< endIndex) {
+        while let range = range(of: occurrence, range: position..<endIndex) {
             let offset = occurrence.distance(from: occurrence.startIndex, to: occurrence.endIndex) - 1
             guard
                 let after = index(
                     range.lowerBound,
                     offsetBy: offset,
-                    limitedBy: endIndex
-                )
+                    limitedBy: endIndex)
             else { break }
 
             indices.append(distance(from: startIndex, to: range.lowerBound))
@@ -56,54 +56,52 @@ public extension String {
         }
 
         let count = occurrence.count
-        return indices.map { index(startIndex, offsetBy: $0) ..< index(startIndex, offsetBy: $0 + count) }
+        return indices.map { index(startIndex, offsetBy: $0)..<index(startIndex, offsetBy: $0 + count) }
     }
 
-    func width(with font: UIFont) -> CGFloat {
+    public func width(with font: UIFont) -> CGFloat {
         ceil(
             NSString(string: self)
                 .boundingRect(
                     with: CGSize(
                         width: CGFloat.greatestFiniteMagnitude,
-                        height: font.lineHeight
-                    ),
+                        height: font.lineHeight),
                     options: .usesLineFragmentOrigin,
                     attributes: [NSAttributedString.Key.font: font],
-                    context: nil
-                ).size.width)
+                    context: nil).size.width)
     }
 
-    func height(with font: UIFont, width: CGFloat) -> CGFloat {
+    public func height(with font: UIFont, width: CGFloat) -> CGFloat {
         ceil(
             NSString(string: self)
                 .boundingRect(
                     with: CGSize(
                         width: width,
-                        height: CGFloat.greatestFiniteMagnitude
-                    ),
+                        height: CGFloat.greatestFiniteMagnitude),
                     options: .usesLineFragmentOrigin,
                     attributes: [NSAttributedString.Key.font: font],
-                    context: nil
-                ).size.height)
+                    context: nil).size.height)
     }
 
-    func htmlStripped() -> String {
+    public func htmlStripped() -> String {
         replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression, range: nil)
             .replacingOccurrences(of: "\n", with: "")
             .replacingOccurrences(of: " ", with: "")
     }
 
-    func spaceByFour(suffix: Int?) -> String {
+    public func spaceByFour(suffix: Int?) -> String {
         let fixed = replacingOccurrences(of: " ", with: "")
         var temp = ""
         for (key, value) in fixed.enumerated() {
             if let suffix {
                 if key >= count - suffix {
                     temp += "\(value)"
-                } else {
+                }
+                else {
                     temp += "*"
                 }
-            } else {
+            }
+            else {
                 temp += "\(value)"
             }
 
@@ -114,15 +112,15 @@ public extension String {
         return temp
     }
 
-    func versionCompare(_ otherVersion: String?) -> ComparisonResult {
+    public func versionCompare(_ otherVersion: String?) -> ComparisonResult {
         compare(otherVersion ?? "", options: .numeric)
     }
 }
 
 // MARK: - Regular Expression
 
-public extension String {
-    enum Regex: String {
+extension String {
+    public enum Regex: String {
         case password
         case username
         case phone
@@ -193,23 +191,22 @@ public extension String {
         }
     }
 
-    static func ~= (lhs: String, rhs: String) -> Bool {
+    public static func ~= (lhs: String, rhs: String) -> Bool {
         guard let regex = try? NSRegularExpression(pattern: rhs) else { return false }
         let range = NSRange(location: 0, length: lhs.utf16.count)
         return regex.firstMatch(in: lhs, options: [], range: range) != nil
     }
 
-    func valid(_ regex: Regex) -> Bool {
+    public func valid(_ regex: Regex) -> Bool {
         self ~= regex.value
     }
 
-    func match(_ regex: Regex) -> [String] {
+    public func match(_ regex: Regex) -> [String] {
         let _string = self as NSString
         return (try? NSRegularExpression(pattern: regex.value))?
             .matches(
                 in: self,
-                range: NSRange(location: 0, length: _string.length)
-            )
+                range: NSRange(location: 0, length: _string.length))
             .map {
                 _string.substring(with: $0.range)
             } ?? []
@@ -218,22 +215,23 @@ public extension String {
 
 // MARK: - Mask
 
-public extension String {
-    enum Mask {
+extension String {
+    public enum Mask {
         case left(Int)
         case email
         /// It wil escape "$"
         case allMasked
     }
 
-    func masked(_ type: Mask) -> String {
+    public func masked(_ type: Mask) -> String {
         switch type {
-        case let .left(count):
+        case .left(let count):
             return enumerated()
                 .map { key, value -> String in
                     if count > 0, (self.count - key - 1) < count {
                         return "\(value)"
-                    } else {
+                    }
+                    else {
                         return "*"
                     }
                 }
@@ -251,11 +249,13 @@ public extension String {
 
                     if detectAt {
                         return "\(value)"
-                    } else {
+                    }
+                    else {
                         if count < 3 {
                             count += 1
                             return "\(value)"
-                        } else {
+                        }
+                        else {
                             return "*"
                         }
                     }
@@ -278,8 +278,8 @@ public extension String {
 
 // MARK: - Date
 
-public extension String {
-    enum DateFormat: String {
+extension String {
+    public enum DateFormat: String {
         public enum ISO8601 {
             /// Format: 2021-05-31T11:00:00.000Z
             case standard
@@ -309,14 +309,14 @@ public extension String {
     }
 
     /// Need to collect the other situation
-    func dateFromISO8601(_ type: DateFormat.ISO8601) -> Date? {
+    public func dateFromISO8601(_ type: DateFormat.ISO8601) -> Date? {
         let formatter = ISO8601DateFormatter()
         formatter.timeZone = .init(identifier: "Asia/Hong_Kong")
         formatter.formatOptions = type.options
         return formatter.date(from: self)
     }
 
-    func dateFromFormat(_ format: DateFormat) -> Date? {
+    public func dateFromFormat(_ format: DateFormat) -> Date? {
         let formatter = DateFormatter()
         formatter.dateFormat = format.rawValue
         formatter.calendar = Calendar(identifier: .gregorian)
@@ -326,35 +326,32 @@ public extension String {
 
 // MARK: - NSMutableAttributedString
 
-public extension NSMutableAttributedString {
-    func textColor(_ color: UIColor) -> NSMutableAttributedString {
+extension NSMutableAttributedString {
+    public func textColor(_ color: UIColor) -> NSMutableAttributedString {
         addAttribute(
             .foregroundColor,
             value: color,
-            range: .init(location: 0, length: length)
-        )
+            range: .init(location: 0, length: length))
         return self
     }
 
-    func font(_ font: UIFont) -> NSMutableAttributedString {
+    public func font(_ font: UIFont) -> NSMutableAttributedString {
         addAttribute(
             .font,
             value: font,
-            range: .init(location: 0, length: length)
-        )
+            range: .init(location: 0, length: length))
         return self
     }
 
-    func characterSpacing(_ spacing: CGFloat) -> NSMutableAttributedString {
+    public func characterSpacing(_ spacing: CGFloat) -> NSMutableAttributedString {
         addAttribute(
             .kern,
             value: spacing,
-            range: .init(location: 0, length: length - 1)
-        )
+            range: .init(location: 0, length: length - 1))
         return self
     }
 
-    func textAlignment(_ alignment: NSTextAlignment) -> NSMutableAttributedString {
+    public func textAlignment(_ alignment: NSTextAlignment) -> NSMutableAttributedString {
         if let pre = attribute(.paragraphStyle, at: 0, effectiveRange: nil) as? NSMutableParagraphStyle {
             pre.alignment = alignment
             return self
@@ -366,12 +363,11 @@ public extension NSMutableAttributedString {
         addAttribute(
             .paragraphStyle,
             value: paragraphStyle,
-            range: .init(location: 0, length: length)
-        )
+            range: .init(location: 0, length: length))
         return self
     }
 
-    func lineSpacing(_ spacing: CGFloat) -> NSMutableAttributedString {
+    public func lineSpacing(_ spacing: CGFloat) -> NSMutableAttributedString {
         if let pre = attribute(.paragraphStyle, at: 0, effectiveRange: nil) as? NSMutableParagraphStyle {
             pre.lineSpacing = spacing
             return self
@@ -383,32 +379,28 @@ public extension NSMutableAttributedString {
         addAttribute(
             NSAttributedString.Key.paragraphStyle,
             value: paragraphStyle,
-            range: NSMakeRange(0, length)
-        )
+            range: NSMakeRange(0, length))
         return self
     }
 
-    func highlight(
+    public func highlight(
         font: UIFont,
         color: UIColor,
-        rangeSubString: String
-    )
+        rangeSubString: String)
         -> NSMutableAttributedString
     {
         for item in string.ranges(of: rangeSubString) {
             addAttributes(
                 [.font: font, .foregroundColor: color],
-                range: NSRange(item, in: string)
-            )
+                range: NSRange(item, in: string))
         }
         return self
     }
 
-    func highlights(
+    public func highlights(
         font: UIFont,
         color: UIColor,
-        rangeSubStrings: [String?]
-    )
+        rangeSubStrings: [String?])
         -> NSMutableAttributedString
     {
         rangeSubStrings

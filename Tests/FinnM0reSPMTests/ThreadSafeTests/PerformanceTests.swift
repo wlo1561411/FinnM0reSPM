@@ -22,12 +22,14 @@ final class PerformanceTests: XCTestCase {
             _ = x.b
 
             if Bool.random() {
-                c = .random(in: 0 ... 1000)
-            } else {
+                c = .random(in: 0...1000)
+            }
+            else {
                 if Bool.random() {
-                    x.a = .random(in: 0 ... 1000)
-                } else {
-                    x.b = .random(in: 0 ... 1000)
+                    x.a = .random(in: 0...1000)
+                }
+                else {
+                    x.b = .random(in: 0...1000)
                 }
             }
 
@@ -44,7 +46,7 @@ final class PerformanceTests: XCTestCase {
 
         let t1 = Date()
 
-        for _ in 0 ..< Constants.iterations {
+        for _ in 0..<Constants.iterations {
             _ = queue.sync {
                 value
             }
@@ -76,7 +78,7 @@ final class PerformanceTests: XCTestCase {
 
         let t1 = Date()
 
-        for _ in 0 ..< Constants.iterations {
+        for _ in 0..<Constants.iterations {
             _ = await a.read()
             await a.update()
         }

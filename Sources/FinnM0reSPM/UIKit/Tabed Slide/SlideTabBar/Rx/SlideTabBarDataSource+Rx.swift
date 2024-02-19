@@ -130,8 +130,8 @@ class RxSlideTabBarDataSource: SlideTabBarDataSource {
 
 // MARK: - Binding
 
-public extension Reactive where Base: SlideTabBar {
-    func titles<Source: ObservableType>
+extension Reactive where Base: SlideTabBar {
+    public func titles<Source: ObservableType>
     (_ source: Source)
         -> Disposable
         where Source.Element == [String]
@@ -140,7 +140,7 @@ public extension Reactive where Base: SlideTabBar {
         return items(dataSource: dataSource)(source)
     }
 
-    func items<
+    public func items<
         Sequence: Swift.Sequence,
         Source: ObservableType
     >
@@ -155,7 +155,7 @@ public extension Reactive where Base: SlideTabBar {
         }
     }
 
-    func items<
+    public func items<
         DataSource: RxSlideTabBarDataSourceType & SlideTabBarDataSource,
         _ObservableType: ObservableType
     >
@@ -172,13 +172,14 @@ public extension Reactive where Base: SlideTabBar {
                 ofObject: self.base,
                 dataSource: dataSource as SlideTabBarDataSource,
                 observable: source,
-                retainDataSource: true
-            ) { [weak tabBar = self.base] (_: RxSlideTabBarDataSourceProxy, event) in
+                retainDataSource: true)
+            { [weak tabBar = self.base] (_: RxSlideTabBarDataSourceProxy, event) in
                 guard let tabBar else { return }
 
                 if let _event = event as? Event<[String]> {
                     dataSource.tabBar(tabBar, observedEvent: _event)
-                } else {
+                }
+                else {
                     dataSource.tabBar(tabBar, observedEvent: event)
                 }
             }

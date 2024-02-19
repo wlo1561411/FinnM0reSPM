@@ -1,15 +1,15 @@
 import SwiftUI
 
 @available(iOS 14.0, *)
-public extension LazyImage {
-    enum Phase {
+extension LazyImage {
+    public enum Phase {
         case placeholder
         case success(UIImage)
         case failure(Error)
 
         var image: UIImage? {
             switch self {
-            case let .success(image):
+            case .success(let image):
                 return image
             default:
                 return nil
@@ -18,7 +18,7 @@ public extension LazyImage {
 
         var error: Error? {
             switch self {
-            case let .failure(error):
+            case .failure(let error):
                 return error
             default:
                 return nil
@@ -26,7 +26,7 @@ public extension LazyImage {
         }
     }
 
-    final class Repository: ObservableObject {
+    public final class Repository: ObservableObject {
         @Published
         var phase: Phase?
 
@@ -35,7 +35,8 @@ public extension LazyImage {
         init(downloader: LazyImageDownloader? = nil) {
             if let downloader {
                 self.downloader = downloader
-            } else {
+            }
+            else {
                 self.downloader = DefaultDownloader()
             }
         }
@@ -45,7 +46,8 @@ public extension LazyImage {
             do {
                 let image = try await downloader.image(from: url)
                 phase = .success(image)
-            } catch {
+            }
+            catch {
                 phase = .failure(error)
             }
         }

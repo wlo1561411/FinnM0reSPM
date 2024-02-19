@@ -15,8 +15,8 @@ public protocol InputType: AnyObject {
 }
 
 @available(iOS 14, *)
-public extension InputType {
-    var functionalConfig: (PasteableTextField) -> Void {
+extension InputType {
+    public var functionalConfig: (PasteableTextField) -> Void {
         { [weak self] textField in
             guard let self else { return }
 

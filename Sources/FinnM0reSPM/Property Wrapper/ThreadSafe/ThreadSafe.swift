@@ -1,5 +1,3 @@
-// reference by https://github.com/geor-kasapidi/STS
-
 @propertyWrapper
 public final class ThreadSafe<T> {
     private let lock = UnfairLock()

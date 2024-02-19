@@ -6,8 +6,7 @@ public protocol SlideTabBarDistribution {
         _ scrollView: UIScrollView,
         _ contentInset: UIEdgeInsets,
         _ stackView: UIStackView,
-        _ fullConstraint: Constraint?
-    )
+        _ fullConstraint: Constraint?)
 }
 
 extension SlideTabBarDistribution {
@@ -16,44 +15,44 @@ extension SlideTabBarDistribution {
     }
 }
 
-public extension SlideTabBarDistribution where Self == SlideTabBar.ContentLeading {
-    static var contentLeading: SlideTabBar.ContentLeading { .init() }
+extension SlideTabBarDistribution where Self == SlideTabBar.ContentLeading {
+    public static var contentLeading: SlideTabBar.ContentLeading { .init() }
 }
 
-public extension SlideTabBarDistribution where Self == SlideTabBar.ContentCenter {
-    static var contentCenter: SlideTabBar.ContentCenter { .init() }
+extension SlideTabBarDistribution where Self == SlideTabBar.ContentCenter {
+    public static var contentCenter: SlideTabBar.ContentCenter { .init() }
 }
 
-public extension SlideTabBarDistribution where Self == SlideTabBar.Full {
-    static var full: SlideTabBar.Full { .init() }
+extension SlideTabBarDistribution where Self == SlideTabBar.Full {
+    public static var full: SlideTabBar.Full { .init() }
 }
 
-public extension SlideTabBarDistribution where Self == SlideTabBar.Width {
-    static func width(_ value: CGFloat, alignToCenter: Bool) -> SlideTabBar
+extension SlideTabBarDistribution where Self == SlideTabBar.Width {
+    public static func width(_ value: CGFloat, alignToCenter: Bool) -> SlideTabBar
         .Width { .init(value: value, alignToCenter: alignToCenter) }
 }
 
-public extension SlideTabBar {
-    struct ContentLeading: SlideTabBarDistribution {
+extension SlideTabBar {
+    public struct ContentLeading: SlideTabBarDistribution {
         public func update(
             _ scrollView: UIScrollView,
             _ contentInset: UIEdgeInsets,
             _ stackView: UIStackView,
-            _ fullConstraint: Constraint?
-        ) {
+            _ fullConstraint: Constraint?)
+        {
             resetContentInset(scrollView: scrollView, contentInset: contentInset)
             stackView.distribution = .equalSpacing
             fullConstraint?.deactivate()
         }
     }
 
-    struct ContentCenter: SlideTabBarDistribution {
+    public struct ContentCenter: SlideTabBarDistribution {
         public func update(
             _ scrollView: UIScrollView,
             _ contentInset: UIEdgeInsets,
             _ stackView: UIStackView,
-            _ fullConstraint: Constraint?
-        ) {
+            _ fullConstraint: Constraint?)
+        {
             stackView.distribution = .equalSpacing
             fullConstraint?.deactivate()
 
@@ -63,26 +62,27 @@ public extension SlideTabBar {
             if scrollView.frame.width > stackView.frame.width + (contentInset.left + contentInset.right) {
                 let padding = (scrollView.frame.width - stackView.frame.width) / 2
                 scrollView.contentInset = .init(top: 0, left: padding, bottom: 0, right: padding)
-            } else {
+            }
+            else {
                 resetContentInset(scrollView: scrollView, contentInset: contentInset)
             }
         }
     }
 
-    struct Full: SlideTabBarDistribution {
+    public struct Full: SlideTabBarDistribution {
         public func update(
             _ scrollView: UIScrollView,
             _ contentInset: UIEdgeInsets,
             _ stackView: UIStackView,
-            _ fullConstraint: Constraint?
-        ) {
+            _ fullConstraint: Constraint?)
+        {
             resetContentInset(scrollView: scrollView, contentInset: contentInset)
             stackView.distribution = .fillEqually
             fullConstraint?.activate()
         }
     }
 
-    struct Width: SlideTabBarDistribution {
+    public struct Width: SlideTabBarDistribution {
         let value: CGFloat
         let alignToCenter: Bool
 
@@ -90,8 +90,8 @@ public extension SlideTabBar {
             _ scrollView: UIScrollView,
             _ contentInset: UIEdgeInsets,
             _ stackView: UIStackView,
-            _ fullConstraint: Constraint?
-        ) {
+            _ fullConstraint: Constraint?)
+        {
             stackView.distribution = .fillEqually
             stackView
                 .arrangedSubviews
@@ -111,12 +111,13 @@ public extension SlideTabBar {
                     let padding = (scrollView.frame.width - stackView.frame.width) / 2
                     resetContentInset(
                         scrollView: scrollView,
-                        contentInset: .init(top: 0, left: padding, bottom: 0, right: padding)
-                    )
-                } else {
+                        contentInset: .init(top: 0, left: padding, bottom: 0, right: padding))
+                }
+                else {
                     resetContentInset(scrollView: scrollView, contentInset: contentInset)
                 }
-            } else {
+            }
+            else {
                 resetContentInset(scrollView: scrollView, contentInset: contentInset)
             }
         }

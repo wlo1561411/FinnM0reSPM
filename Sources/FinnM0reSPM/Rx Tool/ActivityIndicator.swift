@@ -37,12 +37,12 @@ public final class ActivityIndicator: SharedSequenceConvertibleType {
                 onSubscribe: {
                     if !self.isLoading, resetWhenSubscribe {
                         self.set(1)
-                    } else {
+                    }
+                    else {
                         self.increment()
                     }
                 },
-                onDispose: { self.decrement() }
-            )
+                onDispose: { self.decrement() })
     }
 
     fileprivate func trackOnDisposeOfObservable
@@ -110,8 +110,8 @@ public final class ActivityIndicator: SharedSequenceConvertibleType {
 
 // MARK: - ActivityToken
 
-private extension ActivityIndicator {
-    struct ActivityToken<T: ObservableConvertibleType>: Disposable {
+extension ActivityIndicator {
+    fileprivate struct ActivityToken<T: ObservableConvertibleType>: Disposable {
         private let _source: T
         private let _dispose: Cancelable
 
@@ -142,29 +142,28 @@ private extension ActivityIndicator {
     }
 }
 
-public extension ObservableType {
-    func trackOnDispose(_ activityIndicator: ActivityIndicator) -> RxSwift.Observable<Element> {
+extension ObservableType {
+    public func trackOnDispose(_ activityIndicator: ActivityIndicator) -> RxSwift.Observable<Element> {
         activityIndicator.trackOnDisposeOfObservable(self)
     }
 
-    func trackOnNext(
+    public func trackOnNext(
         _ activityIndicator: ActivityIndicator,
-        resetWhenSubscribe: Bool = true
-    )
+        resetWhenSubscribe: Bool = true)
         -> RxSwift.Observable<Element>
     {
         activityIndicator.trackOnNext(self, resetWhenSubscribe: resetWhenSubscribe)
     }
 }
 
-public extension PrimitiveSequenceType where Trait == SingleTrait {
-    func trackOnDispose(_ activityIndicator: ActivityIndicator) -> RxSwift.Single<Element> {
+extension PrimitiveSequenceType where Trait == SingleTrait {
+    public func trackOnDispose(_ activityIndicator: ActivityIndicator) -> RxSwift.Single<Element> {
         activityIndicator.trackOnDisposeOfSingle(self)
     }
 }
 
-public extension PrimitiveSequenceType where Trait == CompletableTrait {
-    func trackOnDispose(_ activityIndicator: ActivityIndicator) -> RxSwift.Completable {
+extension PrimitiveSequenceType where Trait == CompletableTrait {
+    public func trackOnDispose(_ activityIndicator: ActivityIndicator) -> RxSwift.Completable {
         activityIndicator.trackOnDisposeOfCompletable(self)
     }
 }

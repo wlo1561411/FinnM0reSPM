@@ -2,12 +2,12 @@ import SwiftUI
 
 private struct OffsetPreferenceKey: PreferenceKey {
     static var defaultValue: CGFloat = .zero
-    static func reduce(value _: inout CGFloat, nextValue _: () -> CGFloat) {}
+    static func reduce(value _: inout CGFloat, nextValue _: () -> CGFloat) { }
 }
 
 private struct SizePreferenceKey: PreferenceKey {
     static var defaultValue: CGSize = .zero
-    static func reduce(value _: inout CGSize, nextValue _: () -> CGSize) {}
+    static func reduce(value _: inout CGSize, nextValue _: () -> CGSize) { }
 }
 
 @available(iOS 14.0, *)
@@ -28,8 +28,8 @@ public struct DelegatedScrollView<Content: View>: View {
     public init(
         @ViewBuilder content: @escaping () -> Content,
         onOffsetChanged: ((CGFloat) -> Void)? = nil,
-        onBottomReached: (() -> Void)? = nil
-    ) {
+        onBottomReached: (() -> Void)? = nil)
+    {
         self.content = content
         self.onOffsetChanged = onOffsetChanged
         self.onBottomReached = onBottomReached
@@ -63,16 +63,15 @@ public struct DelegatedScrollView<Content: View>: View {
             Color.clear
                 .preference(
                     key: OffsetPreferenceKey.self,
-                    value: proxy.frame(in: .named(spaceName)).minY
-                )
+                    value: proxy.frame(in: .named(spaceName)).minY)
         }
         .frame(height: 0)
     }
 }
 
 @available(iOS 14.0, *)
-private extension View {
-    func readSize(_ onChange: @escaping (CGSize) -> Void) -> some View {
+extension View {
+    fileprivate func readSize(_ onChange: @escaping (CGSize) -> Void) -> some View {
         background(
             GeometryReader { proxy in
                 Color.clear
@@ -91,7 +90,7 @@ struct DelegatedScrollView_Previews: PreviewProvider {
         var body: some View {
             DelegatedScrollView {
                 LazyVStack {
-                    ForEach(0 ..< 100) { index in
+                    ForEach(0..<100) { index in
                         Text("\(index)")
                     }
                 }

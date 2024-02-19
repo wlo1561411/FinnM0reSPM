@@ -27,12 +27,14 @@ final class ReadWriteTests: XCTestCase {
                 _ = $0.x.b
 
                 if Bool.random() {
-                    $0.c = .random(in: 0 ... 1000)
-                } else {
+                    $0.c = .random(in: 0...1000)
+                }
+                else {
                     if Bool.random() {
-                        $0.x.a = .random(in: 0 ... 1000)
-                    } else {
-                        $0.x.b = .random(in: 0 ... 1000)
+                        $0.x.a = .random(in: 0...1000)
+                    }
+                    else {
+                        $0.x.b = .random(in: 0...1000)
                     }
                 }
 
@@ -46,7 +48,7 @@ final class ReadWriteTests: XCTestCase {
     }
 
     func testLockThrowing() {
-        struct Err: Swift.Error {}
+        struct Err: Swift.Error { }
 
         let lock = UnfairLock()
 

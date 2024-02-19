@@ -54,12 +54,14 @@ final class ModifyTests: XCTestCase {
         structValue.x.a += 5
 
         if Bool.random() {
-            structValue.c = .random(in: 0 ... 1000)
-        } else {
+            structValue.c = .random(in: 0...1000)
+        }
+        else {
             if Bool.random() {
-                structValue.x.a = .random(in: 0 ... 1000)
-            } else {
-                structValue.x.b = .random(in: 0 ... 1000)
+                structValue.x.a = .random(in: 0...1000)
+            }
+            else {
+                structValue.x.b = .random(in: 0...1000)
             }
         }
 
@@ -82,11 +84,12 @@ final class ModifyTests: XCTestCase {
         // get = 0.319
 
         measure {
-            for _ in 0 ..< 100_000 {
+            for _ in 0..<100_000 {
                 if Bool.random() {
-                    self.structValue.x.a = .random(in: 0 ... 1000)
-                } else {
-                    self.structValue.x.b = .random(in: 0 ... 1000)
+                    self.structValue.x.a = .random(in: 0...1000)
+                }
+                else {
+                    self.structValue.x.b = .random(in: 0...1000)
                 }
 
                 self.structValue.c = self.structValue.x.b + self.structValue.x.a
@@ -111,9 +114,9 @@ final class ModifyTests: XCTestCase {
         let initialValue = structValue
 
         await withThrowingTaskGroup(of: Void.self) { group in
-            for _ in 1 ..< 10000 {
+            for _ in 1..<10000 {
                 group.addTask {
-                    try await Task.sleep(nanoseconds: .random(in: 10_000_000 ..< 200_000_000))
+                    try await Task.sleep(nanoseconds: .random(in: 10_000_000..<200_000_000))
                     return self.modifyComplexStruct()
                 }
             }
@@ -131,12 +134,14 @@ final class ModifyTests: XCTestCase {
             _ = self.classValue.x.b
 
             if Bool.random() {
-                self.classValue.c = .random(in: 0 ... 1000)
-            } else {
+                self.classValue.c = .random(in: 0...1000)
+            }
+            else {
                 if Bool.random() {
-                    self.classValue.x.a = .random(in: 0 ... 1000)
-                } else {
-                    self.classValue.x.b = .random(in: 0 ... 1000)
+                    self.classValue.x.a = .random(in: 0...1000)
+                }
+                else {
+                    self.classValue.x.b = .random(in: 0...1000)
                 }
             }
 
@@ -158,9 +163,10 @@ final class ModifyTests: XCTestCase {
                 self.arrayValue.removeAll {
                     $0 % 2 == 0
                 }
-            } else {
-                for _ in 0 ..< 20 {
-                    self.arrayValue.append(.random(in: 0 ... 10))
+            }
+            else {
+                for _ in 0..<20 {
+                    self.arrayValue.append(.random(in: 0...10))
                 }
             }
 

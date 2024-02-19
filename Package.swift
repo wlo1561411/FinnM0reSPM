@@ -9,8 +9,7 @@ let package = Package(
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
             name: "FinnM0reSPM",
-            targets: ["FinnM0reSPM"]
-        ),
+            targets: ["FinnM0reSPM"]),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -26,11 +25,8 @@ let package = Package(
                 "SnapKit",
                 "RxSwift",
                 .product(name: "RxCocoa", package: "RxSwift"),
-            ]
-        ),
+            ]),
         .testTarget(
             name: "FinnM0reSPMTests",
-            dependencies: ["FinnM0reSPM"]
-        ),
-    ]
-)
+            dependencies: ["FinnM0reSPM"]),
+    ])

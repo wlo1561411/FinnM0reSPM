@@ -32,12 +32,12 @@ public class RxSlideTabBarDelegateProxy:
 
 // MARK: - Observable
 
-public extension Reactive where Base: SlideTabBar {
-    var delegate: DelegateProxy<SlideTabBar, SlideTabBarDelegate> {
+extension Reactive where Base: SlideTabBar {
+    public var delegate: DelegateProxy<SlideTabBar, SlideTabBarDelegate> {
         RxSlideTabBarDelegateProxy.proxy(for: base)
     }
 
-    var didSelected: Observable<(sender: SlideTabBar, index: Int)> {
+    public var didSelected: Observable<(sender: SlideTabBar, index: Int)> {
         delegate
             .methodInvoked(#selector(SlideTabBarDelegate.didSelected(_:at:)))
             .map { a in

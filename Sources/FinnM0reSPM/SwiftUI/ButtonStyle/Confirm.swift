@@ -23,8 +23,8 @@ public struct Confirm: ButtonStyle {
 }
 
 @available(iOS 14.0, *)
-public extension ButtonStyle where Self == Confirm {
-    static func confirm(_ size: CGFloat) -> Confirm {
+extension ButtonStyle where Self == Confirm {
+    public static func confirm(_ size: CGFloat) -> Confirm {
         Confirm(size: size)
     }
 }

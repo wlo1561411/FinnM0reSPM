@@ -13,15 +13,14 @@ enum SlideCalculator {
             red: calculate(first: components1[0], second: components2[0], percentage: percentage),
             green: calculate(first: components1[1], second: components2[1], percentage: percentage),
             blue: calculate(first: components1[2], second: components2[2], percentage: percentage),
-            alpha: 1
-        )
+            alpha: 1)
     }
 
     /// R, G, B ,Alpha
     static func colorRGB(_ color: UIColor) -> [CGFloat] {
         guard var components = color.cgColor.components else { return [] }
         if components.count == 2 {
-            for _ in 0 ... 1 {
+            for _ in 0...1 {
                 components.insert(components[0], at: 0)
             }
         }
@@ -33,12 +32,10 @@ enum SlideCalculator {
             .boundingRect(
                 with: CGSize(
                     width: CGFloat.greatestFiniteMagnitude,
-                    height: font.lineHeight
-                ),
+                    height: font.lineHeight),
                 options: .usesLineFragmentOrigin,
                 attributes: [NSAttributedString.Key.font: font],
-                context: nil
-            ).size.width
+                context: nil).size.width
     }
 
     static func textHeight(with font: UIFont, from width: CGFloat, by text: String) -> CGFloat {
@@ -46,11 +43,9 @@ enum SlideCalculator {
             .boundingRect(
                 with: CGSize(
                     width: width,
-                    height: CGFloat.greatestFiniteMagnitude
-                ),
+                    height: CGFloat.greatestFiniteMagnitude),
                 options: .usesLineFragmentOrigin,
                 attributes: [NSAttributedString.Key.font: font],
-                context: nil
-            ).size.height
+                context: nil).size.height
     }
 }

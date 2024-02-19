@@ -102,8 +102,8 @@ class RxCycleBannerViewDataSource: CycleBannerViewDataSource {
 
 // MARK: - Binding
 
-public extension Reactive where Base: CycleBannerView {
-    func items<
+extension Reactive where Base: CycleBannerView {
+    public func items<
         Sequence: Swift.Sequence,
         Source: ObservableType
     >
@@ -118,7 +118,7 @@ public extension Reactive where Base: CycleBannerView {
         }
     }
 
-    func items<
+    public func items<
         DataSource: RxCycleBannerViewDataSourceType & CycleBannerViewDataSource,
         _ObservableType: ObservableType
     >
@@ -135,8 +135,8 @@ public extension Reactive where Base: CycleBannerView {
                 ofObject: self.base,
                 dataSource: dataSource as CycleBannerViewDataSource,
                 observable: source,
-                retainDataSource: true
-            ) { [weak bannerView = self.base] (_: RxCycleBannerViewDataSourceProxy, event) in
+                retainDataSource: true)
+            { [weak bannerView = self.base] (_: RxCycleBannerViewDataSourceProxy, event) in
                 guard let bannerView else { return }
                 dataSource.bannerView(bannerView, observedEvent: event)
             }

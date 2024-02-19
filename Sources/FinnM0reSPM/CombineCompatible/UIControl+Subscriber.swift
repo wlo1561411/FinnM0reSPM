@@ -2,8 +2,8 @@ import Combine
 import UIKit
 
 @available(iOS 13.0, *)
-public extension UIControl {
-    final class Subscription<
+extension UIControl {
+    public final class Subscription<
         SubscriberType: Subscriber,
         Control: UIControl
     >: Combine.Subscription
@@ -18,7 +18,7 @@ public extension UIControl {
             control.addTarget(self, action: #selector(eventHandler), for: event)
         }
 
-        public func request(_: Subscribers.Demand) {}
+        public func request(_: Subscribers.Demand) { }
 
         public func cancel() {
             subscriber = nil

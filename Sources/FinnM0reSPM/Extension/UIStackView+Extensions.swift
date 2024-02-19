@@ -1,13 +1,13 @@
 import UIKit
 
-public extension UIStackView {
-    convenience init(
+extension UIStackView {
+    public convenience init(
         arrangedSubviews: [UIView] = [],
         spacing: CGFloat,
         axis: NSLayoutConstraint.Axis = .vertical,
         distribution: Distribution,
-        alignment: Alignment
-    ) {
+        alignment: Alignment)
+    {
         self.init(arrangedSubviews: arrangedSubviews)
         self.axis = axis
         self.spacing = spacing
@@ -15,12 +15,12 @@ public extension UIStackView {
         self.alignment = alignment
     }
 
-    func removeFully(_ view: UIView) {
+    public func removeFully(_ view: UIView) {
         removeArrangedSubview(view)
         view.removeFromSuperview()
     }
 
-    func removeAllFully() {
+    public func removeAllFully() {
         arrangedSubviews.forEach { removeFully($0) }
     }
 }

@@ -103,8 +103,8 @@ class RxSlideViewDataSource: SlideViewDataSource {
 // MARK: - Binding
 
 // TODO: Cache Size
-public extension Reactive where Base: SlideView {
-    func items<
+extension Reactive where Base: SlideView {
+    public func items<
         Sequence: Swift.Sequence,
         Source: ObservableType
     >
@@ -122,13 +122,12 @@ public extension Reactive where Base: SlideView {
         }
     }
 
-    func items<
+    public func items<
         DataSource: RxSlideViewDataSourceType & SlideViewDataSource,
         _ObservableType: ObservableType
     >(
         dataSource: DataSource,
-        at baseController: UIViewController
-    )
+        at baseController: UIViewController)
         -> (_ source: _ObservableType)
         -> Disposable
         where DataSource.Element == _ObservableType.Element
@@ -141,8 +140,10 @@ public extension Reactive where Base: SlideView {
                 ofObject: self.base,
                 dataSource: dataSource as SlideViewDataSource,
                 observable: source,
-                retainDataSource: true
-            ) { [weak slideView = self.base, weak baseController] (_: RxSlideViewDataSourceProxy, event) in
+                retainDataSource: true)
+            { [weak slideView = self.base, weak baseController] (
+                _: RxSlideViewDataSourceProxy,
+                event) in
                 guard let slideView, let baseController else { return }
                 dataSource.slideView(slideView, observedEvent: event, at: baseController)
             }

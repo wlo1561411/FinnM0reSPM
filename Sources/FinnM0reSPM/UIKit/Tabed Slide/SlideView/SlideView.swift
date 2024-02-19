@@ -102,7 +102,8 @@ extension SlideView {
 
             preIndex = index
             preViewController = to
-        } else {
+        }
+        else {
             show(at: index)
         }
 
@@ -134,22 +135,20 @@ extension SlideView {
     private func animate(
         from preViewController: UIViewController,
         to toViewController: UIViewController,
-        with index: Int
-    ) {
+        with index: Int)
+    {
         let preRect = preViewController.view.frame
 
         let leftRect = CGRect(
             x: preRect.origin.x - preRect.width,
             y: preRect.origin.y,
             width: preRect.width,
-            height: preRect.height
-        )
+            height: preRect.height)
         let rightRect = CGRect(
             x: preRect.origin.x + preRect.width,
             y: preRect.origin.y,
             width: preRect.width,
-            height: preRect.height
-        )
+            height: preRect.height)
 
         var startRect: CGRect = .zero
         var endRect: CGRect = .zero
@@ -157,7 +156,8 @@ extension SlideView {
         if index > preIndex {
             startRect = rightRect
             endRect = leftRect
-        } else {
+        }
+        else {
             startRect = leftRect
             endRect = rightRect
         }
@@ -180,16 +180,15 @@ extension SlideView {
 
                 self?.delegate?.didSwitch?(to: index, viewController: toViewController)
                 self?.isSwitching = false
-            }
-        )
+            })
     }
 
     private func animateBack(with _: CGFloat) {
         UIView.animate(
             withDuration: 0.3,
             delay: 0,
-            options: .curveEaseIn
-        ) { [weak self] in
+            options: .curveEaseIn)
+        { [weak self] in
             self?.translate(with: 0)
         } completion: { [weak self] _ in
             guard let self else { return }
@@ -215,7 +214,8 @@ extension SlideView {
 
         if toIndex < preIndex {
             x = bounds.origin.x - bounds.width + offset
-        } else if toIndex > preIndex {
+        }
+        else if toIndex > preIndex {
             x = bounds.origin.x + bounds.width + offset
         }
 
@@ -223,16 +223,14 @@ extension SlideView {
             x: bounds.origin.x + offset,
             y: bounds.origin.y,
             width: bounds.width,
-            height: bounds.height
-        )
+            height: bounds.height)
 
         if toIndex >= 0, toIndex < viewControllersCount {
             toViewController?.view.frame = CGRect(
                 x: x,
                 y: bounds.origin.y,
                 width: bounds.width,
-                height: bounds.height
-            )
+                height: bounds.height)
         }
         delegate?.switching?(from: preIndex, to: toIndex, with: abs(offset / bounds.width))
     }
@@ -270,7 +268,8 @@ extension SlideView {
 
         if offset > 0 {
             panToIndex = preIndex - 1
-        } else if offset < 0 {
+        }
+        else if offset < 0 {
             panToIndex = preIndex + 1
         }
 
@@ -281,7 +280,8 @@ extension SlideView {
         if panToIndex < 0 || panToIndex >= viewControllersCount {
             toIndex = panToIndex
             translate(with: offset / 2)
-        } else {
+        }
+        else {
             if
                 panToIndex != toIndex,
                 let to = viewController(with: panToIndex)
@@ -316,8 +316,8 @@ extension SlideView {
         UIView.animate(
             withDuration: animationTime,
             delay: 0,
-            options: .curveEaseIn
-        ) { [weak self] in
+            options: .curveEaseIn)
+        { [weak self] in
             self?.translate(with: offset > 0 ? self?.bounds.width ?? 0 : -(self?.bounds.width ?? 0))
         }
         completion: { [weak self] _ in
@@ -346,15 +346,17 @@ extension SlideView {
 
 extension SlideView {
     private func viewController(with index: Int) -> UIViewController? {
-        if let cache = cache {
+        if let cache {
             if let cachedObject = cache.object(for: "\(index)") {
                 return cachedObject
-            } else {
+            }
+            else {
                 guard let object = dataSource?.viewController(self, at: index) else { return nil }
                 cache.set(object: object, for: "\(index)")
                 return object
             }
-        } else {
+        }
+        else {
             return dataSource?.viewController(self, at: index)
         }
     }

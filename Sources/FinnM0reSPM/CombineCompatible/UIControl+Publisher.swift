@@ -2,8 +2,8 @@ import Combine
 import UIKit
 
 @available(iOS 13.0, *)
-public extension UIControl {
-    struct Publisher<Control: UIControl>: Combine.Publisher {
+extension UIControl {
+    public struct Publisher<Control: UIControl>: Combine.Publisher {
         public typealias Output = Control
         public typealias Failure = Never
 

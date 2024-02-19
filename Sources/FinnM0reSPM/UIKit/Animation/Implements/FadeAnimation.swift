@@ -5,14 +5,13 @@ final class FadeAnimation: BaseAnimation {
         fromValue: CGFloat = 1,
         toValue: CGFloat = 0,
         duration: CFTimeInterval = 0.15,
-        layer: CALayer? = nil
-    ) {
+        layer: CALayer? = nil)
+    {
         super.init(
             fromValue: fromValue,
             toValue: toValue,
             duration: duration,
-            layer: layer
-        )
+            layer: layer)
     }
 
     private func startAnimation(reverse: Bool) {
@@ -20,8 +19,7 @@ final class FadeAnimation: BaseAnimation {
             keyPath: "opacity",
             fromValue: reverse ? toValue : fromValue,
             toValue: reverse ? fromValue : toValue,
-            duration: duration
-        )
+            duration: duration)
 
         layer?.add(opacity, forKey: "opacity")
     }

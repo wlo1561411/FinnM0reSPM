@@ -1,64 +1,63 @@
 import UIKit
 
-extension UIView: StylerCompatible {}
+extension UIView: StylerCompatible { }
 
-public extension Styler where Base: UIView {
+extension Styler where Base: UIView {
     @discardableResult
-    func other(_ closure: @escaping (Base) -> Void) -> Self {
+    public func other(_ closure: @escaping (Base) -> Void) -> Self {
         closure(base)
         return self
     }
 
     @discardableResult
-    func add(to view: UIView) -> Self {
+    public func add(to view: UIView) -> Self {
         view.addSubview(base)
         return self
     }
 
     @discardableResult
-    func add(to stackView: UIStackView) -> Self {
+    public func add(to stackView: UIStackView) -> Self {
         stackView.addArrangedSubview(base)
         return self
     }
 
     @discardableResult
-    func insert(to view: UIView, at: Int) -> Self {
+    public func insert(to view: UIView, at: Int) -> Self {
         view.insertSubview(base, at: at)
         return self
     }
 
     @discardableResult
-    func insert(to stackView: UIStackView, at: Int) -> Self {
+    public func insert(to stackView: UIStackView, at: Int) -> Self {
         stackView.insertArrangedSubview(base, at: at)
         return self
     }
 
     @discardableResult
-    func borderColor(_ color: UIColor) -> Self {
+    public func borderColor(_ color: UIColor) -> Self {
         base.layer.borderColor = color.cgColor
         return self
     }
 
     @discardableResult
-    func borderWidth(_ width: CGFloat) -> Self {
+    public func borderWidth(_ width: CGFloat) -> Self {
         base.layer.borderWidth = width
         return self
     }
 
     @discardableResult
-    func round(_ radius: CGFloat) -> Self {
+    public func round(_ radius: CGFloat) -> Self {
         base.clipsToBounds = true
         base.layer.cornerRadius = radius
         return self
     }
 
     @discardableResult
-    func dottedBorder(
+    public func dottedBorder(
         _ color: UIColor,
         lineDashPattern: [Int] = [8, 4],
         lineWidth: CGFloat = 1,
-        radius: CGFloat = 5
-    )
+        radius: CGFloat = 5)
         -> Self
     {
         DispatchQueue.main.async {
@@ -78,11 +77,10 @@ public extension Styler where Base: UIView {
     }
 
     @discardableResult
-    func dottedLine(
+    public func dottedLine(
         _ color: UIColor,
         lineDashPattern: [Int] = [8, 4],
-        lineWidth: CGFloat = 1
-    )
+        lineWidth: CGFloat = 1)
         -> Self
     {
         func updatePath(_ layer: CAShapeLayer) {
@@ -95,7 +93,8 @@ public extension Styler where Base: UIView {
         DispatchQueue.main.async {
             if let layer = base.layer.sublayers?.first(where: { $0.name == "Dotted" }) as? CAShapeLayer {
                 updatePath(layer)
-            } else {
+            }
+            else {
                 let layer = CAShapeLayer()
                 layer.name = "Dotted"
                 layer.strokeColor = color.cgColor
@@ -113,7 +112,7 @@ public extension Styler where Base: UIView {
     }
 
     @discardableResult
-    func round(at corners: CACornerMask, radius: CGFloat) -> Self {
+    public func round(at corners: CACornerMask, radius: CGFloat) -> Self {
         base.clipsToBounds = true
         base.layer.cornerRadius = radius
         base.layer.maskedCorners = corners
@@ -121,14 +120,13 @@ public extension Styler where Base: UIView {
     }
 
     @discardableResult
-    func shadow(
+    public func shadow(
         color: UIColor = .black,
         opacity: Float,
         offset: CGSize,
         shadowRadius: CGFloat,
         cornerRadius: CGFloat,
-        scale: Bool = true
-    )
+        scale: Bool = true)
         -> Self
     {
         DispatchQueue.main.async {
@@ -146,11 +144,10 @@ public extension Styler where Base: UIView {
     }
 
     @discardableResult
-    func gradient(
+    public func gradient(
         _ axis: NSLayoutConstraint.Axis,
         colors: [CGColor],
-        completion: ((CAGradientLayer) -> Void)? = nil
-    )
+        completion: ((CAGradientLayer) -> Void)? = nil)
         -> Self
     {
         let start: CGPoint
@@ -174,7 +171,7 @@ public extension Styler where Base: UIView {
         return self
     }
 
-    func applyGradient(startPoint: CGPoint, endPoint: CGPoint, colors: [CGColor]) -> CAGradientLayer {
+    public func applyGradient(startPoint: CGPoint, endPoint: CGPoint, colors: [CGColor]) -> CAGradientLayer {
         let layer = CAGradientLayer()
         layer.colors = colors
         layer.startPoint = startPoint
@@ -188,7 +185,7 @@ public extension Styler where Base: UIView {
     }
 
     @discardableResult
-    func blur(alpha: CGFloat = 0.8, style: UIBlurEffect.Style = .dark) -> Self {
+    public func blur(alpha: CGFloat = 0.8, style: UIBlurEffect.Style = .dark) -> Self {
         let effect = UIBlurEffect(style: style)
         let blurView = UIVisualEffectView(effect: effect)
         blurView.alpha = alpha
@@ -202,12 +199,13 @@ public extension Styler where Base: UIView {
 
     /// nil means set to identity
     @discardableResult
-    func rotating(_ angle: CGFloat?, clockwise: Bool = true) -> Self {
+    public func rotating(_ angle: CGFloat?, clockwise: Bool = true) -> Self {
         UIView.animate(withDuration: 0.2) {
             if let angle {
                 let _angle = clockwise ? angle : -angle
                 self.base.transform = CGAffineTransform(rotationAngle: _angle / 180 * CGFloat(Double.pi))
-            } else {
+            }
+            else {
                 self.base.transform = .identity
             }
         }
@@ -216,21 +214,21 @@ public extension Styler where Base: UIView {
 
     /// nil means set to identity
     @discardableResult
-    func rotated(_ angle: CGFloat?, clockwise: Bool = true) -> Self {
+    public func rotated(_ angle: CGFloat?, clockwise: Bool = true) -> Self {
         if let angle {
             let _angle = clockwise ? angle : -angle
             base.transform = CGAffineTransform(rotationAngle: _angle / 180 * CGFloat(Double.pi))
-        } else {
+        }
+        else {
             base.transform = .identity
         }
         return self
     }
 
     @discardableResult
-    func separator(
+    public func separator(
         _ axis: NSLayoutConstraint.Axis,
-        _ color: UIColor
-    )
+        _ color: UIColor)
         -> Self
     {
         base.backgroundColor = color
@@ -248,10 +246,9 @@ public extension Styler where Base: UIView {
     }
 
     @discardableResult
-    func space(
+    public func space(
         _ axis: NSLayoutConstraint.Axis,
-        _ height: CGFloat
-    )
+        _ height: CGFloat)
         -> Self
     {
         makeConstraints { make in
@@ -268,10 +265,9 @@ public extension Styler where Base: UIView {
     }
 
     @discardableResult
-    func hugging(
+    public func hugging(
         _ priority: UILayoutPriority,
-        for axis: NSLayoutConstraint.Axis
-    )
+        for axis: NSLayoutConstraint.Axis)
         -> Self
     {
         base.setContentHuggingPriority(priority, for: axis)
@@ -279,10 +275,9 @@ public extension Styler where Base: UIView {
     }
 
     @discardableResult
-    func compressionResistance(
+    public func compressionResistance(
         _ priority: UILayoutPriority,
-        for axis: NSLayoutConstraint.Axis
-    )
+        for axis: NSLayoutConstraint.Axis)
         -> Self
     {
         base.setContentCompressionResistancePriority(priority, for: axis)
@@ -290,7 +285,7 @@ public extension Styler where Base: UIView {
     }
 
     @discardableResult
-    func mask(by image: UIImage?) -> Self {
+    public func mask(by image: UIImage?) -> Self {
         guard image != nil else { return self }
 
         let mask = CALayer()
@@ -301,12 +296,12 @@ public extension Styler where Base: UIView {
         return self
     }
 
-    func addTransition(
+    public func addTransition(
         duration: CFTimeInterval = 0.25,
         timingFunction: CAMediaTimingFunctionName = .easeIn,
         type: CATransitionType,
-        from: CATransitionSubtype
-    ) {
+        from: CATransitionSubtype)
+    {
         let animation = CATransition()
         animation.timingFunction = CAMediaTimingFunction(name: timingFunction)
         animation.type = type
@@ -348,7 +343,8 @@ public extension Styler where Base: UIView {
                     if self.tag == 0 {
                         self.navigationController?.view.sr.addTransition(type: .moveIn, from: .fromLeft)
                         self.navigationController?.pushViewController(TransitionDemo(tag: 1), animated: false)
-                    } else {
+                    }
+                    else {
                         self.navigationController?.view.sr.addTransition(type: .reveal, from: .fromRight)
                         self.navigationController?.popViewController(animated: false)
                     }

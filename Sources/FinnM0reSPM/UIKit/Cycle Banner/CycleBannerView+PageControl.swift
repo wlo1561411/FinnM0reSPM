@@ -1,8 +1,8 @@
 import UIKit
 
-public extension CycleBannerView {
+extension CycleBannerView {
     // TODO: Too many count will wrong, maybe can use UIPageControl
-    class PageControl: UIView {
+    public class PageControl: UIView {
         private let stackView = UIStackView()
 
         private var selectedImageName = ""
@@ -26,8 +26,8 @@ public extension CycleBannerView {
         convenience init(
             count: Int,
             selectedImageName: String,
-            unselectedImageName: String
-        ) {
+            unselectedImageName: String)
+        {
             self.init(frame: .zero)
             configItems(count: count, selectedImageName: selectedImageName, unselectedImageName: unselectedImageName)
         }
@@ -58,8 +58,8 @@ public extension CycleBannerView {
         public func configItems(
             count: Int,
             selectedImageName: String,
-            unselectedImageName: String
-        ) {
+            unselectedImageName: String)
+        {
             _selectedIndex = 0
 
             isHidden = count <= 1
@@ -68,7 +68,7 @@ public extension CycleBannerView {
 
             stackView.removeAllFully()
 
-            for item in 0 ..< count {
+            for item in 0..<count {
                 stackView.addArrangedSubview(buildImageView(index: item))
             }
         }

@@ -54,7 +54,8 @@ public class CycleBannerView: UIView {
         didSet {
             if autoSliding {
                 setupTimer()
-            } else {
+            }
+            else {
                 stopTimer()
             }
         }
@@ -151,7 +152,8 @@ extension CycleBannerView {
             if currentIndex == itemCount {
                 currentIndex = 0
             }
-        } else {
+        }
+        else {
             currentIndex -= 1
             tempIndex = currentIndex - 1
             if currentIndex < 0 {
@@ -192,21 +194,21 @@ extension CycleBannerView {
 
 // MARK: - Scroll
 
-public extension CycleBannerView {
+extension CycleBannerView {
     /// End scroll with timer
-    func scrollViewDidEndScrollingAnimation(_: UIScrollView) {
+    public func scrollViewDidEndScrollingAnimation(_: UIScrollView) {
         if tempIndex == tempCount - 1 {
             collectionView.scrollToItem(at: [0, 1], at: .left, animated: false)
             tempIndex = 1
         }
     }
 
-    func scrollViewWillBeginDragging(_: UIScrollView) {
+    public func scrollViewWillBeginDragging(_: UIScrollView) {
         isScrolling = true
         startPoint = collectionView.contentOffset.x
     }
 
-    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+    public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         isScrolling = false
         endPoint = scrollView.contentOffset.x
 
@@ -246,17 +248,18 @@ extension CycleBannerView:
         var fixed = 0
         if indexPath.row == 0 {
             fixed = itemCount - 1
-        } else if indexPath.row == tempCount - 1 {
+        }
+        else if indexPath.row == tempCount - 1 {
             fixed = 0
-        } else {
+        }
+        else {
             fixed = indexPath.row - 1
         }
 
         cell.embed(
             itemCount == 0 ? nil : dataSource?.item(at: fixed),
             space: itemSpacing,
-            size: collectionView.frame.size
-        )
+            size: collectionView.frame.size)
 
         return cell
     }

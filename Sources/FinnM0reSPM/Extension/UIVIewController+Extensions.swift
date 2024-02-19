@@ -1,7 +1,7 @@
 import UIKit
 
-public extension UIViewController {
-    var isVisible: Bool {
+extension UIViewController {
+    public var isVisible: Bool {
         if isViewLoaded {
             return view.window != nil
         }

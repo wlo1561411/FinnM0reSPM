@@ -2,12 +2,11 @@ import RxCocoa
 import RxSwift
 import UIKit
 
-public extension Styler where Base: UIButton {
+extension Styler where Base: UIButton {
     @discardableResult
-    func onTap(
+    public func onTap(
         dispose: DisposeBag,
-        _ closure: ((ControlEvent<Void>.Element) -> Void)?
-    )
+        _ closure: ((ControlEvent<Void>.Element) -> Void)?)
         -> Self
     {
         base.rx.tap
@@ -17,8 +16,8 @@ public extension Styler where Base: UIButton {
     }
 }
 
-public extension Reactive where Base: UIButton {
-    var enable: Binder<Bool> {
+extension Reactive where Base: UIButton {
+    public var enable: Binder<Bool> {
         Binder(base) { button, enable in
             button.sr.enable(enable)
         }

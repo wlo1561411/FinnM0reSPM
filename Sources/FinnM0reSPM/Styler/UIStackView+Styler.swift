@@ -1,12 +1,11 @@
 import UIKit
 
-public extension Styler where Base: UIStackView {
+extension Styler where Base: UIStackView {
     @discardableResult
-    func config(
+    public func config(
         spacing: CGFloat = 0,
         alignment: UIStackView.Alignment = .fill,
-        distribution: UIStackView.Distribution = .fill
-    )
+        distribution: UIStackView.Distribution = .fill)
         -> Self
     {
         base.spacing = spacing
@@ -16,7 +15,7 @@ public extension Styler where Base: UIStackView {
     }
 
     @discardableResult
-    func addArranged(_ view: [UIView]) -> Self {
+    public func addArranged(_ view: [UIView]) -> Self {
         for item in view {
             base.addArrangedSubview(item)
         }

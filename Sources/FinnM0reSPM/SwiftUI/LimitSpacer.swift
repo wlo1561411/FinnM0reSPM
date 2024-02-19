@@ -1,8 +1,8 @@
 import SwiftUI
 
 @available(iOS 14.0, *)
-public extension Spacer {
-    struct Limited: View {
+extension Spacer {
+    public struct Limited: View {
         let pixel: CGFloat
 
         public init(_ pixel: CGFloat) {

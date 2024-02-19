@@ -32,7 +32,7 @@ public enum CurrencyRegex: InputRegex, Equatable {
         switch self {
         case .noDecimal:
             return "^[0-9,]*$"
-        case let .withDecimal(maxDigits):
+        case .withDecimal(let maxDigits):
             return "^[0-9,]*([.][0-9]{0,\(maxDigits)})?$"
         }
     }
@@ -41,7 +41,7 @@ public enum CurrencyRegex: InputRegex, Equatable {
         switch self {
         case .noDecimal:
             return nil
-        case let .withDecimal(maxDigits):
+        case .withDecimal(let maxDigits):
             return maxDigits
         }
     }

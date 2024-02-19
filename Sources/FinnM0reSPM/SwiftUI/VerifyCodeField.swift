@@ -15,8 +15,8 @@ public struct VerifyCodeField: View {
 
     public init(
         code: Binding<String>,
-        numberOfCode: Int = 6
-    ) {
+        numberOfCode: Int = 6)
+    {
         _code = code
         self.numberOfCode = numberOfCode
     }
@@ -32,31 +32,29 @@ public struct VerifyCodeField: View {
                     regex: .number,
                     keyboardType: .numberPad,
                     disablePaste: true,
-                    maxLength: numberOfCode
-                ),
+                    maxLength: numberOfCode),
                 configuration: {
                     $0.textColor = .clear
                     $0.tintColor = .clear
+                })
+                .opacity(0.01)
+                .onChange(of: code) {
+                    isFirstResponder = $0.count != numberOfCode
+                    selectedIndex = $0.count < numberOfCode ? $0.count : nil
                 }
-            )
-            .opacity(0.01)
-            .onChange(of: code) {
-                isFirstResponder = $0.count != numberOfCode
-                selectedIndex = $0.count < numberOfCode ? $0.count : nil
-            }
-            .onChange(of: selectedIndex) { _ in
-                cursorOpacity = 1
+                .onChange(of: selectedIndex) { _ in
+                    cursorOpacity = 1
 
-                withAnimation(.easeInOut(duration: 0.7).repeatForever(autoreverses: true)) {
-                    cursorOpacity = 0
+                    withAnimation(.easeInOut(duration: 0.7).repeatForever(autoreverses: true)) {
+                        cursorOpacity = 0
+                    }
                 }
-            }
-            .onAppear {
-                selectedIndex = 0
-            }
+                .onAppear {
+                    selectedIndex = 0
+                }
 
             HStack(spacing: 16) {
-                ForEach(0 ..< numberOfCode, id: \.self) { index in
+                ForEach(0..<numberOfCode, id: \.self) { index in
                     ZStack {
                         RoundedRectangle(cornerRadius: 8)
                             .fill(Color.gray)
@@ -66,7 +64,7 @@ public struct VerifyCodeField: View {
                             let startIndex = code.index(code.startIndex, offsetBy: index)
                             let endIndex = code.index(startIndex, offsetBy: 1)
 
-                            Text(String(code[startIndex ..< endIndex]))
+                            Text(String(code[startIndex..<endIndex]))
                                 .font(.system(size: 24))
                         }
 

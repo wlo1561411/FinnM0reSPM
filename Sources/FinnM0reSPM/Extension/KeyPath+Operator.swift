@@ -2,8 +2,7 @@ import Foundation
 
 func == <Structure, Value: Equatable>(
     lhs: KeyPath<Structure, Value>,
-    rhs: Value
-)
+    rhs: Value)
     -> (Structure) -> Bool
 {
     { $0[keyPath: lhs] == rhs }
@@ -11,8 +10,7 @@ func == <Structure, Value: Equatable>(
 
 func >= <Structure, Value: Comparable>(
     lhs: KeyPath<Structure, Value>,
-    rhs: Value
-)
+    rhs: Value)
     -> (Structure) -> Bool
 {
     { $0[keyPath: lhs] >= rhs }
@@ -20,8 +18,7 @@ func >= <Structure, Value: Comparable>(
 
 func <= <Structure, Value: Comparable>(
     lhs: KeyPath<Structure, Value>,
-    rhs: Value
-)
+    rhs: Value)
     -> (Structure) -> Bool
 {
     { $0[keyPath: lhs] <= rhs }
@@ -29,8 +26,7 @@ func <= <Structure, Value: Comparable>(
 
 func > <Structure, Value: Comparable>(
     lhs: KeyPath<Structure, Value>,
-    rhs: Value
-)
+    rhs: Value)
     -> (Structure) -> Bool
 {
     { $0[keyPath: lhs] > rhs }
@@ -38,8 +34,7 @@ func > <Structure, Value: Comparable>(
 
 func < <Structure, Value: Comparable>(
     lhs: KeyPath<Structure, Value>,
-    rhs: Value
-)
+    rhs: Value)
     -> (Structure) -> Bool
 {
     { $0[keyPath: lhs] < rhs }
@@ -47,8 +42,7 @@ func < <Structure, Value: Comparable>(
 
 func ~= <Structure, Value: Comparable>(
     lhs: KeyPath<Structure, Value>,
-    rhs: (Value, Value)
-)
+    rhs: (Value, Value))
     -> (Structure) -> Bool
 {
     { $0[keyPath: lhs] >= rhs.0 && $0[keyPath: lhs] <= rhs.1 }
@@ -56,8 +50,7 @@ func ~= <Structure, Value: Comparable>(
 
 func && <Structure>(
     lhs: @escaping (Structure) -> Bool,
-    rhs: @escaping (Structure) -> Bool
-)
+    rhs: @escaping (Structure) -> Bool)
     -> (Structure) -> Bool
 {
     { structure in lhs(structure) && rhs(structure) }
@@ -65,8 +58,7 @@ func && <Structure>(
 
 func || <Structure>(
     lhs: @escaping (Structure) -> Bool,
-    rhs: @escaping (Structure) -> Bool
-)
+    rhs: @escaping (Structure) -> Bool)
     -> (Structure) -> Bool
 {
     { structure in lhs(structure) || rhs(structure) }

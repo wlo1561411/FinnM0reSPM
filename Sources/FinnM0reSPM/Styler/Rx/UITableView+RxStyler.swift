@@ -2,13 +2,12 @@ import RxCocoa
 import RxSwift
 import UIKit
 
-public extension Styler where Base: UITableView {
+extension Styler where Base: UITableView {
     @discardableResult
-    func observe<Observable, Sequence>(
+    public func observe<Observable, Sequence>(
         from elements: Observable,
         factory: @escaping (UITableView, Int, Sequence.Element) -> UITableViewCell,
-        dispose: DisposeBag
-    )
+        dispose: DisposeBag)
         -> Self
         where
         Observable: ObservableType,
@@ -22,7 +21,7 @@ public extension Styler where Base: UITableView {
     }
 
     @discardableResult
-    func observe<
+    public func observe<
         Observable: ObservableType,
         Sequence: Swift.Sequence,
         Cell: UITableViewCell
@@ -31,8 +30,7 @@ public extension Styler where Base: UITableView {
         identifier: String = "\(Cell.self)",
         type: Cell.Type,
         configure: @escaping (Int, Sequence.Element, Cell) -> Void,
-        dispose: DisposeBag
-    )
+        dispose: DisposeBag)
         -> Self
         where Observable.Element == Sequence
     {
@@ -43,15 +41,14 @@ public extension Styler where Base: UITableView {
     }
 
     @discardableResult
-    func observe<
+    public func observe<
         Observable: ObservableType,
         Sequence: Swift.Sequence,
         DataSource: RxTableViewDataSourceType & UITableViewDataSource
     >(
         from elements: Observable,
         dataSource: DataSource,
-        dispose: DisposeBag
-    )
+        dispose: DisposeBag)
         -> Self
         where
         Observable.Element == Sequence,

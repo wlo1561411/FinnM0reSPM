@@ -9,8 +9,8 @@ open class VerticalCollectionViewLayout: BaseCollectionViewFlowLayout {
     public init(
         numberOfItemsPerColumn: Int,
         itemLayoutSize: NSCollectionLayoutSize,
-        spacing: CGFloat = 0
-    ) {
+        spacing: CGFloat = 0)
+    {
         super.init()
         self.numberOfItemsPerColumn = numberOfItemsPerColumn
         self.itemLayoutSize = itemLayoutSize
@@ -28,7 +28,7 @@ open class VerticalCollectionViewLayout: BaseCollectionViewFlowLayout {
     }
 
     private func setupItemsAttributes() {
-        for item in 0 ..< itemsCount {
+        for item in 0..<itemsCount {
             let indexPath = IndexPath(row: item, section: 0)
             let attributes = UICollectionViewLayoutAttributes(forCellWith: indexPath)
 
@@ -49,17 +49,20 @@ open class VerticalCollectionViewLayout: BaseCollectionViewFlowLayout {
 }
 
 @available(iOS 13.0, *)
-public extension NSCollectionLayoutDimension {
-    func value(_ collectionView: UICollectionView?) -> CGFloat {
+extension NSCollectionLayoutDimension {
+    public func value(_ collectionView: UICollectionView?) -> CGFloat {
         guard let collectionView else { return 0 }
 
         if isAbsolute || isEstimated {
             return dimension
-        } else if isFractionalWidth {
+        }
+        else if isFractionalWidth {
             return collectionView.frame.size.width * dimension
-        } else if isFractionalHeight {
+        }
+        else if isFractionalHeight {
             return collectionView.frame.size.height * dimension
-        } else {
+        }
+        else {
             return 0
         }
     }

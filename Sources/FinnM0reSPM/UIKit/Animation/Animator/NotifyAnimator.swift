@@ -21,8 +21,8 @@ class NotifyAnimator {
     init(
         view: UIView,
         label: UILabel,
-        textFactory: @escaping (Int) -> String
-    ) {
+        textFactory: @escaping (Int) -> String)
+    {
         self.view = view
         self.label = label
         self.textFactory = textFactory
@@ -45,11 +45,13 @@ extension NotifyAnimator {
         if value == 0, currentValue == 1 {
             animation = nil
             setupNotifyAnimation(style: .oneToZero)
-        } else if value == 1, currentValue == 0 {
+        }
+        else if value == 1, currentValue == 0 {
             updateValue(value: value)
             animation = nil
             setupNotifyAnimation(style: .zeroToOne)
-        } else {
+        }
+        else {
             updateValue(value: value)
         }
     }
@@ -115,11 +117,11 @@ extension NotifyAnimator {
             textFactory: {
                 if $0 <= 0 {
                     return ""
-                } else {
+                }
+                else {
                     return $0 > 99 ? "99+" : "\($0)"
                 }
-            }
-        )
+            })
 
         private var cancellable = Set<AnyCancellable>()
 

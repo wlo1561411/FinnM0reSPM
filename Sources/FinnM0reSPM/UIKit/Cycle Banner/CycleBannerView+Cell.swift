@@ -1,7 +1,7 @@
 import UIKit
 
-public extension CycleBannerView {
-    class Cell: UICollectionViewCell {
+extension CycleBannerView {
+    public class Cell: UICollectionViewCell {
         private(set) var embeddedView: UIView?
 
         override public init(frame: CGRect) {

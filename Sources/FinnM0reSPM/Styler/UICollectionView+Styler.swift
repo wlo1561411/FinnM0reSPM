@@ -1,8 +1,8 @@
 import Combine
 import UIKit
 
-public extension Styler where Base: UICollectionView {
-    enum SupplementType {
+extension Styler where Base: UICollectionView {
+    public enum SupplementType {
         case header
         case footer
         case custom(String)
@@ -13,17 +13,16 @@ public extension Styler where Base: UICollectionView {
                 return UICollectionView.elementKindSectionHeader
             case .footer:
                 return UICollectionView.elementKindSectionFooter
-            case let .custom(value):
+            case .custom(let value):
                 return value
             }
         }
     }
 
     @discardableResult
-    func register<Cell: UICollectionViewCell>(
+    public func register<Cell: UICollectionViewCell>(
         _ cell: Cell.Type,
-        identifier: String = "\(Cell.self)"
-    )
+        identifier: String = "\(Cell.self)")
         -> Self
     {
         base.register(cell.self, forCellWithReuseIdentifier: identifier)
@@ -31,39 +30,36 @@ public extension Styler where Base: UICollectionView {
     }
 
     @discardableResult
-    func register<Supplementary: UICollectionReusableView>(
+    public func register<Supplementary: UICollectionReusableView>(
         _ supplementary: Supplementary.Type,
         type: SupplementType,
-        identifier: String = ""
-    )
+        identifier: String = "")
         -> Self
     {
         let _identifier = identifier.isEmpty ? "\(type.kind)\(Supplementary.self)" : identifier
         base.register(
             supplementary.self,
             forSupplementaryViewOfKind: type.kind,
-            withReuseIdentifier: _identifier
-        )
+            withReuseIdentifier: _identifier)
         return self
     }
 }
 
 // MARK: - Layout
 
-public extension Styler where Base: UICollectionView {
+extension Styler where Base: UICollectionView {
     @available(iOS 14.0, *)
-    func justTitleRegistration(
+    public func justTitleRegistration(
         type: SupplementType,
         viewTag: Int = 99,
         initialize: @escaping (UILabel) -> Void,
-        configure: ((UILabel) -> Void)? = nil
-    )
+        configure: ((UILabel) -> Void)? = nil)
         -> UICollectionView.SupplementaryRegistration<UICollectionReusableView>
     {
         supplementaryRegistration(
             type: type,
-            viewTag: viewTag
-        ) { reusable in
+            viewTag: viewTag)
+        { reusable in
             let label = UILabel()
             label.sr
                 .add(to: reusable)
@@ -80,12 +76,11 @@ public extension Styler where Base: UICollectionView {
     }
 
     @available(iOS 14.0, *)
-    func supplementaryRegistration(
+    public func supplementaryRegistration(
         type: SupplementType,
         viewTag: Int = 99,
         initialize: @escaping (UICollectionReusableView) -> UIView,
-        configure: ((UIView) -> Void)? = nil
-    )
+        configure: ((UIView) -> Void)? = nil)
         -> UICollectionView.SupplementaryRegistration<UICollectionReusableView>
     {
         .init(
@@ -93,7 +88,8 @@ public extension Styler where Base: UICollectionView {
         { supplementaryView, _, _ in
             if let tagView = supplementaryView.subviews.first(where: { $0.tag == viewTag }) {
                 configure?(tagView)
-            } else {
+            }
+            else {
                 let tagView = initialize(supplementaryView)
                 tagView.tag = viewTag
                 configure?(tagView)
@@ -102,11 +98,10 @@ public extension Styler where Base: UICollectionView {
     }
 
     @available(iOS 14.0, *)
-    func generateDataSource<I: Hashable, M: Hashable>(
+    public func generateDataSource<I: Hashable, M: Hashable>(
         cell: UICollectionView.CellRegistration<some UICollectionViewCell, M>,
         header: UICollectionView.SupplementaryRegistration<UICollectionReusableView>? = nil,
-        footer: UICollectionView.SupplementaryRegistration<UICollectionReusableView>? = nil
-    )
+        footer: UICollectionView.SupplementaryRegistration<UICollectionReusableView>? = nil)
         -> UICollectionViewDiffableDataSource<I, M>
     {
         let cell = cell
@@ -117,8 +112,7 @@ public extension Styler where Base: UICollectionView {
             collectionView.dequeueConfiguredReusableCell(
                 using: cell,
                 for: indexPath,
-                item: item
-            )
+                item: item)
         }
 
         setSupplementaryView(dataSource, header: header, footer: footer)
@@ -127,11 +121,10 @@ public extension Styler where Base: UICollectionView {
     }
 
     @available(iOS 14.0, *)
-    func generateDataSource<I: Hashable, M: Hashable>(
+    public func generateDataSource<I: Hashable, M: Hashable>(
         cellProvider: @escaping (UICollectionView, IndexPath, M) -> UICollectionViewCell?,
         header: UICollectionView.SupplementaryRegistration<UICollectionReusableView>? = nil,
-        footer: UICollectionView.SupplementaryRegistration<UICollectionReusableView>? = nil
-    )
+        footer: UICollectionView.SupplementaryRegistration<UICollectionReusableView>? = nil)
         -> UICollectionViewDiffableDataSource<I, M>
     {
         let header = header
@@ -148,8 +141,8 @@ public extension Styler where Base: UICollectionView {
     private func setSupplementaryView(
         _ dataSource: UICollectionViewDiffableDataSource<some Hashable, some Hashable>,
         header: UICollectionView.SupplementaryRegistration<UICollectionReusableView>? = nil,
-        footer: UICollectionView.SupplementaryRegistration<UICollectionReusableView>? = nil
-    ) {
+        footer: UICollectionView.SupplementaryRegistration<UICollectionReusableView>? = nil)
+    {
         guard header != nil || footer != nil
         else { return }
 
@@ -159,15 +152,13 @@ public extension Styler where Base: UICollectionView {
                 guard let header else { return .init() }
                 return collectionView.dequeueConfiguredReusableSupplementary(
                     using: header,
-                    for: indexPath
-                )
+                    for: indexPath)
 
             case UICollectionView.elementKindSectionFooter:
                 guard let footer else { return .init() }
                 return collectionView.dequeueConfiguredReusableSupplementary(
                     using: footer,
-                    for: indexPath
-                )
+                    for: indexPath)
             default:
                 return .init()
             }

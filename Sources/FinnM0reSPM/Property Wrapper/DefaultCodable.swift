@@ -29,8 +29,7 @@ extension Default: Codable {
 extension KeyedDecodingContainer {
     func decode<T>(
         _ type: Default<T>.Type,
-        forKey key: Key
-    )
+        forKey key: Key)
         throws -> Default<T>
         where T: DefaultValue
     {

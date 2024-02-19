@@ -20,8 +20,8 @@ public struct UIKitTextField: UIViewRepresentable {
         showPassword: Binding<Bool>,
         isPasswordType: Bool,
         inputType: some InputType,
-        configuration: @escaping (UITextField) -> Void = { (_: UITextField) in }
-    ) {
+        configuration: @escaping (UITextField) -> Void = { (_: UITextField) in })
+    {
         _text = text
         _isFirstResponder = isFirstResponder
         _showPassword = showPassword
@@ -35,8 +35,7 @@ public struct UIKitTextField: UIViewRepresentable {
         Coordinator(
             $text,
             $isFirstResponder,
-            inputType
-        )
+            inputType)
     }
 
     public func makeUIView(context: Context) -> UITextField {
@@ -85,8 +84,8 @@ public struct UIKitTextField: UIViewRepresentable {
         init(
             _ text: Binding<String>,
             _ isFirstResponder: Binding<Bool>,
-            _ inputType: some InputType
-        ) {
+            _ inputType: some InputType)
+        {
             _text = text
             _isFirstResponder = isFirstResponder
             self.inputType = inputType

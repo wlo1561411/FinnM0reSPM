@@ -1,8 +1,8 @@
 import UIKit
 
-public extension Styler where Base: UITextField {
+extension Styler where Base: UITextField {
     @discardableResult
-    func placeholder(_ text: String?, color: UIColor = .lightGray) -> Self {
+    public func placeholder(_ text: String?, color: UIColor = .lightGray) -> Self {
         base.attributedPlaceholder = text?
             .attributed
             .textColor(color)
@@ -10,14 +10,14 @@ public extension Styler where Base: UITextField {
         return self
     }
 
-    enum Padding {
+    public enum Padding {
         case horizontal
         case left
         case right
     }
 
     @discardableResult
-    func padding(_ padding: Padding, offset: CGFloat) -> Self {
+    public func padding(_ padding: Padding, offset: CGFloat) -> Self {
         switch padding {
         case .horizontal:
             let lv = UIView(frame: .init(origin: .zero, size: .init(width: offset, height: 1)))
@@ -40,7 +40,7 @@ public extension Styler where Base: UITextField {
         return self
     }
 
-    func remainCursor(to new: String) {
+    public func remainCursor(to new: String) {
         guard let selectedTextRange = base.selectedTextRange else { return }
 
         let currentCursorPosition = base.offset(from: base.beginningOfDocument, to: selectedTextRange.start)

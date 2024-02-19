@@ -18,8 +18,8 @@ public struct ViewDidLoadModifier: ViewModifier {
 }
 
 @available(iOS 14.0, *)
-public extension View {
-    func onViewDidLoad(_ perform: @escaping (() -> Void)) -> some View {
+extension View {
+    public func onViewDidLoad(_ perform: @escaping (() -> Void)) -> some View {
         modifier(ViewDidLoadModifier(action: perform))
     }
 }

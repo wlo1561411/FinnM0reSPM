@@ -32,12 +32,12 @@ public class RxCycleBannerViewDelegateProxy:
 
 // MARK: - Observable
 
-public extension Reactive where Base: CycleBannerView {
-    var delegate: DelegateProxy<CycleBannerView, CycleBannerViewDelegate> {
+extension Reactive where Base: CycleBannerView {
+    public var delegate: DelegateProxy<CycleBannerView, CycleBannerViewDelegate> {
         RxCycleBannerViewDelegateProxy.proxy(for: base)
     }
 
-    var didSelected: Observable<Int> {
+    public var didSelected: Observable<Int> {
         delegate
             .methodInvoked(#selector(CycleBannerViewDelegate.didSelected(at:)))
             .map { a in
@@ -45,7 +45,7 @@ public extension Reactive where Base: CycleBannerView {
             }
     }
 
-    var didScroll: Observable<Int> {
+    public var didScroll: Observable<Int> {
         delegate
             .methodInvoked(#selector(CycleBannerViewDelegate.didScroll(to:)))
             .map { a in

@@ -1,15 +1,14 @@
 import RxSwift
 
-public extension Styler {
+extension Styler {
     @discardableResult
-    func observe<
+    public func observe<
         Observable: ObservableType,
         Element
     >(
         from observable: Observable,
         to transform: (Reactive<Base>) -> Binder<Element>,
-        dispose: DisposeBag
-    )
+        dispose: DisposeBag)
         -> Self
         where
         Observable.Element == Element,

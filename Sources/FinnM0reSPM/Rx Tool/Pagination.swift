@@ -23,8 +23,8 @@ public final class Pagination<T> {
         offset: Int = 1,
         observable: @escaping ((Int) -> Observable<[T]>),
         onLoading: ((Bool) -> Void)? = nil,
-        onElementChanged: (([T]) -> Void)? = nil
-    ) {
+        onElementChanged: (([T]) -> Void)? = nil)
+    {
         self.offset = offset
         startPageIndex = pageIndex
 
@@ -63,10 +63,11 @@ extension Pagination {
             .flatMap { [unowned self] page in
                 if page > 1, self.isRefreshing {
                     return Observable
-                        .concat((0 ..< page).map { observable($0 + 1) })
+                        .concat((0..<page).map { observable($0 + 1) })
                         .scan([T](), accumulator: { $0 + $1 })
                         .takeLast(1)
-                } else {
+                }
+                else {
                     return observable(page)
                 }
             }
@@ -79,8 +80,7 @@ extension Pagination {
             .combineLatest(
                 request,
                 response,
-                elements.asObservable()
-            )
+                elements.asObservable())
             .map { [unowned self] _, response, elements in
                 self.pageIndex == self.startPageIndex ? response : elements + response
             }
@@ -92,8 +92,7 @@ extension Pagination {
             .of(
                 request.map { _ in true },
                 response.map { _ in false },
-                error.map { _ in false }
-            )
+                error.map { _ in false })
             .merge()
             .bind(to: loading)
             .disposed(by: disposeBag)
@@ -105,12 +104,14 @@ extension Pagination {
             .flatMap { [unowned self] loading -> Observable<Int> in
                 if loading {
                     return Observable.empty()
-                } else {
+                }
+                else {
                     self.isRefreshing = true
 
                     if self.pageIndex < pageIndex {
                         self.pageIndex = pageIndex
-                    } else {
+                    }
+                    else {
                         self.startPageIndex = self.pageIndex
                     }
 
@@ -129,7 +130,8 @@ extension Pagination {
             .flatMap { [unowned self] loading -> Observable<Int> in
                 if loading || self.isLastData {
                     return Observable.empty()
-                } else {
+                }
+                else {
                     self.isRefreshing = false
 
                     return Observable<Int>.create { observer in

@@ -1,7 +1,7 @@
 import Foundation
 
-public extension Numeric {
-    func currencyFormatted(minimum: Int = 0, maximum: Int = 2) -> String {
+extension Numeric {
+    public func currencyFormatted(minimum: Int = 0, maximum: Int = 2) -> String {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
         formatter.groupingSeparator = ","

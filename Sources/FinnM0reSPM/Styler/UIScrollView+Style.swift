@@ -1,16 +1,16 @@
 import Combine
 import UIKit
 
-public extension Styler where Base: UIScrollView {
+extension Styler where Base: UIScrollView {
     @discardableResult
-    func closeIndicator() -> Self {
+    public func closeIndicator() -> Self {
         base.showsVerticalScrollIndicator = false
         base.showsHorizontalScrollIndicator = false
         return self
     }
 
     @available(iOS 13.0, *)
-    var scrollablePublisher: AnyPublisher<Bool, Never> {
+    public var scrollablePublisher: AnyPublisher<Bool, Never> {
         base
             .publisher(for: \.contentSize)
             .receive(on: DispatchQueue.main)
@@ -26,7 +26,7 @@ public extension Styler where Base: UIScrollView {
 
     @available(iOS 13.0, *)
     @discardableResult
-    func automaticScrollable(storeIn: inout Set<AnyCancellable>) -> Self {
+    public func automaticScrollable(storeIn: inout Set<AnyCancellable>) -> Self {
         scrollablePublisher
             .sink(receiveValue: { [weak base] in
                 base?.isScrollEnabled = $0

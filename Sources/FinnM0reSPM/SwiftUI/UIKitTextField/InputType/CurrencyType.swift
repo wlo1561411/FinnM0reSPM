@@ -12,8 +12,8 @@ public class CurrencyType: InputType {
 
     public init(
         regex: CurrencyRegex,
-        maxAmount: Decimal? = nil
-    ) {
+        maxAmount: Decimal? = nil)
+    {
         self.regex = regex
         self.maxAmount = maxAmount
     }
@@ -45,7 +45,8 @@ public class CurrencyType: InputType {
     private func isEndWithDecimalPoint(_ text: String) -> Bool {
         if text.last == "." {
             return true
-        } else {
+        }
+        else {
             return false
         }
     }
@@ -57,7 +58,8 @@ public class CurrencyType: InputType {
 
         if splittedText[1].contains(where: { $0 != "0" }) || splittedText[1].count == maxDigits {
             return false
-        } else {
+        }
+        else {
             return true
         }
     }

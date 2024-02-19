@@ -1,10 +1,9 @@
 import RxSwift
 
-public extension ObservableConvertibleType {
-    func publish<Object: AnyObject, Value>(
+extension ObservableConvertibleType {
+    public func publish<Object: AnyObject, Value>(
         to object: Object,
-        _ keyPath: ReferenceWritableKeyPath<Object, Value>
-    )
+        _ keyPath: ReferenceWritableKeyPath<Object, Value>)
         -> Observable<Element>
         where Element == Value
     {
@@ -15,10 +14,9 @@ public extension ObservableConvertibleType {
             })
     }
 
-    func publish<Object: AnyObject, Value>(
+    public func publish<Object: AnyObject, Value>(
         to object: Object,
-        _ keyPath: ReferenceWritableKeyPath<Object, Value?>
-    )
+        _ keyPath: ReferenceWritableKeyPath<Object, Value?>)
         -> Observable<Element>
         where Element == Value
     {
@@ -30,11 +28,10 @@ public extension ObservableConvertibleType {
     }
 }
 
-public extension Completable {
-    func complete<Object: AnyObject>(
+extension Completable {
+    public func complete<Object: AnyObject>(
         to object: Object,
-        _ keyPath: ReferenceWritableKeyPath<Object, Bool>
-    )
+        _ keyPath: ReferenceWritableKeyPath<Object, Bool>)
         -> Completable
     {
         observe(on: MainScheduler.instance)

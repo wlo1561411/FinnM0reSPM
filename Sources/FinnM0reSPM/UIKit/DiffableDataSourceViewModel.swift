@@ -12,8 +12,8 @@ public protocol DiffableDataSourceViewModel {
 }
 
 @available(iOS 14.0, *)
-public extension DiffableDataSourceViewModel {
-    var snapshotPublisher: AnyPublisher<Snapshot, Never> {
+extension DiffableDataSourceViewModel {
+    public var snapshotPublisher: AnyPublisher<Snapshot, Never> {
         snapshotSubject
             .compactMap { $0 }
             .eraseToAnyPublisher()

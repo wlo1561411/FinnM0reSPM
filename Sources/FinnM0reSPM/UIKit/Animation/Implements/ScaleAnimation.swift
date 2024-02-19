@@ -15,14 +15,13 @@ final class ScaleAnimation: BaseAnimation {
         fromValue: CGFloat = 1,
         toValue: CGFloat = 0.5,
         duration: CFTimeInterval = 0.15,
-        layer: CALayer? = nil
-    ) {
+        layer: CALayer? = nil)
+    {
         super.init(
             fromValue: fromValue,
             toValue: toValue,
             duration: duration,
-            layer: layer
-        )
+            layer: layer)
     }
 
     private func startAnimation(reverse: Bool) {
@@ -33,8 +32,7 @@ final class ScaleAnimation: BaseAnimation {
             keyPath: "transform.scale",
             fromValue: style == .normal ? fromValue : reverseFrom,
             toValue: style == .normal ? toValue : reverseTo,
-            duration: duration
-        )
+            duration: duration)
 
         layer?.add(scaleDown, forKey: "transform.scale.down")
     }
@@ -67,7 +65,8 @@ final class ScaleAnimation: BaseAnimation {
             if isScaleDown {
                 onScaleDown?()
                 startAnimation(reverse: true)
-            } else {
+            }
+            else {
                 onCompleted?(flag)
                 nextAnimation?.perform()
             }

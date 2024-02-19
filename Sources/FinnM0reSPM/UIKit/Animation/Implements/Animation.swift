@@ -10,8 +10,7 @@ extension Animation {
         keyPath: String,
         fromValue: Any,
         toValue: Any,
-        duration: CFTimeInterval
-    )
+        duration: CFTimeInterval)
         -> CABasicAnimation
     {
         let animation = CABasicAnimation(keyPath: keyPath)
@@ -43,8 +42,8 @@ class BaseAnimation: NSObject, Animation {
         duration: CFTimeInterval,
         nextAnimation: Animation? = nil,
         layer: CALayer? = nil,
-        onCompleted: ((Bool) -> Void)? = nil
-    ) {
+        onCompleted: ((Bool) -> Void)? = nil)
+    {
         self.fromValue = fromValue
         self.toValue = toValue
         self.duration = duration
@@ -53,7 +52,7 @@ class BaseAnimation: NSObject, Animation {
         self.onCompleted = onCompleted
     }
 
-    func perform() {}
+    func perform() { }
 }
 
 // MARK: - Chaining

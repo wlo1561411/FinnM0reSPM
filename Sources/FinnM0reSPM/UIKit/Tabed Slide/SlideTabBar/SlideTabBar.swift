@@ -109,8 +109,8 @@ public class SlideTabBar: UIView {
     public init(
         numberOfItems: @escaping () -> Int,
         factory: @escaping (Int) -> SlideTabBar.Item,
-        onSelected: ((Int) -> Void)?
-    ) {
+        onSelected: ((Int) -> Void)?)
+    {
         super.init(frame: .zero)
         setup(numberOfItems: numberOfItems, factory: factory, onSelected: onSelected)
         commitInit()
@@ -159,8 +159,8 @@ public class SlideTabBar: UIView {
         numberOfItems: @escaping () -> Int,
         factory: @escaping (Int) -> SlideTabBar.Item,
         shouldAllowItemSelect: ((Int) -> Bool)? = nil,
-        onSelected: ((Int) -> Void)? = nil
-    ) {
+        onSelected: ((Int) -> Void)? = nil)
+    {
         getNumberOfItems = numberOfItems
         itemFactory = factory
         self.shouldAllowItemSelect = shouldAllowItemSelect
@@ -177,8 +177,8 @@ public class SlideTabBar: UIView {
     public func select(
         at index: Int?,
         animated: Bool,
-        withEvent: Bool = false
-    ) {
+        withEvent: Bool = false)
+    {
         if let index {
             isReloading = !animated
 
@@ -186,10 +186,12 @@ public class SlideTabBar: UIView {
                 items.forEach { $0.setSelected(false, settings: itemSettings) }
                 _selectedIndex = index
                 items[safe: index]?.setSelected(true, settings: itemSettings)
-            } else {
+            }
+            else {
                 selectedIndex = index
             }
-        } else {
+        }
+        else {
             selectedIndex = -1
             items.forEach { $0.setSelected(false, settings: itemSettings) }
         }
@@ -242,7 +244,7 @@ extension SlideTabBar {
 
         guard numberOfItems > 0 else { return }
 
-        items = (0 ..< numberOfItems)
+        items = (0..<numberOfItems)
             .compactMap { index in
                 guard let item = setupItem(at: index) else { return nil }
                 itemsStackView.addArrangedSubview(item)
@@ -280,7 +282,8 @@ extension SlideTabBar {
             !shouldAllowItemSelect(item.tag)
         {
             item.setEnable(false, settings: itemSettings)
-        } else {
+        }
+        else {
             item.setSelected(isSelected, settings: itemSettings)
         }
     }
@@ -295,23 +298,21 @@ extension SlideTabBar {
     private func updateItemTitleColor(
         from fromItem: SlideTabBar.Item?,
         to toItem: SlideTabBar.Item? = nil,
-        by percentage: CGFloat
-    ) {
+        by percentage: CGFloat)
+    {
         toItem?.setTransformingColor(
             SlideCalculator
                 .color(
                     by: 1 - percentage,
                     between: itemSettings[.normal]?.color ?? .clear,
-                    itemSettings[.selected]?.color ?? .clear
-                ))
+                    itemSettings[.selected]?.color ?? .clear))
 
         fromItem?.setTransformingColor(
             SlideCalculator
                 .color(
                     by: percentage,
                     between: itemSettings[.normal]?.color ?? .clear,
-                    itemSettings[.selected]?.color ?? .clear
-                ))
+                    itemSettings[.selected]?.color ?? .clear))
     }
 
     private func tabBarItem(at index: Int) -> SlideTabBar.Item? {
@@ -352,7 +353,7 @@ extension SlideTabBar {
             !shouldAllowItemSelect(index)
         else { return index }
 
-        return (0 ..< itemsCount).first(where: { shouldAllowItemSelect($0) }) ?? -1
+        return (0..<itemsCount).first(where: { shouldAllowItemSelect($0) }) ?? -1
     }
 }
 
@@ -393,8 +394,7 @@ extension SlideTabBar {
                 x: toItem.center.x - scrollView.bounds.width / 2,
                 y: toItem.frame.origin.y,
                 width: scrollView.bounds.width,
-                height: scrollView.bounds.height
-            )
+                height: scrollView.bounds.height)
 
             scrollView.scrollRectToVisible(calced, animated: animated)
         }
@@ -413,8 +413,7 @@ extension SlideTabBar {
         else {
             offsetX = min(
                 max(offsetX, -scrollView.contentInset.left),
-                scrollView.contentSize.width - scrollView.bounds.width + scrollView.contentInset.right
-            )
+                scrollView.contentSize.width - scrollView.bounds.width + scrollView.contentInset.right)
         }
 
         let offsetPoint = CGPoint(x: offsetX, y: 0)
@@ -427,20 +426,19 @@ extension SlideTabBar {
         let location = trackerMode.location(
             with: toItem,
             spacing: itemSpacing,
-            at: scrollView
-        )
+            at: scrollView)
 
         let frame = CGRect(
             x: location.x,
             y: bounds.height - trackerHeight,
             width: location.width,
-            height: trackerHeight
-        )
+            height: trackerHeight)
 
         if trackerView.isHidden {
             trackerView.isHidden = false
             trackerView.frame = frame
-        } else {
+        }
+        else {
             guard animated
             else {
                 trackerView.frame = frame
@@ -454,8 +452,7 @@ extension SlideTabBar {
                 animations: { [weak trackerView] in
                     trackerView?.frame = frame
                 },
-                completion: nil
-            )
+                completion: nil)
         }
     }
 
@@ -479,7 +476,8 @@ extension SlideTabBar {
             toX = toLocation.x
 
             updateItemTitleColor(from: fromItem, to: toItem, by: percentage)
-        } else {
+        }
+        else {
             toItemWidth = fromItemWidth
             toX = toIndex > fromIndex ? fromX + fromItemWidth : fromX - fromItemWidth
 
@@ -493,8 +491,7 @@ extension SlideTabBar {
             x: calcedX,
             y: trackerView.frame.origin.y,
             width: calcedWidth,
-            height: trackerHeight
-        )
+            height: trackerHeight)
     }
 }
 
@@ -503,7 +500,7 @@ extension SlideTabBar {
 #if swift(>=5.9)
     @available(iOS 17.0, *)
     #Preview {
-        let title = (0 ... 5).map { "This is Test \($0)" }
+        let title = (0...5).map { "This is Test \($0)" }
 
         return SlideTabBar()
             .sr
@@ -535,8 +532,7 @@ extension SlideTabBar {
                             tabBar.reload(at: 2, animated: true)
                         }
                         print("Tap", $0)
-                    }
-                )
+                    })
                 tabBar.reload(animated: true)
             }
             .unwrap()

@@ -12,29 +12,29 @@ public protocol MultipleTabViewModel: AnyObject {
 }
 
 @available(iOS 14.0, *)
-public extension MultipleTabViewModel {
-    var tabsPublisher: AnyPublisher<[Tab], Never> {
+extension MultipleTabViewModel {
+    public var tabsPublisher: AnyPublisher<[Tab], Never> {
         tabsSubject
             .removeDuplicates()
             .eraseToAnyPublisher()
     }
 
-    var displayTabs: [Tab] {
+    public var displayTabs: [Tab] {
         tabsSubject.value
     }
 
-    var currentTabIndex: Int {
+    public var currentTabIndex: Int {
         displayTabs.firstIndex(where: { $0 == currentTab }) ?? 0
     }
 
-    func updateTabs(_ tabs: [Tab], force: Bool = false) {
+    public func updateTabs(_ tabs: [Tab], force: Bool = false) {
         if force {
             tabsSubject.send([])
         }
         tabsSubject.send(tabs)
     }
 
-    func selectTab(at index: Int) {
+    public func selectTab(at index: Int) {
         guard let new = displayTabs[safe: index] else { return }
         currentTab = new
     }

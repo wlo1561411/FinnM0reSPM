@@ -8,17 +8,18 @@ final class PaginationTests: XCTestCase {
         let minimum = page == 1 ? 0 : (page - 1) * 10
         let maximum = page * 10
 
-        let result = (minimum ..< maximum).map { $0 }
+        let result = (minimum..<maximum).map { $0 }
 
         if delay == 0 {
             return .just(result)
-        } else {
+        }
+        else {
             return .create { o in
                 DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
                     o.onNext(result)
                     o.onCompleted()
                 }
-                return Disposables.create {}
+                return Disposables.create { }
             }
         }
     }
@@ -30,7 +31,7 @@ final class PaginationTests: XCTestCase {
 
         stubPagination.refreshTrigger.onNext(())
 
-        let expect = (0 ..< 10).map { $0 }
+        let expect = (0..<10).map { $0 }
         XCTAssertEqual(expect, stubPagination.elements.value)
     }
 
@@ -43,7 +44,7 @@ final class PaginationTests: XCTestCase {
         stubPagination.loadNextPageTrigger.onNext(())
 
         delay(for: 0.1) {
-            let expect = (0 ..< 20).map { $0 }
+            let expect = (0..<20).map { $0 }
             XCTAssertEqual(expect, stubPagination.elements.value)
         }
     }
@@ -56,7 +57,7 @@ final class PaginationTests: XCTestCase {
         stubPagination.refreshTrigger.onNext(())
         stubPagination.loadNextPageTrigger.onNext(())
 
-        let expect = (0 ..< 20).map { $0 }
+        let expect = (0..<20).map { $0 }
 
         delay(for: 0.1) {
             XCTAssertEqual(expect, stubPagination.elements.value)

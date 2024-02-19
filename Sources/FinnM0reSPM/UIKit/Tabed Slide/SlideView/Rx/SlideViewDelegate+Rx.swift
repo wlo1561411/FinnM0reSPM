@@ -33,12 +33,12 @@ public class RxSlideViewDelegateProxy:
 
 // MARK: - Observable
 
-public extension Reactive where Base: SlideView {
-    var delegate: DelegateProxy<SlideView, SlideViewDelegate> {
+extension Reactive where Base: SlideView {
+    public var delegate: DelegateProxy<SlideView, SlideViewDelegate> {
         RxSlideViewDelegateProxy.proxy(for: base)
     }
 
-    var switching: Observable<(fromIndex: Int, toIndex: Int, percentage: CGFloat)> {
+    public var switching: Observable<(fromIndex: Int, toIndex: Int, percentage: CGFloat)> {
         delegate
             .methodInvoked(#selector(SlideViewDelegate.switching(from:to:with:)))
             .map { a in
@@ -46,7 +46,7 @@ public extension Reactive where Base: SlideView {
             }
     }
 
-    var willSwitch: Observable<(index: Int, viewController: UIViewController)> {
+    public var willSwitch: Observable<(index: Int, viewController: UIViewController)> {
         delegate
             .methodInvoked(#selector(SlideViewDelegate.willSwitch(to:viewController:)))
             .map { a in
@@ -54,7 +54,7 @@ public extension Reactive where Base: SlideView {
             }
     }
 
-    var didSwitch: Observable<(index: Int, viewController: UIViewController)> {
+    public var didSwitch: Observable<(index: Int, viewController: UIViewController)> {
         delegate
             .methodInvoked(#selector(SlideViewDelegate.didSwitch(to:viewController:)))
             .map { a in
@@ -62,7 +62,7 @@ public extension Reactive where Base: SlideView {
             }
     }
 
-    var didCancelSwitch: Observable<(index: Int, viewController: UIViewController)> {
+    public var didCancelSwitch: Observable<(index: Int, viewController: UIViewController)> {
         delegate
             .methodInvoked(#selector(SlideViewDelegate.didCancelSwitch(to:viewController:)))
             .map { a in

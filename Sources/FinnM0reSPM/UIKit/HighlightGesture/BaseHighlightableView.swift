@@ -75,12 +75,11 @@ public class BaseHighlightableView: SlideTabBar.Item {
 
                 self.isHighlight = false
                 self.onTap?(self)
-            }
-        )
+            })
     }
 
     /// Override this function to update UI
-    public func setupViewsFromStatus() {}
+    public func setupViewsFromStatus() { }
 
     public func dispose() {
         removeAllSetting()
@@ -99,7 +98,7 @@ public class BaseHighlightableView: SlideTabBar.Item {
         self.isEnable = isEnable
     }
 
-    override public func setTransformingColor(_: UIColor) {}
+    override public func setTransformingColor(_: UIColor) { }
 
     deinit {
         dispose()
@@ -108,8 +107,8 @@ public class BaseHighlightableView: SlideTabBar.Item {
 
 // MARK: - Setting
 
-public extension BaseHighlightableView {
-    var currentStatus: Status {
+extension BaseHighlightableView {
+    public var currentStatus: Status {
         if isEnable == false {
             return .disable
         }
@@ -125,16 +124,16 @@ public extension BaseHighlightableView {
         return .normal
     }
 
-    var currentSetting: Setting? {
+    public var currentSetting: Setting? {
         settingDictionary[currentStatus]
     }
 
-    func addSetting(_ setting: Setting, at status: Status = .normal) {
+    public func addSetting(_ setting: Setting, at status: Status = .normal) {
         settingDictionary[status] = setting
         setupViewsFromStatus()
     }
 
-    func getSetting(from status: Status) -> Setting? {
+    public func getSetting(from status: Status) -> Setting? {
         if let setting = settingDictionary[status] {
             return setting
         }
@@ -149,12 +148,12 @@ public extension BaseHighlightableView {
         }
     }
 
-    func setSettings(_ setting: [Status: Setting]) {
+    public func setSettings(_ setting: [Status: Setting]) {
         settingDictionary = setting
         setupViewsFromStatus()
     }
 
-    func removeAllSetting() {
+    public func removeAllSetting() {
         settingDictionary = [:]
     }
 }

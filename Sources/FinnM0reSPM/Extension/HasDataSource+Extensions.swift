@@ -12,8 +12,7 @@ extension HasDataSource {
         dataSource: DelegateProxy.Delegate,
         observable: _ObservableType,
         retainDataSource: Bool,
-        binding: @escaping (DelegateProxy, Event<_ObservableType.Element>) -> Void
-    )
+        binding: @escaping (DelegateProxy, Event<_ObservableType.Element>) -> Void)
         -> Disposable
         where
         DelegateProxy.ParentObject: UIView,
@@ -23,8 +22,7 @@ extension HasDataSource {
         let unregisterDelegate = DelegateProxy.installForwardDelegate(
             dataSource,
             retainDelegate: retainDataSource,
-            onProxyForObject: object
-        )
+            onProxyForObject: object)
 
         if object.window != nil {
             object.layoutIfNeeded()
@@ -42,14 +40,13 @@ extension HasDataSource {
                 if let object {
                     assert(
                         proxy === DelegateProxy.currentDelegate(for: object),
-                        "Proxy changed from the time it was first set.\nOriginal: \(proxy)\nExisting: \(String(describing: DelegateProxy.currentDelegate(for: object)))"
-                    )
+                        "Proxy changed from the time it was first set.\nOriginal: \(proxy)\nExisting: \(String(describing: DelegateProxy.currentDelegate(for: object)))")
                 }
 
                 binding(proxy, event)
 
                 switch event {
-                case let .error(error):
+                case .error(let error):
                     fatalError(error.localizedDescription)
                 case .completed:
                     unregisterDelegate.dispose()

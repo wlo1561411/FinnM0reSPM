@@ -8,26 +8,26 @@ public enum Visibility {
 }
 
 @available(iOS 14.0, *)
-public extension View {
-    func strokeBorder(color: UIColor, cornerRadius: CGFloat, lineWidth: CGFloat = 1) -> some View {
+extension View {
+    public func strokeBorder(color: UIColor, cornerRadius: CGFloat, lineWidth: CGFloat = 1) -> some View {
         background(
             RoundedRectangle(cornerRadius: cornerRadius)
                 .stroke(lineWidth: lineWidth)
                 .foregroundColor(.from(color)))
     }
 
-    func backgroundColor(_ color: UIColor, alpha: CGFloat = 1) -> some View {
+    public func backgroundColor(_ color: UIColor, alpha: CGFloat = 1) -> some View {
         background(
             Color.from(color, alpha: alpha))
     }
 
-    func pageBackgroundColor(_ color: UIColor, alpha: CGFloat = 1) -> some View {
+    public func pageBackgroundColor(_ color: UIColor, alpha: CGFloat = 1) -> some View {
         background(
             Color.from(color, alpha: alpha).ignoresSafeArea())
     }
 
     @ViewBuilder
-    func visibility(_ visibility: Visibility) -> some View {
+    public func visibility(_ visibility: Visibility) -> some View {
         switch visibility {
         case .visible:
             self
@@ -39,13 +39,14 @@ public extension View {
     }
 
     @ViewBuilder
-    func `if`
+    public func `if`
     (_ condition: Bool, transform: (Self) -> some View)
         -> some View
     {
         if condition {
             transform(self)
-        } else {
+        }
+        else {
             self
         }
     }

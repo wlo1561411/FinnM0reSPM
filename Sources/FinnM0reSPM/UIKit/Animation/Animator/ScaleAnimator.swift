@@ -33,8 +33,7 @@ extension ScaleAnimator {
         animation = ScaleAnimation(
             fromValue: isOn ? 1 : 0.5,
             toValue: isOn ? 0.5 : 1,
-            layer: view?.layer
-        )
-        .style(.normal)
+            layer: view?.layer)
+            .style(.normal)
     }
 }

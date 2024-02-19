@@ -30,7 +30,7 @@ public struct BarProgressView: View {
                 }
                 .mask(
                     HStack(spacing: 2) {
-                        ForEach(0 ..< numbersOfBar, id: \.self) { _ in
+                        ForEach(0..<numbersOfBar, id: \.self) { _ in
                             RoundedRectangle(cornerRadius: 1)
                                 .frame(width: 4)
                         }

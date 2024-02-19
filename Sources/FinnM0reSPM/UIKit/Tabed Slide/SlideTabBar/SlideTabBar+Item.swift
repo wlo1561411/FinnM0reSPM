@@ -1,10 +1,10 @@
 import Foundation
 import UIKit
 
-public extension SlideTabBar {
-    typealias Settings = [SlideTabBar.ItemSetting.Status: SlideTabBar.ItemSetting]
+extension SlideTabBar {
+    public typealias Settings = [SlideTabBar.ItemSetting.Status: SlideTabBar.ItemSetting]
 
-    struct ItemSetting {
+    public struct ItemSetting {
         public enum Status {
             case normal
             case selected
@@ -15,13 +15,13 @@ public extension SlideTabBar {
         var color: UIColor?
     }
 
-    class Item: UIView {
-        public func setSelected(_: Bool, settings _: Settings) {}
-        public func setEnable(_: Bool, settings _: Settings) {}
-        public func setTransformingColor(_: UIColor) {}
+    public class Item: UIView {
+        public func setSelected(_: Bool, settings _: Settings) { }
+        public func setEnable(_: Bool, settings _: Settings) { }
+        public func setTransformingColor(_: UIColor) { }
     }
 
-    class DefaultItem: SlideTabBar.Item {
+    public class DefaultItem: SlideTabBar.Item {
         private(set) var titleLabel = UILabel()
 
         init() {

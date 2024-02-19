@@ -76,10 +76,11 @@ public class HighlightGesture: UIGestureRecognizer {
 
         if
             touchPoint.x < -10 || touchPoint.y < -10 || touchPoint.x > vTmp.bounds.width + 10 || touchPoint.y > vTmp.bounds
-            .height + 10
+                .height + 10
         {
             forceCancelGesture()
-        } else {}
+        }
+        else { }
     }
 
     deinit {
@@ -139,8 +140,8 @@ extension HighlightGesture {
     }
 }
 
-public extension UIView {
-    func appendHighlightGesture(onHighlight: HighlightGesture.OnHighlight? = nil, onClick: (() -> Void)? = nil) {
+extension UIView {
+    public func appendHighlightGesture(onHighlight: HighlightGesture.OnHighlight? = nil, onClick: (() -> Void)? = nil) {
         if onHighlight == nil, onClick == nil {
             return
         }
@@ -151,7 +152,7 @@ public extension UIView {
         addGestureRecognizer(gesture)
     }
 
-    func triggerNonHighlightEvent() {
+    public func triggerNonHighlightEvent() {
         guard let oldGesture = gestureRecognizers?.first(where: { $0 is HighlightGesture }) as? HighlightGesture
         else { return }
 

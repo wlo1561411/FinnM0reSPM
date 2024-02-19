@@ -2,7 +2,7 @@ import RxCocoa
 import RxSwift
 import UIKit
 
-public protocol KeyboardMovement {}
+public protocol KeyboardMovement { }
 
 extension KeyboardMovement {
     private var keyboardAboveSpacing: CGFloat { 20 }
@@ -34,8 +34,8 @@ extension KeyboardMovement {
     }
 }
 
-public extension KeyboardMovement where Self: UIViewController {
-    var viewMovementDriver: Driver<CGFloat?> {
+extension KeyboardMovement where Self: UIViewController {
+    public var viewMovementDriver: Driver<CGFloat?> {
         keyboardHeightObservable
             .map { [weak self] height in
                 guard
@@ -47,8 +47,7 @@ public extension KeyboardMovement where Self: UIViewController {
 
                 let keyboardFrame = CGRect(
                     origin: .init(x: 0, y: UIScreen.main.bounds.height - height),
-                    size: .init(width: UIScreen.main.bounds.width, height: height)
-                )
+                    size: .init(width: UIScreen.main.bounds.width, height: height))
 
                 let origin = textfield.superview?
                     .convert(textfield.frame, to: nil)
@@ -56,16 +55,17 @@ public extension KeyboardMovement where Self: UIViewController {
 
                 let maxYminXOrigin = CGPoint(
                     x: origin.x,
-                    y: origin.y + textfield.frame.height + self.keyboardAboveSpacing
-                )
+                    y: origin.y + textfield.frame.height + self.keyboardAboveSpacing)
 
                 let estimated = origin.y - keyboardFrame.origin.y + textfield.frame.height + self.keyboardAboveSpacing
 
                 if keyboardFrame.contains(maxYminXOrigin) {
                     return estimated
-                } else if maxYminXOrigin.y > keyboardFrame.maxY {
+                }
+                else if maxYminXOrigin.y > keyboardFrame.maxY {
                     return estimated - (maxYminXOrigin.y - keyboardFrame.maxY)
-                } else {
+                }
+                else {
                     return 0
                 }
             }
@@ -74,8 +74,8 @@ public extension KeyboardMovement where Self: UIViewController {
     }
 }
 
-private extension UIApplication {
-    var firstResponder: UIResponder? {
+extension UIApplication {
+    fileprivate var firstResponder: UIResponder? {
         var _firstResponder: UIResponder?
 
         let reportAsFirstHandler = { (responder: UIResponder) in
@@ -87,15 +87,14 @@ private extension UIApplication {
             to: nil,
             from:
             reportAsFirstHandler,
-            for: nil
-        )
+            for: nil)
         return _firstResponder
     }
 }
 
-private extension UIResponder {
+extension UIResponder {
     @objc
-    func reportAsFirst(_ sender: Any) {
+    fileprivate func reportAsFirst(_ sender: Any) {
         if let handler = sender as? (UIResponder) -> Void {
             handler(self)
         }
