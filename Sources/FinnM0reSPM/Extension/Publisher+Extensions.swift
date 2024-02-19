@@ -3,7 +3,7 @@ import Foundation
 import RxCocoa
 import RxSwift
 
-@available(iOS 14.0, *)
+@available(iOS 13.0, *)
 extension Publisher {
     public func asObservable() -> Observable<Output> {
         Observable<Output>.create { observer in
