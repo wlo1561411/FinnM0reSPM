@@ -7,7 +7,8 @@ public struct LazyImage<Success, Placeholder, Failure>: View
     Placeholder: View,
     Failure: View
 {
-    @StateObject fileprivate var repository: Repository = .init()
+    @StateObject
+    fileprivate var repository: Repository = .init()
 
     private let url: String
 

@@ -2,7 +2,8 @@ import SwiftUI
 
 @available(iOS 14.0, *)
 public struct ViewDidLoadModifier: ViewModifier {
-    @State private var viewDidLoad = false
+    @State
+    private var viewDidLoad = false
     let action: (() -> Void)?
 
     public func body(content: Content) -> some View {

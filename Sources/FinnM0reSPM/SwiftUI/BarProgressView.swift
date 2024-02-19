@@ -2,7 +2,8 @@ import SwiftUI
 
 @available(iOS 14.0, *)
 public struct BarProgressView: View {
-    @State private var currentProgress = 0.0
+    @State
+    private var currentProgress = 0.0
 
     let ratio: Double
     let duration: Double
@@ -47,7 +48,8 @@ public struct BarProgressView: View {
 @available(iOS 14.0, *)
 struct BarProgressView_Previews: PreviewProvider {
     struct Preview: View {
-        @State var ratio: Double = 0
+        @State
+        var ratio: Double = 0
 
         var body: some View {
             VStack {
