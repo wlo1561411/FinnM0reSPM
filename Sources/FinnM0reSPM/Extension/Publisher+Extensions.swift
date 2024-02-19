@@ -1,7 +1,7 @@
 import Combine
 import Foundation
 
-@available(iOS 14.0, *)
+@available(iOS 13.0, *)
 extension Publisher {
     public func `if`(
         _ condition: Bool,

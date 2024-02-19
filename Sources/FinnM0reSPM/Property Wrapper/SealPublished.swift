@@ -1,44 +1,65 @@
 import Combine
 
+@available(iOS 13.0, *)
 @propertyWrapper
 public struct SealPublished<T> {
     public typealias Publisher = AnyPublisher<T, Never>
     
-    private class Storage {
-        var cancellable: AnyCancellable?
+    public class PublisherHandler {
+        fileprivate weak var subject: CurrentValueSubject<T, Never>?
+        fileprivate var modifyPublisher: ((Publisher) -> Publisher)?
+        
+        private var cancellable: AnyCancellable?
+        
+        /// Default publisher will drop first value
+        public func publisher(dropFirst: Bool = true) -> Publisher {
+            let publisher = subject?
+                .if(dropFirst) {
+                    $0.dropFirst().eraseToAnyPublisher()
+                }
+                .eraseToAnyPublisher() ?? Empty().eraseToAnyPublisher()
+            
+            return modifyPublisher?(publisher) ?? publisher
+        }
+        
+        /// Default publisher will drop first value
+        public func sealSink(dropFirst: Bool = true, receiveValue: @escaping ((T) -> Void)) {
+            cancellable = publisher(dropFirst: dropFirst)
+                .sink(receiveValue: receiveValue)
+        }
+        
+        public func cancelSealedSubscription() {
+            cancellable?.cancel()
+            cancellable = nil
+        }
+        
+        deinit {
+            cancelSealedSubscription()
+        }
     }
     
     private let subject: CurrentValueSubject<T, Never>
-    private let storage = Storage()
+    private let publisherHandler = PublisherHandler()
     
-    private var modifyPublisher: ((Publisher) -> Publisher)?
-        
     public var wrappedValue: T { subject.value }
     
-    public var projectedValue: Publisher {
-        let publisher = subject.dropFirst().eraseToAnyPublisher()
-        return modifyPublisher?(publisher) ?? publisher
+    public var projectedValue: PublisherHandler {
+        publisherHandler
     }
     
     public init(wrappedValue: T) {
         self.subject = CurrentValueSubject(wrappedValue)
+        self.publisherHandler.subject = subject
     }
     
+    /// The modifyPublisher can not omitted if needed
     public init(defaultValue: T, modifyPublisher: ((Publisher) -> Publisher)? = nil) {
         self.subject = CurrentValueSubject(defaultValue)
-        self.modifyPublisher = modifyPublisher
+        self.publisherHandler.subject = subject
+        self.publisherHandler.modifyPublisher = modifyPublisher
     }
     
     public func send(_ value: T) {
         subject.send(value)
-    }
-    
-    public func sealSink(receiveValue: @escaping ((T) -> Void)) {
-        storage.cancellable = projectedValue.sink(receiveValue: receiveValue)
-    }
-    
-    public func cancelSealedSubscription() {
-        storage.cancellable?.cancel()
-        storage.cancellable = nil
     }
 }
