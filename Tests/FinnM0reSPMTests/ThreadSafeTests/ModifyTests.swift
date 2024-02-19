@@ -16,16 +16,19 @@ final class ModifyTests: XCTestCase {
 
     private final class ComplexClass: Equatable {
         final class InnerClass: Equatable {
-            @ThreadSafe var a: Int = .zero
+            @ThreadSafe
+            var a: Int = .zero
 
-            @ThreadSafe var b: Int = .zero
+            @ThreadSafe
+            var b: Int = .zero
 
             static func == (lhs: InnerClass, rhs: InnerClass) -> Bool {
                 lhs.a == rhs.a && lhs.b == rhs.b
             }
         }
 
-        @ThreadSafe var c: Int = .zero
+        @ThreadSafe
+        var c: Int = .zero
 
         var x: InnerClass = .init()
 
@@ -34,11 +37,14 @@ final class ModifyTests: XCTestCase {
         }
     }
 
-    @ThreadSafe private var structValue = ComplexStruct()
+    @ThreadSafe
+    private var structValue = ComplexStruct()
 
-    @ThreadSafe private var classValue = ComplexClass()
+    @ThreadSafe
+    private var classValue = ComplexClass()
 
-    @ThreadSafe private var arrayValue: [Int] = []
+    @ThreadSafe
+    private var arrayValue: [Int] = []
 
     private func modifyComplexStruct() {
         _ = structValue.c

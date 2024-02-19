@@ -2,9 +2,12 @@ import SwiftUI
 
 @available(iOS 14.0, *)
 public struct UIKitTextField: UIViewRepresentable {
-    @Binding var text: String
-    @Binding var isFirstResponder: Bool
-    @Binding var showPassword: Bool
+    @Binding
+    var text: String
+    @Binding
+    var isFirstResponder: Bool
+    @Binding
+    var showPassword: Bool
 
     private let isPasswordType: Bool
     private let inputType: any InputType
@@ -69,8 +72,10 @@ public struct UIKitTextField: UIViewRepresentable {
     }
 
     public class Coordinator: NSObject {
-        @Binding private var text: String
-        @Binding private var isFirstResponder: Bool
+        @Binding
+        private var text: String
+        @Binding
+        private var isFirstResponder: Bool
 
         private let inputType: any InputType
 

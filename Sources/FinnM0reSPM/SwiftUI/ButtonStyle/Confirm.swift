@@ -2,7 +2,8 @@ import SwiftUI
 
 @available(iOS 14.0, *)
 public struct Confirm: ButtonStyle {
-    @Environment(\.isEnabled) var isEnabled
+    @Environment(\.isEnabled)
+    var isEnabled
 
     var size: CGFloat = 14
 

@@ -2,11 +2,15 @@ import SwiftUI
 
 @available(iOS 14.0, *)
 public struct VerifyCodeField: View {
-    @State private var selectedIndex: Int?
-    @State private var cursorOpacity: Double = 1
-    @State private var isFirstResponder = true
+    @State
+    private var selectedIndex: Int?
+    @State
+    private var cursorOpacity: Double = 1
+    @State
+    private var isFirstResponder = true
 
-    @Binding var code: String
+    @Binding
+    var code: String
     let numberOfCode: Int
 
     public init(
@@ -84,7 +88,8 @@ public struct VerifyCodeField: View {
 @available(iOS 14.0, *)
 struct VerifyCodeField_Previews: PreviewProvider {
     class ViewModel: ObservableObject {
-        @Published var code = ""
+        @Published
+        var code = ""
         let numberOfCode: Int
 
         init(numberOfCode: Int) {
@@ -93,7 +98,8 @@ struct VerifyCodeField_Previews: PreviewProvider {
     }
 
     struct Preview: View {
-        @StateObject var viewModel: ViewModel
+        @StateObject
+        var viewModel: ViewModel
 
         var body: some View {
             VStack {

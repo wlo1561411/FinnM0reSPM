@@ -14,7 +14,8 @@ final class DefaultCodableTests: XCTestCase {
     }
 
     private struct TestModel: Codable {
-        @Default<Status.Pending> var status: Status
+        @Default<Status.Pending>
+        var status: Status
     }
 
     func testDecoding() {

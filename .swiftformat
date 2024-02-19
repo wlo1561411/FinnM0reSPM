@@ -1,6 +1,8 @@
 --acronyms ID,URL,UUID
 --allman false
+--anonymousforeach convert
 --assetliterals visual-width
+--asynccapturing 
 --beforemarks 
 --binarygrouping 4,8
 --categorymark "MARK: %c"
@@ -45,6 +47,7 @@
 --nospaceoperators 
 --nowrapoperators 
 --octalgrouping 4,8
+--onelineforeach ignore
 --operatorfunc spaced
 --organizetypes actor,class,enum,struct
 --patternlet inline
@@ -55,21 +58,24 @@
 --semicolons inline
 --shortoptionals always
 --smarttabs enabled
---someAny false
+--someany false
 --stripunusedargs always
 --structthreshold 0
 --swiftversion 5.7
 --tabwidth unspecified
+--throwcapturing 
 --trailingclosures 
 --trimwhitespace nonblank-lines
 --typeattributes prev-line
 --typeblanklines remove
 --typemark "MARK: - %t"
---varattributes same-line
+--varattributes prev-line
 --voidtype void
 --wraparguments before-first
 --wrapcollections before-first
 --wrapconditions before-first
+--wrapeffects preserve
+--wrapenumcases always
 --wrapparameters before-first
 --wrapreturntype if-multiline
 --wrapternary default
@@ -77,6 +83,4 @@
 --xcodeindentation disabled
 --yodaswap always
 --disable blankLinesAroundMark,enumNamespaces,initCoderUnavailable,numberFormatting,preferKeyPath,redundantObjc,redundantSelf,sortDeclarations,strongOutlets,trailingClosures,trailingCommas
---enable blankLineAfterImports,blockComments,sortedSwitchCases,wrapEnumCases,wrapSwitchCases
-
---exclude Pods,library
+--enable blockComments,wrapEnumCases,wrapSwitchCases

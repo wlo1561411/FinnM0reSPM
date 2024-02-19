@@ -27,7 +27,8 @@ extension LazyImage {
     }
 
     public final class Repository: ObservableObject {
-        @Published var phase: Phase?
+        @Published
+        var phase: Phase?
 
         private let downloader: LazyImageDownloader
 

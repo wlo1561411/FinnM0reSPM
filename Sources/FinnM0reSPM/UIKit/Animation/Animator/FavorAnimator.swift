@@ -106,8 +106,10 @@ extension FavorAnimator {
 
 #if swift(>=5.9)
     fileprivate class FavorAnimator_Preview: BaseHighlightableView {
-        @Stylish private var imageView = UIImageView()
-        @Stylish private var fullImageView = UIImageView()
+        @Stylish
+        private var imageView = UIImageView()
+        @Stylish
+        private var fullImageView = UIImageView()
 
         private lazy var animator = FavorAnimator(imageView: imageView, fullImageView: fullImageView, shouldFadeOut: true)
 

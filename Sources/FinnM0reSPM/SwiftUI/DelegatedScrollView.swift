@@ -18,9 +18,12 @@ public struct DelegatedScrollView<Content: View>: View {
     let onOffsetChanged: ((CGFloat) -> Void)?
     let onBottomReached: (() -> Void)?
 
-    @State var offsetY = CGFloat.zero
-    @State var size = CGSize.zero
-    @State var contentSize = CGSize.zero
+    @State
+    var offsetY = CGFloat.zero
+    @State
+    var size = CGSize.zero
+    @State
+    var contentSize = CGSize.zero
 
     public init(
         @ViewBuilder content: @escaping () -> Content,
@@ -81,7 +84,8 @@ extension View {
 @available(iOS 14.0, *)
 struct DelegatedScrollView_Previews: PreviewProvider {
     struct Preview: View {
-        @State var offset = CGFloat.zero
+        @State
+        var offset = CGFloat.zero
 
         var body: some View {
             DelegatedScrollView {

@@ -103,9 +103,12 @@ extension NotifyAnimator {
     import Combine
 
     fileprivate class NotifyAnimator_Preview: UIView {
-        @Stylish private var plusButton = UIButton()
-        @Stylish private var minusButton = UIButton()
-        @Stylish private var countLabel = UILabel()
+        @Stylish
+        private var plusButton = UIButton()
+        @Stylish
+        private var minusButton = UIButton()
+        @Stylish
+        private var countLabel = UILabel()
 
         private lazy var notifyAnimator = NotifyAnimator(
             view: countLabel,
