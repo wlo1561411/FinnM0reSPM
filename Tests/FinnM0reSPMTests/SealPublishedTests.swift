@@ -42,8 +42,6 @@ class SealPublishedTests: XCTestCase {
                 XCTAssertEqual($0, "Mapped")
             }
         
-        testObject.sendValue()
-        
         wait(for: [expectation], timeout: 0.1)
     }
     
