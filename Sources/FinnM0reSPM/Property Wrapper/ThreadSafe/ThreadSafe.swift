@@ -1,3 +1,4 @@
+// https://betterprogramming.pub/mastering-thread-safety-in-swift-with-one-runtime-trick-260c358a7515
 @propertyWrapper
 public final class ThreadSafe<T> {
     private let lock = UnfairLock()
