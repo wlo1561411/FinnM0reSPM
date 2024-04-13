@@ -266,7 +266,7 @@ extension MessagePopoverView: UICollectionViewDelegate,
 }
 
 #if swift(>=5.9)
-    private class Demo: UIViewController {
+    private class MessagePopoverViewDemo: UIViewController {
         let tableView = UITableView()
 
         let messagePopoverView = MessagePopoverView()
@@ -288,7 +288,7 @@ extension MessagePopoverView: UICollectionViewDelegate,
         }
     }
 
-    extension Demo: UITableViewDelegate, UITableViewDataSource {
+    extension MessagePopoverViewDemo: UITableViewDelegate, UITableViewDataSource {
         func tableView(_: UITableView, numberOfRowsInSection _: Int) -> Int {
             100
         }
@@ -317,6 +317,6 @@ extension MessagePopoverView: UICollectionViewDelegate,
 
     @available(iOS 17.0, *)
     #Preview {
-        Demo()
+        MessagePopoverViewDemo()
     }
 #endif
