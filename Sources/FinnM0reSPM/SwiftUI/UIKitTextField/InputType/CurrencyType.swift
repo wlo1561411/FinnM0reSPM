@@ -99,7 +99,8 @@ public class CurrencyType: InputType {
 
         checkMaxAmountLimit(&amount)
 
-        return amount.currencyFormatted(maximum: regex.maxDigits ?? 0)
+        #warning("TODO")
+        return "\(amount)"
     }
 
     private func checkStartWithDecimalPoint(_ text: inout String) {
