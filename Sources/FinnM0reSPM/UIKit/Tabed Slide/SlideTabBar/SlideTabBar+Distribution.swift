@@ -15,25 +15,28 @@ extension SlideTabBarDistribution {
     }
 }
 
-extension SlideTabBarDistribution where Self == SlideTabBar.ContentLeading {
-    public static var contentLeading: SlideTabBar.ContentLeading { .init() }
+extension SlideTabBarDistribution {
+    public static func contentLeading() -> Self where Self == SlideTabBar.ContentLeadingDistribution { .init() }
 }
 
-extension SlideTabBarDistribution where Self == SlideTabBar.ContentCenter {
-    public static var contentCenter: SlideTabBar.ContentCenter { .init() }
+extension SlideTabBarDistribution {
+    public static func contentCenter() -> Self where Self == SlideTabBar.ContentCenterDistribution { .init() }
 }
 
-extension SlideTabBarDistribution where Self == SlideTabBar.Full {
-    public static var full: SlideTabBar.Full { .init() }
+extension SlideTabBarDistribution {
+    public static func full() -> Self where Self == SlideTabBar.FullDistribution { .init() }
 }
 
-extension SlideTabBarDistribution where Self == SlideTabBar.Width {
-    public static func width(_ value: CGFloat, alignToCenter: Bool) -> SlideTabBar
-        .Width { .init(value: value, alignToCenter: alignToCenter) }
+extension SlideTabBarDistribution where Self == SlideTabBar.WidthDistribution {
+    public static func width(_ value: CGFloat, alignToCenter: Bool) -> Self where Self == SlideTabBar.WidthDistribution {
+        .init(
+            value: value,
+            alignToCenter: alignToCenter)
+    }
 }
 
 extension SlideTabBar {
-    public struct ContentLeading: SlideTabBarDistribution {
+    public struct ContentLeadingDistribution: SlideTabBarDistribution {
         public func update(
             _ scrollView: UIScrollView,
             _ contentInset: UIEdgeInsets,
@@ -46,7 +49,7 @@ extension SlideTabBar {
         }
     }
 
-    public struct ContentCenter: SlideTabBarDistribution {
+    public struct ContentCenterDistribution: SlideTabBarDistribution {
         public func update(
             _ scrollView: UIScrollView,
             _ contentInset: UIEdgeInsets,
@@ -69,7 +72,7 @@ extension SlideTabBar {
         }
     }
 
-    public struct Full: SlideTabBarDistribution {
+    public struct FullDistribution: SlideTabBarDistribution {
         public func update(
             _ scrollView: UIScrollView,
             _ contentInset: UIEdgeInsets,
@@ -82,7 +85,7 @@ extension SlideTabBar {
         }
     }
 
-    public struct Width: SlideTabBarDistribution {
+    public struct WidthDistribution: SlideTabBarDistribution {
         let value: CGFloat
         let alignToCenter: Bool
 

@@ -92,7 +92,7 @@ public class SlideTabBar: UIView {
         }
     }
 
-    public var distribution: SlideTabBarDistribution = .contentLeading
+    public var distribution: SlideTabBarDistribution = .contentLeading()
     public var trackerMode: SlideTabBarTrackerMode = .byView
     public var configurations: Set<Configuration> = [
         .duplicateTap(false),
@@ -508,7 +508,7 @@ extension SlideTabBar {
             .trackerColor(.blue)
             .bottomLineHeight(10)
             .bottomLineColor(.red)
-            .distribution(.contentLeading)
+            .distribution(.contentLeading())
             .contentInset(.init(top: 10, left: 16, bottom: 10, right: 16))
             .itemSpacing(40)
             .makeConstraints({ make in
