@@ -76,7 +76,7 @@ extension KeyboardMovement where Self: UIViewController {
 
 @available(iOS 14.0, *)
 extension KeyboardMovement where Self: UIViewController, Self: HasCancellable {
-    func handleKeyboardInteraction() {
+    public func handleKeyboardInteraction() {
         view.appendHighlightGesture(
             onClick: { [weak self] in
                 self?.view.endEditing(true)
