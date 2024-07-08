@@ -34,7 +34,7 @@ extension KeyboardMovement {
 }
 
 extension KeyboardMovement where Self: UIViewController {
-    public var viewMovementDriver: AnyPublisher<CGFloat?, Never> {
+    public var viewMovementPublisher: AnyPublisher<CGFloat?, Never> {
         keyboardHeightPublisher
             .map { [weak self] height in
                 guard
@@ -71,6 +71,24 @@ extension KeyboardMovement where Self: UIViewController {
             .removeDuplicates()
             .receive(on: DispatchQueue.main)
             .eraseToAnyPublisher()
+    }
+}
+
+@available(iOS 14.0, *)
+extension KeyboardMovement where Self: UIViewController, Self: HasCancellable {
+    func handleKeyboardInteraction() {
+        view.appendHighlightGesture(
+            onClick: { [weak self] in
+                self?.view.endEditing(true)
+            })
+
+        viewMovementPublisher
+            .sink(receiveValue: { [weak self] value in
+                UIView.animate(withDuration: 0.2, animations: {
+                    self?.view.frame.origin.y = -(value ?? 0)
+                })
+            })
+            .store(in: &cancellable)
     }
 }
 
