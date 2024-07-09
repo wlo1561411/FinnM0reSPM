@@ -2,9 +2,7 @@ import Foundation
 
 extension MessagePopoverView {
     class ViewModel {
-        typealias Style = MessagePopoverView.Style
-
-        private var styles = [Style?]()
+        private var texts = [String?]()
 
         private var didUpdatedData: (() -> Void)?
 
@@ -15,8 +13,8 @@ extension MessagePopoverView {
             self.didUpdatedData = didUpdatedData
         }
 
-        func update(styles: [Style]) {
-            self.styles = adjustStyleSource(styles)
+        func update(texts: [String]) {
+            self.texts = adjustSource(texts)
             didUpdatedData?()
         }
     }
@@ -26,14 +24,14 @@ extension MessagePopoverView {
 
 extension MessagePopoverView.ViewModel {
     /// 插入分隔線
-    private func adjustStyleSource(_ _styles: [Style]) -> [Style?] {
-        var insertedSeparator = [Style?]()
+    private func adjustSource(_ texts: [String]) -> [String?] {
+        var insertedSeparator: [String?] = [nil]
 
-        _styles.enumerated().forEach {
+        texts.enumerated().forEach {
             insertedSeparator.append($0.element)
 
             // 代表分隔線
-            if $0.offset < _styles.count - 1 {
+            if $0.offset < texts.count - 1 {
                 insertedSeparator.append(nil)
             }
         }
@@ -56,11 +54,11 @@ extension MessagePopoverView.ViewModel {
     }
 
     func getNumberOfItems() -> Int {
-        styles.count
+        texts.count
     }
 
-    func getStyle(at indexPath: IndexPath) -> Style? {
-        guard let style = styles[safe: indexPath.row] else { return nil }
-        return style
+    func getText(at indexPath: IndexPath) -> String? {
+        guard let text = texts[safe: indexPath.row] else { return nil }
+        return text
     }
 }

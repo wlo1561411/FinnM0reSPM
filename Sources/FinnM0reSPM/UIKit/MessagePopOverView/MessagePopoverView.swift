@@ -2,18 +2,9 @@ import Combine
 import SnapKit
 import UIKit
 
+/// TODO: 只有一個 text 會顯示不出來
+/// 目前 workaround 處理
 public class MessagePopoverView: UIView {
-    public enum Style {
-        case reply
-        case report
-        case ban
-        case removeMessage
-
-        var localizedText: String {
-            "\(self)"
-        }
-    }
-
     private let selectorView = UIView()
 
     private let flowLayout = UICollectionViewFlowLayout()
@@ -21,7 +12,7 @@ public class MessagePopoverView: UIView {
 
     private let viewModel = ViewModel()
 
-    private var onItemSelected: ((_ style: Style) -> Void)?
+    private var onItemSelected: ((_ text: String) -> Void)?
     private var onDismiss: (() -> Void)?
 
     private var cancellables = Set<AnyCancellable>()
@@ -59,16 +50,16 @@ public class MessagePopoverView: UIView {
 
     /// 跳出 PopOver
     /// - Parameters:
-    ///   - styles: 按鈕資料來源
+    ///   - texts: 按鈕資料來源
     ///   - tableView: 用來計算 cell 位置
     ///   - indexPath: 用來計算 cell 位置, 紀錄當下點擊 cell
     ///   - onItemSelected: Selector callback
     ///   - onDismiss: Dismiss callback
     public func pop(
-        _ styles: [Style],
+        _ texts: [String],
         to tableView: UITableView,
         from indexPath: IndexPath,
-        onItemSelected: ((_ style: Style) -> Void)?,
+        onItemSelected: ((_ text: String) -> Void)?,
         onDismiss: (() -> Void)?)
     {
         // 避免穿透後還是同一個 cell, 導致怪異行為
@@ -95,7 +86,37 @@ public class MessagePopoverView: UIView {
             self.viewModel.currentCellRect = rect
             self.viewModel.currentIndex = indexPath
 
-            self.viewModel.update(styles: styles)
+            self.viewModel.update(texts: texts)
+        }
+    }
+
+    /// 跳出 PopOver
+    /// - Parameters:
+    ///   - texts: 按鈕資料來源
+    ///   - position: 顯示的座標
+    ///   - indexPath: 用來計算 cell 位置, 紀錄當下點擊 cell
+    ///   - onItemSelected: Selector callback
+    ///   - onDismiss: Dismiss callback
+    public func pop(
+        _ texts: [String],
+        at position: CGPoint,
+        to view: UIView,
+        onItemSelected: ((_ text: String) -> Void)?,
+        onDismiss: (() -> Void)?)
+    {
+        self.onItemSelected = onItemSelected
+        self.onDismiss = onDismiss
+
+        DispatchQueue.main.async {
+            view.window?.addSubview(self)
+            self.snp.makeConstraints { make in
+                make.edges.equalToSuperview()
+            }
+
+            // 使用 constraint 不能改 frame, 用這個替代
+            self.selectorView.transform = CGAffineTransform(translationX: position.x, y: position.y)
+
+            self.viewModel.update(texts: texts)
         }
     }
 
@@ -137,7 +158,7 @@ extension MessagePopoverView {
         addSubview(selectorView)
         selectorView.snp.makeConstraints { make in
             make.height.equalTo(38 + 3)
-            make.width.equalTo(0)
+            make.width.equalTo(100)
             // 這個沒有意義, 只是讓他可以完成佈局
             make.top.leading.equalToSuperview()
         }
@@ -153,6 +174,7 @@ extension MessagePopoverView {
         collectionView.dataSource = self
         collectionView.register(SeparatorCell.self, forCellWithReuseIdentifier: "SeparatorCell")
         collectionView.register(ItemCell.self, forCellWithReuseIdentifier: "ItemCell")
+        collectionView.register(EmptyCell.self, forCellWithReuseIdentifier: "EmptyCell")
 
         flowLayout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
         flowLayout.scrollDirection = .horizontal
@@ -168,7 +190,8 @@ extension MessagePopoverView {
     }
 
     private func bindCollectionViewWidth() {
-        collectionView.publisher(for: \.contentSize)
+        collectionView
+            .publisher(for: \.contentSize)
             .map(\.width)
             .removeDuplicates()
             .receive(on: RunLoop.main)
@@ -226,7 +249,8 @@ extension MessagePopoverView {
 
 // MARK: - UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout
 
-extension MessagePopoverView: UICollectionViewDelegate,
+extension MessagePopoverView:
+    UICollectionViewDelegate,
     UICollectionViewDataSource,
     UICollectionViewDelegateFlowLayout
 {
@@ -235,18 +259,23 @@ extension MessagePopoverView: UICollectionViewDelegate,
     }
 
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let style = viewModel.getStyle(at: indexPath)
+        let text = viewModel.getText(at: indexPath)
 
         var cell: UICollectionViewCell?
 
-        if
-            let style,
+        if text == nil, indexPath.row == 0 {
+            cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: "EmptyCell",
+                for: indexPath)
+        }
+        else if
+            let text,
             let itemCell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: "ItemCell",
                 for: indexPath) as? ItemCell
         {
             cell = itemCell
-            itemCell.config(style)
+            itemCell.config(text)
         }
         else {
             cell = collectionView.dequeueReusableCell(
@@ -259,8 +288,8 @@ extension MessagePopoverView: UICollectionViewDelegate,
     }
 
     public func collectionView(_: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let style = viewModel.getStyle(at: indexPath) else { return }
-        onItemSelected?(style)
+        guard let text = viewModel.getText(at: indexPath) else { return }
+        onItemSelected?(text)
         dismiss()
     }
 }
@@ -270,11 +299,27 @@ extension MessagePopoverView: UICollectionViewDelegate,
         let tableView = UITableView()
 
         let messagePopoverView = MessagePopoverView()
+        let messagePopoverView1 = MessagePopoverView()
 
         override func viewDidLoad() {
             super.viewDidLoad()
 
             view.backgroundColor = .systemGray
+
+            UIView().sr
+                .backgroundColor(.systemPink)
+                .add(to: view)
+                .makeConstraints { make in
+                    make.top.equalTo(70)
+                    make.centerX.equalToSuperview()
+                    make.width.equalTo(200)
+                    make.height.equalTo(100)
+                }
+                .other { [weak self] in
+                    guard let self else { return }
+                    let tap = UITapGestureRecognizer(target: self, action: #selector(tapped(gesture:)))
+                    $0.addGestureRecognizer(tap)
+                }
 
             tableView.sr
                 .dataSource(self)
@@ -285,6 +330,18 @@ extension MessagePopoverView: UICollectionViewDelegate,
                     make.top.equalTo(200)
                     make.left.right.bottom.equalToSuperview()
                 }
+        }
+
+        @objc
+        func tapped(gesture: UITapGestureRecognizer) {
+            messagePopoverView1.pop(
+                ["this is test"],
+                at: gesture.location(in: view),
+                to: view,
+                onItemSelected: {
+                    print($0)
+                },
+                onDismiss: nil)
         }
     }
 
@@ -305,11 +362,11 @@ extension MessagePopoverView: UICollectionViewDelegate,
 
         func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
             messagePopoverView.pop(
-                [.reply, .removeMessage, .report],
+                ["reply", "removeMessage", "report"],
                 to: tableView,
                 from: indexPath,
                 onItemSelected: {
-                    print($0.localizedText)
+                    print($0)
                 },
                 onDismiss: nil)
         }

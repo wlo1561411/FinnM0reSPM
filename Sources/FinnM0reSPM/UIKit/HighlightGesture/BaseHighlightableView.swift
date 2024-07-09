@@ -62,7 +62,7 @@ public class BaseHighlightableView: UIView {
     }
 
     public func setupGesture() {
-        appendHighlightGesture(
+        addHighlightGesture(
             onHighlight: { [weak self] isHighlight in
                 guard self?.isEnable == true else { return }
                 self?.isHighlight = isHighlight

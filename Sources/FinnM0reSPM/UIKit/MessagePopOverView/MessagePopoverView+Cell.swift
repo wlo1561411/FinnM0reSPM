@@ -49,8 +49,16 @@ extension MessagePopoverView {
             fatalError("init(coder:) has not been implemented")
         }
 
-        func config(_ style: MessagePopoverView.Style) {
-            titleLabel.text = style.localizedText
+        func config(_ text: String) {
+            titleLabel.text = text
+        }
+    }
+
+    class EmptyCell: UICollectionViewCell {
+        override func preferredLayoutAttributesFitting(_ layoutAttributes: UICollectionViewLayoutAttributes) -> UICollectionViewLayoutAttributes {
+            let attributes = super.preferredLayoutAttributesFitting(layoutAttributes)
+            attributes.frame.size.width = 0
+            return attributes
         }
     }
 }

@@ -141,7 +141,7 @@ extension HighlightGesture {
 }
 
 extension UIView {
-    public func appendHighlightGesture(onHighlight: HighlightGesture.OnHighlight? = nil, onClick: (() -> Void)? = nil) {
+    public func addHighlightGesture(onHighlight: HighlightGesture.OnHighlight? = nil, onClick: (() -> Void)? = nil) {
         if onHighlight == nil, onClick == nil {
             return
         }
