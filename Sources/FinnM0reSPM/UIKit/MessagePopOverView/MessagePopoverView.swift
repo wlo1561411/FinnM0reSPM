@@ -7,6 +7,8 @@ import UIKit
 public class MessagePopoverView: UIView {
     private let selectorView = UIView()
 
+    private let triangleShapeLayer = CAShapeLayer()
+
     private let flowLayout = UICollectionViewFlowLayout()
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: flowLayout)
 
@@ -17,9 +19,18 @@ public class MessagePopoverView: UIView {
 
     private var cancellables = Set<AnyCancellable>()
 
+    public var popoverBackgroundColor: UIColor = .black {
+        didSet {
+            triangleShapeLayer.fillColor = popoverBackgroundColor.cgColor
+            collectionView.backgroundColor = popoverBackgroundColor
+        }
+    }
+
+    public var messageTextColor: UIColor = .white
+
     public init() {
         super.init(frame: .zero)
-        
+
         setupUI()
 
         bindUpdate()
@@ -30,7 +41,7 @@ public class MessagePopoverView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    public override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+    override public func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
         let pointInCollectionView = collectionView.convert(point, from: self)
 
         // 只有允許 collectionView 的點擊事件, 其他就穿透下去
@@ -120,7 +131,7 @@ public class MessagePopoverView: UIView {
         }
     }
 
-    func dismiss(resetIndex: Bool = true) {
+    public func dismiss(resetIndex: Bool = true) {
         removeFromSuperview()
         onDismiss?()
 
@@ -230,7 +241,7 @@ extension MessagePopoverView {
         let triangleView = UIView(frame: CGRect(origin: .zero, size: size))
         triangleView.backgroundColor = .clear
 
-        let shapeLayer = CAShapeLayer()
+        let shapeLayer = triangleShapeLayer
         shapeLayer.frame = triangleView.bounds
 
         let path = UIBezierPath()
@@ -275,12 +286,16 @@ extension MessagePopoverView:
                 for: indexPath) as? ItemCell
         {
             cell = itemCell
-            itemCell.config(text)
+            itemCell.titleLabel.textColor = messageTextColor
+            itemCell.titleLabel.text = text
         }
-        else {
-            cell = collectionView.dequeueReusableCell(
+        else if
+            let separatorCell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: "SeparatorCell",
-                for: indexPath)
+                for: indexPath) as? SeparatorCell
+        {
+            cell = separatorCell
+            separatorCell.line.backgroundColor = messageTextColor
         }
 
         guard let cell else { return .init() }
@@ -334,6 +349,8 @@ extension MessagePopoverView:
 
         @objc
         func tapped(gesture: UITapGestureRecognizer) {
+            messagePopoverView1.popoverBackgroundColor = .systemGray5
+            messagePopoverView1.messageTextColor = .black
             messagePopoverView1.pop(
                 ["this is test"],
                 at: gesture.location(in: view),

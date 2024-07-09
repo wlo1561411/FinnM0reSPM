@@ -2,13 +2,14 @@ import UIKit
 
 extension MessagePopoverView {
     class SeparatorCell: UICollectionViewCell {
+        private(set) var line = UIView()
+
         override init(frame: CGRect) {
             super.init(frame: frame)
 
             backgroundColor = .clear
             contentView.backgroundColor = .clear
 
-            let line = UIView()
             line.backgroundColor = .darkGray
 
             contentView.addSubview(line)
@@ -25,7 +26,7 @@ extension MessagePopoverView {
     }
 
     class ItemCell: UICollectionViewCell {
-        private let titleLabel = UILabel()
+        private(set) var titleLabel = UILabel()
 
         override init(frame: CGRect) {
             super.init(frame: frame)
@@ -48,14 +49,12 @@ extension MessagePopoverView {
         required init?(coder _: NSCoder) {
             fatalError("init(coder:) has not been implemented")
         }
-
-        func config(_ text: String) {
-            titleLabel.text = text
-        }
     }
 
     class EmptyCell: UICollectionViewCell {
-        override func preferredLayoutAttributesFitting(_ layoutAttributes: UICollectionViewLayoutAttributes) -> UICollectionViewLayoutAttributes {
+        override func preferredLayoutAttributesFitting(_ layoutAttributes: UICollectionViewLayoutAttributes)
+            -> UICollectionViewLayoutAttributes
+        {
             let attributes = super.preferredLayoutAttributesFitting(layoutAttributes)
             attributes.frame.size.width = 0
             return attributes
