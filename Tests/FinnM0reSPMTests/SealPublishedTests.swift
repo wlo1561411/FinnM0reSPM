@@ -16,8 +16,8 @@ class SealPublishedTests: XCTestCase {
         var mappedValue: String
         
         func sendValue() {
-            _testValue.send("New Value")
-            _mappedValue.send("New Value")
+            testValue = "New Value"
+            mappedValue = "New Value"
         }
         
         func async(completion: @escaping () -> Void) {

@@ -41,8 +41,15 @@ public struct SealPublished<T> {
     private let subject: CurrentValueSubject<T, Never>
     private let publisherHandler = PublisherHandler()
     
-    public var wrappedValue: T { subject.value }
-    
+    public var wrappedValue: T {
+        get {
+            subject.value
+        }
+        set {
+            subject.send(newValue)
+        }
+    }
+
     public var projectedValue: PublisherHandler {
         publisherHandler
     }
@@ -57,9 +64,5 @@ public struct SealPublished<T> {
         self.subject = CurrentValueSubject(defaultValue)
         self.publisherHandler.subject = subject
         self.publisherHandler.modifyPublisher = modifyPublisher
-    }
-    
-    public func send(_ value: T) {
-        subject.send(value)
     }
 }
