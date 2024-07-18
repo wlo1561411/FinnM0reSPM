@@ -205,7 +205,7 @@ extension MessagePopoverView {
             .publisher(for: \.contentSize)
             .map(\.width)
             .removeDuplicates()
-            .receive(on: RunLoop.main)
+            .receiveOnMainIfNeeded()
             .sink { [weak self] width in
                 guard let self else { return }
                 self.selectorView.snp.updateConstraints { make in
