@@ -304,15 +304,15 @@ extension SlideTabBar {
             SlideCalculator
                 .color(
                     by: 1 - percentage,
-                    between: itemSettings[.normal]?.color ?? .clear,
-                    itemSettings[.selected]?.color ?? .clear))
+                    between: itemSettings[.normal]?.textColor ?? .clear,
+                    itemSettings[.selected]?.textColor ?? .clear))
 
         fromItem?.setTransformingColor(
             SlideCalculator
                 .color(
                     by: percentage,
-                    between: itemSettings[.normal]?.color ?? .clear,
-                    itemSettings[.selected]?.color ?? .clear))
+                    between: itemSettings[.normal]?.textColor ?? .clear,
+                    itemSettings[.selected]?.textColor ?? .clear))
     }
 
     private func tabBarItem(at index: Int) -> SlideTabBarItem? {
@@ -511,6 +511,18 @@ extension SlideTabBar {
             .distribution(.contentLeading())
             .contentInset(.init(top: 10, left: 16, bottom: 10, right: 16))
             .itemSpacing(40)
+            .itemSettings([
+                .normal : .init(
+                    font: .systemFont(ofSize: 14),
+                    textColor: .darkGray,
+                    borderColor: .systemGreen,
+                    borderWidth: 0,
+                    backgroundColor: .systemGray5),
+                .selected : .init(
+                    font: .systemFont(ofSize: 14),
+                    textColor: .systemGreen,
+                    borderWidth: 1)
+            ])
             .makeConstraints({ make in
                 make.width.equalTo(300)
                 make.height.equalTo(100)

@@ -201,7 +201,6 @@ extension PopoverPullableStrategy {
 
     public func observeKeyboardMovementIfNeeded(
         target: UIViewController,
-
         onBeginEditing: Selector,
         onEndEditing: Selector)
     {
@@ -221,7 +220,6 @@ extension PopoverPullableStrategy {
 
     public func manualUpdate(
         height: CGFloat,
-
         with view: UIView,
         at controller: UIViewController)
     {

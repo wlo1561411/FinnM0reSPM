@@ -9,8 +9,10 @@ public protocol SlideTabBarItem: UIView {
     func setTransformingColor(_ color: UIColor)
 }
 
-extension SlideTabBarItem where Self == SlideTabBar.DefaultItem {
-    public static var empty: SlideTabBar.DefaultItem { .init() }
+extension SlideTabBarItem {
+    public static func empty() -> Self where Self == SlideTabBar.DefaultItem {
+        .init()
+    }
 }
 
 extension SlideTabBar {
@@ -22,7 +24,10 @@ extension SlideTabBar {
         }
 
         var font: UIFont?
-        var color: UIColor?
+        var textColor: UIColor?
+        var borderColor: UIColor?
+        var borderWidth: CGFloat?
+        var backgroundColor: UIColor?
     }
 
     public class DefaultItem: UIView, SlideTabBarItem {
@@ -47,27 +52,33 @@ extension SlideTabBar {
         }
 
         public func setSelected(_ isSelected: Bool, settings: Settings) {
-            if let color = isSelected ? settings[.selected]?.color : settings[.normal]?.color {
-                titleLabel.textColor = color
-            }
-
-            if let font = isSelected ? settings[.selected]?.font : settings[.normal]?.font {
-                titleLabel.font = font
-            }
+            applySettings(for: isSelected ? .selected : .normal, settings: settings)
         }
 
         public func setEnable(_ isEnable: Bool, settings: Settings) {
-            if let color = isEnable ? settings[.normal]?.color : settings[.disable]?.color {
-                titleLabel.textColor = color
-            }
-
-            if let font = settings[.normal]?.font {
-                titleLabel.font = font
-            }
+            applySettings(for: isEnable ? .normal : .disable, settings: settings)
         }
 
         public func setTransformingColor(_ color: UIColor) {
             titleLabel.textColor = color
+        }
+
+        private func applySettings(for status: ItemSetting.Status, settings: Settings) {
+            let normalSetting = settings[.normal]
+            let currentSetting = settings[status]
+
+            let textColor = currentSetting?.textColor ?? normalSetting?.textColor ?? .clear
+            let font = currentSetting?.font ?? normalSetting?.font ?? .systemFont(ofSize: 14)
+            let backgroundColor = currentSetting?.backgroundColor ?? normalSetting?.backgroundColor ?? .clear
+            let borderColor = currentSetting?.borderColor ?? normalSetting?.borderColor ?? .clear
+            let borderWidth = currentSetting?.borderWidth ?? normalSetting?.borderWidth ?? 0
+
+            titleLabel.textColor = textColor
+            titleLabel.font = font
+
+            self.backgroundColor = backgroundColor
+            self.layer.borderColor = borderColor.cgColor
+            self.layer.borderWidth = borderWidth
         }
     }
 }

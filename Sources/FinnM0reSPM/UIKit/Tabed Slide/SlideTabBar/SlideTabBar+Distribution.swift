@@ -27,7 +27,7 @@ extension SlideTabBarDistribution {
     public static func full() -> Self where Self == SlideTabBar.FullDistribution { .init() }
 }
 
-extension SlideTabBarDistribution where Self == SlideTabBar.WidthDistribution {
+extension SlideTabBarDistribution {
     public static func width(_ value: CGFloat, alignToCenter: Bool) -> Self where Self == SlideTabBar.WidthDistribution {
         .init(
             value: value,

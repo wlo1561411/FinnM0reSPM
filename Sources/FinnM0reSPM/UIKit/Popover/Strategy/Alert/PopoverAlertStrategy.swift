@@ -56,7 +56,6 @@ public struct PopoverAlertStrategy: PopoverStrategy {
 extension PopoverAlertStrategy {
     public func addContentView(
         with view: UIView,
-
         at controller: UIViewController)
     {
         view.clipsToBounds = true
@@ -86,7 +85,6 @@ extension PopoverAlertStrategy {
 extension PopoverAlertStrategy {
     public func presentContent(
         with view: UIView,
-
         at controller: UIViewController,
         onPresented: (() -> Void)?)
     {
@@ -109,7 +107,6 @@ extension PopoverAlertStrategy {
 
     public func dismissContent(
         with view: UIView,
-
         at controller: UIViewController,
         beforeClosed: (() -> Void)?,
         onClosed: (() -> Void)?)
