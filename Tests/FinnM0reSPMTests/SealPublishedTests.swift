@@ -9,12 +9,11 @@ class SealPublishedTests: XCTestCase {
         var testValue = "Initial Value"
         
         @SealPublished(
-            defaultValue: "Initial Value",
             modifyPublisher: {
                 $0.map { _ in "Mapped" }.eraseToAnyPublisher()
             })
-        var mappedValue: String
-        
+        var mappedValue: String = "Initial Value"
+
         func sendValue() {
             testValue = "New Value"
             mappedValue = "New Value"

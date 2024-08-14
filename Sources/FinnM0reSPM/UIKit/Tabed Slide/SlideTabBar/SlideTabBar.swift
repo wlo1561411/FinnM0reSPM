@@ -142,7 +142,7 @@ public class SlideTabBar: UIView {
             make.left.right.equalToSuperview()
             make.centerY.equalToSuperview()
 
-            fullConstraint = make.width.equalTo(self.snp.width).constraint
+            fullConstraint = make.width.equalTo(0).constraint
         }
 
         fullConstraint?.deactivate()
@@ -500,7 +500,7 @@ extension SlideTabBar {
 #if swift(>=5.9)
     @available(iOS 17.0, *)
     #Preview {
-        let title = (0...5).map { "This is Test \($0)" }
+        let title = (0...1).map { "This is Test \($0)" }
 
         return SlideTabBar()
             .sr
@@ -537,7 +537,7 @@ extension SlideTabBar {
                         return item
                     },
                     shouldAllowItemSelect: {
-                        $0 != 1
+                        $0 != 10
                     },
                     onSelected: {
                         if $0 == 4 {
