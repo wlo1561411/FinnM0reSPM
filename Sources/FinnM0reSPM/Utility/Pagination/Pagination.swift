@@ -1,23 +1,27 @@
 import Foundation
 
-protocol CountablePaged {
+public protocol CountablePaged {
+    associatedtype Item
     var pageNum: Int { get }
     var isLastPage: Bool { get }
+    var items: [Item] { get }
 }
 
-class Pagination<T: AutoCodable & CountablePaged> {
+public class Pagination<T: AutoCodable & CountablePaged> {
     private let initPage: Int
+
     private(set) var currentPage = 0
     private(set) var pageSize: Int
     private(set) var isLastPage = false
     private(set) var isLoading = false
-    private(set) var response: T?
+    private(set) var latestResponse: T?
+    private(set) var allItems: [T.Item] = []
 
     private var fetching: ((Int, Int, @escaping (Result<T, Error>) -> Void) -> Void)?
-    private var onSuccess: ((T) -> Void)?
+    private var onSuccess: ((_ latestResponse: T, _ allItems: [T.Item]) -> Void)?
     private var onError: ((Error) -> Void)?
 
-    init(
+    public init(
         page: Int = 1,
         pageSize: Int = 20)
     {
@@ -25,9 +29,9 @@ class Pagination<T: AutoCodable & CountablePaged> {
         self.initPage = page
     }
 
-    func setup(
+    public func setup(
         fetching: ((Int, Int, @escaping (Result<T, Error>) -> Void) -> Void)?,
-        onSuccess: ((T) -> Void)?,
+        onSuccess: ((_ latestResponse: T, _ allItems: [T.Item]) -> Void)?,
         onError: ((Error) -> Void)?)
     {
         self.fetching = fetching
@@ -35,18 +39,22 @@ class Pagination<T: AutoCodable & CountablePaged> {
         self.onError = onError
     }
 
-    func reload() {
+    public func reload() {
         guard !isLoading
         else {
             print("\(self) 正在請求")
             return
         }
-        
+
+        latestResponse = nil
+        allItems.removeAll()
+
         currentPage = initPage
+
         loadPage(page: currentPage)
     }
 
-    func next() {
+    public func next() {
         guard !isLoading
         else {
             print("\(self) 正在請求")
@@ -81,10 +89,11 @@ class Pagination<T: AutoCodable & CountablePaged> {
 
             switch result {
             case .success(let response):
-                self.response = response
+                self.latestResponse = response
                 currentPage = response.pageNum
                 isLastPage = response.isLastPage
-                onSuccess?(response)
+                allItems += response.items
+                onSuccess?(response, allItems)
 
             case .failure(let error):
                 onError?(error)

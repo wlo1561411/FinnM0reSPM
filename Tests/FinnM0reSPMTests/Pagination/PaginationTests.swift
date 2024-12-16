@@ -4,26 +4,28 @@ import XCTest
 
 final class PaginationTests: XCTestCase {
     func testReload() {
-        let expectation = XCTestExpectation(description: "Reload API call")
+        let reloadExpectation = XCTestExpectation(description: "Start Reload")
+        let finalExpectation = XCTestExpectation(description: "Reload API call")
 
         let mockService = MockService(page: 10, testReload: true)
 
         let pagination = Pagination<Response>(page: 10)
 
         pagination.setup(
-            fetching: { page, _, completion in
-                mockService.fetchingMock(completion: completion)
+            fetching: { page, size, completion in
+                mockService.fetchingMock(pageSize: size, completion: completion)
                 if mockService.spyCount == 2 {
                     XCTAssertEqual(page, 10)
                 }
             },
-            onSuccess: { response in
+            onSuccess: { response, _ in
                 if response.pageNum == 11 {
                     pagination.reload()
+                    reloadExpectation.fulfill()
                 }
                 else {
                     XCTAssertEqual(response.pageNum, 10)
-                    expectation.fulfill()
+                    finalExpectation.fulfill()
                 }
             },
             onError: { error in
@@ -32,7 +34,7 @@ final class PaginationTests: XCTestCase {
 
         pagination.next()
 
-        wait(for: [expectation], timeout: 3)
+        wait(for: [reloadExpectation, finalExpectation], timeout: 1)
     }
 
     func testNextPage() {
@@ -40,22 +42,24 @@ final class PaginationTests: XCTestCase {
 
         let mockService = MockService(testNext: true)
 
-        let pagination = Pagination<Response>()
+        let pagination = Pagination<Response>(pageSize: 10)
 
         pagination.setup(
-            fetching: { page, _, completion in
+            fetching: { page, size, completion in
                 if mockService.spyCount == 1 {
                     XCTAssertEqual(page, 2)
                 }
-                mockService.fetchingMock(completion: completion)
+                mockService.fetchingMock(pageSize: size, completion: completion)
             },
-            onSuccess: { response in
+            onSuccess: { response, allItems in
                 if response.pageNum == 1 {
                     XCTAssertFalse(response.isLastPage)
+                    XCTAssertEqual(allItems.count, 10)
                     pagination.next()
                 }
                 else {
                     XCTAssertEqual(response.pageNum, 2)
+                    XCTAssertEqual(allItems.count, 20)
                     expectation.fulfill()
                 }
             },
@@ -65,7 +69,7 @@ final class PaginationTests: XCTestCase {
 
         pagination.next()
 
-        wait(for: [expectation], timeout: 3)
+        wait(for: [expectation], timeout: 1)
     }
 
     func testNoNextPageIfLastPage() {
@@ -79,10 +83,10 @@ final class PaginationTests: XCTestCase {
         let pagination = Pagination<Response>()
 
         pagination.setup(
-            fetching: { _, _, completion in
-                mockService.fetchingMock(completion: completion)
+            fetching: { _, size, completion in
+                mockService.fetchingMock(pageSize: size, completion: completion)
             },
-            onSuccess: { response in
+            onSuccess: { response, _ in
                 if mockService.spyCount == 2 {
                     unExpectation.fulfill()
                 }
@@ -98,7 +102,7 @@ final class PaginationTests: XCTestCase {
 
         pagination.next()
 
-        wait(for: [expectation, unExpectation], timeout: 3)
+        wait(for: [expectation, unExpectation], timeout: 1)
     }
 
     func testLoadingState() {
@@ -109,10 +113,10 @@ final class PaginationTests: XCTestCase {
         let pagination = Pagination<Response>()
 
         pagination.setup(
-            fetching: { _, _, completion in
-                mockService.fetchingMock(completion: completion)
+            fetching: { _, size, completion in
+                mockService.fetchingMock(pageSize: size, completion: completion)
             },
-            onSuccess: { _ in
+            onSuccess: { _, _ in
                 XCTAssertFalse(pagination.isLoading)
                 expectation.fulfill()
             },
@@ -124,7 +128,7 @@ final class PaginationTests: XCTestCase {
 
         XCTAssertTrue(pagination.isLoading)
 
-        wait(for: [expectation], timeout: 2)
+        wait(for: [expectation], timeout: 1)
     }
 
     func testAlreadyLoading() {
@@ -133,10 +137,10 @@ final class PaginationTests: XCTestCase {
         let pagination = Pagination<Response>()
 
         pagination.setup(
-            fetching: { _, _, completion in
-                mockService.fetchingMock(completion: completion)
+            fetching: { _, size, completion in
+                mockService.fetchingMock(pageSize: size, completion: completion)
             },
-            onSuccess: { _ in
+            onSuccess: { _, _ in
                 XCTFail("Should not succeed while loading")
             },
             onError: { _ in

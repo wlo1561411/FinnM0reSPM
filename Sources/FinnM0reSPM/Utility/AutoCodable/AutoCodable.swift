@@ -16,21 +16,47 @@ extension AutoCodable {
     }
 
     private var decodablePaths: [(AutoDecodePath, WrappedDecodable)] {
-        Mirror(reflecting: self)
-            .children
-            .compactMap { key, value in
-                guard 
-                    var key, key.isEmpty == false,
-                    let decodable = value as? WrappedDecodable
-                else {
-                    return nil
-                }
-                
-                if key.hasPrefix("_") {
-                    key.remove(at: key.startIndex)
+        var allProperties: [(String, Any)] = []
+
+        var currentMirror: Mirror? = Mirror(reflecting: self)
+
+        while let mirror = currentMirror {
+            let properties = mirror
+                .children
+                .compactMap { child -> (String, Any)? in
+                    guard let key = child.label
+                    else {
+                        return nil
+                    }
+                    return (key, child.value)
                 }
 
-                return (AutoDecodePath(type: .key(key)), decodable)
+            allProperties.append(contentsOf: properties)
+
+            currentMirror = mirror.superclassMirror
+        }
+
+        return allProperties.compactMap { key, value in
+            var key = key
+
+            guard key.isEmpty == false
+            else {
+                return nil
             }
+
+            guard let decodable = value as? WrappedDecodable
+            else {
+                #if DEBUG
+                    print("⚠️ \(key) 不是 DecodableDefault, 不進行 decode")
+                #endif
+                return nil
+            }
+
+            if key.hasPrefix("_") {
+                key.remove(at: key.startIndex)
+            }
+
+            return (AutoDecodePath(type: .key(key)), decodable)
+        }
     }
 }

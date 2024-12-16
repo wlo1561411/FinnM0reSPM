@@ -3,49 +3,19 @@ import Foundation
 @testable import FinnM0reSPM
 
 extension PaginationTests {
-    struct PagedList<ListItem: AutoCodable>: AutoCodable {
+    struct PagedList<ListItem: AutoCodable>: AutoCodable, CountablePaged {
         @DecodableDefault(0) var pageNum: Int
         @DecodableDefault(false) var isLastPage: Bool
         @DecodableDefault([], path: .init(type: .key("list"))) var items: [ListItem]
         init() { }
     }
 
-    struct Response: AutoCodable, CountablePaged {
-        struct Result: AutoCodable {
-            @DecodableDefault("")
-            var name: String
+    struct Item: AutoCodable { }
 
-            init() { }
-
-            init(name: String) {
-                self.name = name
-            }
-        }
-
-        @DecodableDefault(.init())
-        var results: PagedList<Result>
-
-        @DecodableDefault("")
-        var otherValue: String
-
-        var pageNum: Int {
-            results.pageNum
-        }
-
-        var isLastPage: Bool {
-            results.isLastPage
-        }
-
-        init() { }
-
-        init(results: PagedList<Result>, otherValue: String) {
-            self.results = results
-            self.otherValue = otherValue
-        }
-    }
+    typealias Response = PagedList<Item>
 
     class MockService {
-        var page = 1
+        var page: Int
         var testNext: Bool?
         var testLast: Bool?
         var testReload: Bool?
@@ -59,42 +29,41 @@ extension PaginationTests {
             self.spyCount = spyCount
         }
 
-        func fetchingMock(completion: @escaping (Result<Response, Error>) -> Void) {
+        func fetchingMock(pageSize: Int, completion: @escaping (Result<Response, Error>) -> Void) {
             spyCount += 1
 
-            DispatchQueue.global().asyncAfter(deadline: .now() + 1) { [weak self] in
+            DispatchQueue.global().asyncAfter(deadline: .now() + 0.1) { [weak self] in
                 guard let self else { return }
 
-                let pagedList = PagedList<Response.Result>()
+                let response = Response()
+                response.items = (1...pageSize).map { _ in Item() }
 
                 if let testReload {
                     if testReload {
-                        pagedList.pageNum = page + 1
+                        response.pageNum = page + 1
                         self.testReload = false
                     }
                     else {
-                        pagedList.pageNum = page
+                        response.pageNum = page
                     }
                 }
 
                 if testLast != nil {
-                    pagedList.isLastPage = true
+                    response.isLastPage = true
                 }
                 else {
-                    pagedList.isLastPage = false
+                    response.isLastPage = false
                 }
 
                 if let testNext {
                     if testNext {
-                        pagedList.pageNum = page
+                        response.pageNum = page
                         self.testNext = false
                     }
                     else {
-                        pagedList.pageNum = page + 1
+                        response.pageNum = page + 1
                     }
                 }
-
-                let response = Response(results: pagedList, otherValue: "test")
 
                 completion(.success(response))
             }
