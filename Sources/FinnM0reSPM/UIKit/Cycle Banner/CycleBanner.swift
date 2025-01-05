@@ -85,7 +85,7 @@ extension CycleBanner {
     }
 
     private func scroll(at index: Int, animated: Bool) {
-        guard itemsCount > 0 else { return }
+        guard itemsCount > 1 else { return }
 
         collectionView.scrollToItem(
             at: [0, index],
@@ -275,7 +275,7 @@ private final class Test: UIView, CycleBannerDataSource {
     }
 
     func numberOfItems() -> Int {
-        5
+        1
     }
 }
 
