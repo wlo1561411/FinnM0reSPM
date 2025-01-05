@@ -1,7 +1,7 @@
 import UIKit
 
 @objc
-public protocol CycleBannerViewDelegate: AnyObject {
+public protocol CycleBannerDelegate: AnyObject {
     @objc
     optional func didSelected(at index: Int)
     @objc
