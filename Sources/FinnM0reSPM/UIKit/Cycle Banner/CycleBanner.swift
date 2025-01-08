@@ -1,13 +1,21 @@
-import UIKit
 import SnapKit
+import UIKit
+
+public protocol CycleBannerFlowLayout: UICollectionViewFlowLayout { }
 
 public class CycleBanner: UIView {
-    private let flowLayout = CycleBannerScaledFlowLayout()
-    
+    private var flowLayout: CycleBannerFlowLayout = CycleBannerScaledFlowLayout(
+        itemSize: .init(width: 300, height: 100),
+        itemSpacing: 20)
+
     private var collectionView: UICollectionView!
 
     private var timer: Timer?
-    
+
+    private var itemSize: CGSize {
+        flowLayout.itemSize
+    }
+
     /// 前後各+1
     private var itemsCount: Int {
         var count = dataSource?.numberOfItems() ?? 0
@@ -18,17 +26,18 @@ public class CycleBanner: UIView {
     private var isOnFirst = false
     private var isOnLast = false
 
-    public var autoScrollInterval: TimeInterval = 5
-
-    public var itemSize: CGSize = .zero {
-        didSet {
-            flowLayout.itemSize = itemSize
-        }
-    }
-
-    public var currentIndex: Int {
+    /// 前後各+1
+    private var _currentIndex: Int {
         calculateCurrentIndex()
     }
+
+    /// 真正的 index
+    public var currentIndex: Int {
+        let index = _currentIndex
+        return index > 0 ? index - 1 : itemsCount - 2
+    }
+
+    public var autoScrollInterval: TimeInterval = 5
 
     weak var dataSource: CycleBannerDataSource?
     weak var delegate: CycleBannerDelegate?
@@ -38,8 +47,18 @@ public class CycleBanner: UIView {
         setupUI()
     }
     
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    deinit {
+        stopTimer()
+    }
+
+    public func config(flowLayout: CycleBannerFlowLayout) {
+        self.flowLayout = flowLayout
+        self.collectionView.collectionViewLayout = flowLayout
+        self.flowLayout.invalidateLayout()
     }
 
     public func reload() {
@@ -54,7 +73,8 @@ public class CycleBanner: UIView {
 
         if itemsCount <= 1 {
             stopTimer()
-        } else {
+        }
+        else {
             startTimer()
         }
     }
@@ -90,8 +110,7 @@ extension CycleBanner {
         collectionView.scrollToItem(
             at: [0, index],
             at: .centeredHorizontally,
-            animated: animated
-        )
+            animated: animated)
     }
 }
 
@@ -99,15 +118,18 @@ extension CycleBanner {
 
 extension CycleBanner {
     private func startTimer() {
-        guard itemsCount > 1, timer == nil else { return }
+        guard
+            itemsCount > 1,
+            timer == nil,
+            autoScrollInterval > 0
+        else { return }
 
         timer = Timer.scheduledTimer(
             timeInterval: autoScrollInterval,
             target: self,
             selector: #selector(autoScroll),
             userInfo: nil,
-            repeats: true
-        )
+            repeats: true)
 
         RunLoop.main.add(timer!, forMode: .common)
     }
@@ -117,9 +139,9 @@ extension CycleBanner {
         timer = nil
     }
 
-    @objc 
+    @objc
     private func autoScroll() {
-        scroll(at: currentIndex + 1, animated: true)
+        scroll(at: _currentIndex + 1, animated: true)
     }
 }
 
@@ -138,7 +160,8 @@ extension CycleBanner {
         if index < 1 {
             scrollView.contentOffset.x += CGFloat(itemsCount - 2) * itemSize.width
             isOnLast = scrollView.isDecelerating
-        } else if index >= itemsCount - 1 {
+        }
+        else if index >= itemsCount - 1 {
             scrollView.contentOffset.x -= CGFloat(itemsCount - 2) * itemSize.width
             isOnFirst = scrollView.isDecelerating
         }
@@ -150,14 +173,18 @@ extension CycleBanner {
         let lastOffset = CGFloat(itemsCount - 2) * itemSize.width
         let firstOffset = itemSize.width
 
-        if isOnLast,
-           scrollView.contentOffset.x < lastOffset + tolerances {
+        if
+            isOnLast,
+            scrollView.contentOffset.x < lastOffset + tolerances
+        {
             scrollView.setContentOffset(CGPoint(x: lastOffset, y: 0), animated: true)
             isOnLast = false
         }
 
-        if isOnFirst,
-           scrollView.contentOffset.x > firstOffset - tolerances {
+        if
+            isOnFirst,
+            scrollView.contentOffset.x > firstOffset - tolerances
+        {
             scrollView.setContentOffset(CGPoint(x: firstOffset, y: 0), animated: true)
             isOnFirst = false
         }
@@ -175,6 +202,18 @@ extension CycleBanner {
             return [0, indexPath.item - 1]
         }
     }
+
+    private func performDidScroll() {
+        guard let minX = flowLayout
+            .layoutAttributesForItem(at: [0, _currentIndex])?
+            .frame
+            .minX
+        else { return }
+        
+        if minX == collectionView.contentOffset.x {
+            delegate?.didScroll?(to: currentIndex)
+        }
+    }
 }
 
 // MARK: - CollectionView
@@ -184,29 +223,29 @@ extension CycleBanner:
     UICollectionViewDataSource,
     UICollectionViewDelegateFlowLayout
 {
-    public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+    public func scrollViewWillBeginDragging(_: UIScrollView) {
         stopTimer()
         isOnFirst = false
         isOnLast = false
     }
 
-    public func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+    public func scrollViewDidEndDragging(_: UIScrollView, willDecelerate _: Bool) {
         startTimer()
     }
 
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
         guard itemsCount > 1 else { return }
 
-        adjustOffset(scrollView, with: currentIndex)
+        adjustOffset(scrollView, with: _currentIndex)
 
-        delegate?.didScroll?(to: currentIndex)
+        performDidScroll()
 
         if scrollView.isDecelerating {
             adjustForDecelerating(scrollView)
         }
     }
 
-    public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    public func collectionView(_: UICollectionView, numberOfItemsInSection _: Int) -> Int {
         itemsCount
     }
 
@@ -215,7 +254,7 @@ extension CycleBanner:
         return dataSource?.item(collectionView: collectionView, at: index) ?? .init()
     }
 
-    public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    public func collectionView(_: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let index = convert(indexPath: indexPath)
         delegate?.didSelected?(at: index.item)
     }
@@ -225,62 +264,80 @@ extension CycleBanner:
 
 #if swift(>=5.9)
 
-private final class Cell: UICollectionViewCell {
-    let label = UILabel()
+    private final class Cell: UICollectionViewCell {
+        let label = UILabel()
 
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+        override init(frame: CGRect) {
+            super.init(frame: frame)
 
-        label.textAlignment = .center
-        label.backgroundColor = .systemPink
+            label.textAlignment = .center
+            label.backgroundColor = .systemPink
 
-        contentView.addSubview(label)
-        label.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            contentView.addSubview(label)
+            label.snp.makeConstraints { make in
+                make.edges.equalToSuperview()
+            }
+        }
+    
+        required init?(coder _: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
         }
     }
+
+    private final class Test: UIView, CycleBannerDataSource, CycleBannerDelegate {
+        let banner = CycleBanner()
+
+        init() {
+            super.init(frame: .zero)
+
+            addSubview(banner)
+            banner.snp.makeConstraints { make in
+                make.edges.equalToSuperview()
+                make.height.equalTo(100)
+            }
+
+            banner.autoScrollInterval = 0
+            banner.register(Cell.self, forCellWithReuseIdentifier: "cell")
+            banner.dataSource = self
+            banner.delegate = self
+
+//            banner.config(
+//                flowLayout: CycleBannerScaledFlowLayout(
+//                    itemSize: .init(width: UIScreen.main.bounds.width - 40, height: 100),
+//                    itemSpacing: 20))
+
+            banner.config(
+                flowLayout: CycleBannerFullFlowLayout(
+                    itemSize: .init(width: UIScreen.main.bounds.width, height: 100)))
+
+            banner.reload()
+        }
     
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-}
-
-private final class Test: UIView, CycleBannerDataSource {
-    let banner = CycleBanner()
-
-    init() {
-        super.init(frame: .zero)
-
-        addSubview(banner)
-        banner.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-            make.height.equalTo(100)
+        required init?(coder _: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
         }
 
-        banner.itemSize = .init(width: UIScreen.main.bounds.width - 100, height: 100)
-        banner.register(Cell.self, forCellWithReuseIdentifier: "cell")
-        banner.dataSource = self
+        func item(collectionView: UICollectionView, at indexPath: IndexPath) -> UICollectionViewCell {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
+            (cell as? Cell)?.label.text = "\(indexPath.row)"
+            return cell
+        }
 
-        banner.reload()
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        func didScroll(to index: Int) {
+            print(index)
+        }
+
+        func didSelected(at _: Int) {
+//            print(index)
+        }
+
+        func numberOfItems() -> Int {
+            3
+        }
     }
 
-    func item(collectionView: UICollectionView, at indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
-        (cell as? Cell)?.label.text = "\(indexPath.row)"
-        return cell
+    @available(iOS 17.0, *)
+    #Preview {
+        Test()
     }
-
-    func numberOfItems() -> Int {
-        1
-    }
-}
-
-@available(iOS 17.0, *)
-#Preview {
-    Test()
-}
 #endif

@@ -1,35 +1,43 @@
 import UIKit
 
-public class CycleBannerScaledFlowLayout: UICollectionViewFlowLayout {
+public class CycleBannerScaledFlowLayout:
+    UICollectionViewFlowLayout,
+    CycleBannerFlowLayout
+{
     private var boundsSize: CGSize = .zero
     private var midX: CGFloat = 0
+    private var scale: CGFloat = 0.9
 
-    var scale: CGFloat = 0.9
-
-    public override init() {
+    public init(
+        itemSize: CGSize,
+        itemSpacing: CGFloat)
+    {
         super.init()
         self.scrollDirection = .horizontal
         self.minimumLineSpacing = 0
         self.minimumInteritemSpacing = 0
+        self.itemSize = itemSize
+        self.scale = 1.0 - itemSpacing / itemSize.width
     }
-    
-    required init?(coder: NSCoder) {
+
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    public override func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool {
+
+    override public func shouldInvalidateLayout(forBoundsChange _: CGRect) -> Bool {
         true
     }
 
-    public override func prepare() {
+    override public func prepare() {
         super.prepare()
         boundsSize = collectionView?.bounds.size ?? .zero
         midX = boundsSize.width / 2.0
     }
 
-    public override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
+    override public func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
         // 複製原始佈局屬性以進行修改
-        guard let array = super.layoutAttributesForElements(in: rect)?.map({ $0.copy() as! UICollectionViewLayoutAttributes }) else {
+        guard let array = super.layoutAttributesForElements(in: rect)?.map({ $0.copy() as! UICollectionViewLayoutAttributes })
+        else {
             return nil
         }
 
@@ -41,7 +49,7 @@ public class CycleBannerScaledFlowLayout: UICollectionViewFlowLayout {
                 continue
             }
 
-            guard let collectionView = collectionView else { continue }
+            guard let collectionView else { continue }
             let contentOffset = collectionView.contentOffset
             let itemCenter = CGPoint(x: attributes.center.x - contentOffset.x, y: attributes.center.y - contentOffset.y)
             let distance = abs(midX - itemCenter.x)
@@ -50,18 +58,22 @@ public class CycleBannerScaledFlowLayout: UICollectionViewFlowLayout {
             // 將 item 與 中點 的距離正規化為 [0, 1] 的範圍
             // 0 表示完全位於中點, 1 表示位於邊緣
             let normalized = distance / midX
-
-            let zoom = scale + (1 - scale) * (1 - normalized)
+            // 這裡沒辦法用線性, 會導致 spacing 不準
+            let zoom = cos(normalized * .pi / 4) * (1 - scale) + scale
 
             // 設置縮放效果
-            attributes.transform = CGAffineTransform(scaleX: zoom, y: zoom)
+            attributes.transform = CGAffineTransform(scaleX: zoom, y: zoom * (1 - normalized * (1 - scale)))
         }
 
         return array
     }
 
-    public override func targetContentOffset(forProposedContentOffset proposedContentOffset: CGPoint, withScrollingVelocity velocity: CGPoint) -> CGPoint {
-        guard let collectionView = collectionView else { return proposedContentOffset }
+    override public func targetContentOffset(
+        forProposedContentOffset proposedContentOffset: CGPoint,
+        withScrollingVelocity _: CGPoint)
+        -> CGPoint
+    {
+        guard let collectionView else { return proposedContentOffset }
         let targetRect = CGRect(x: collectionView.contentOffset.x, y: 0, width: boundsSize.width, height: boundsSize.height)
 
         guard let array = super.layoutAttributesForElements(in: targetRect) else {
