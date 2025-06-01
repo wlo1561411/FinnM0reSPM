@@ -1,11 +1,20 @@
 import UIKit
 
-class PinnedHeaderCollectionLayout: UICollectionViewFlowLayout {
+public class PinnedHeaderCollectionLayout: UICollectionViewFlowLayout {
     // 應被固定標頭的分區索引。
-    let pinnedSectionIndex = 0
+    private let pinnedSectionIndex: Int
 
+    public init(pinnedSectionIndex: Int) {
+        self.pinnedSectionIndex = pinnedSectionIndex
+        super.init()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     // 覆寫此方法以修改給定矩形中所有元素（單元格、標頭、頁腳）的布局屬性。
-    override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
+    public override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
         guard var origin = super.layoutAttributesForElements(in: rect), let collectionView else { return nil }
 
         // 為我們要固定的標頭定義特定的索引路徑。
@@ -61,7 +70,7 @@ class PinnedHeaderCollectionLayout: UICollectionViewFlowLayout {
     }
 
     // 覆寫此方法以在視圖範圍更改時使布局無效，這是實現標頭固定效果所必需的。
-    override func shouldInvalidateLayout(forBoundsChange _: CGRect) -> Bool {
+    public override func shouldInvalidateLayout(forBoundsChange _: CGRect) -> Bool {
         true
     }
 }
@@ -85,7 +94,7 @@ class PinnedHeaderCollectionLayout: UICollectionViewFlowLayout {
             }
         }
 
-        let list = UICollectionView(frame: .zero, collectionViewLayout: PinnedHeaderCollectionLayout())
+        let list = UICollectionView(frame: .zero, collectionViewLayout: PinnedHeaderCollectionLayout(pinnedSectionIndex: 2))
 
         override func viewDidLoad() {
             super.viewDidLoad()

@@ -88,6 +88,7 @@ extension VerifyCodeView {
 
     private func makeCodeInputView() {
         codeStackView.removeAllFully()
+        inputSquares.removeAll()
 
         for i in 0..<codeLength {
             let view = Square(colorPattern)

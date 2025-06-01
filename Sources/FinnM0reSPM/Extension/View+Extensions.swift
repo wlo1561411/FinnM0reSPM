@@ -39,10 +39,7 @@ extension View {
     }
 
     @ViewBuilder
-    public func `if`
-    (_ condition: Bool, transform: (Self) -> some View)
-        -> some View
-    {
+    public func `if`(_ condition: Bool, transform: (Self) -> some View) -> some View {
         if condition {
             transform(self)
         }

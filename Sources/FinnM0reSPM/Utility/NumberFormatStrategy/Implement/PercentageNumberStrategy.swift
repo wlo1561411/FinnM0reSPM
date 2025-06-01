@@ -18,7 +18,7 @@ struct PercentageNumberStrategy: NumberFormatStrategy {
     let withChangeSymbol: Bool
 
     func format(value: any Numeric) -> String {
-        var result = defaultFormat(value: value)
+        var result = format(value: value, strategy: self)
         let value = Double(result) ?? 0
 
         if value != 0 {

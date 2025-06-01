@@ -26,26 +26,4 @@ struct SlideCalculator {
         }
         return components
     }
-
-    static func textWidth(with font: UIFont, by text: String) -> CGFloat {
-        NSString(string: text)
-            .boundingRect(
-                with: CGSize(
-                    width: CGFloat.greatestFiniteMagnitude,
-                    height: font.lineHeight),
-                options: .usesLineFragmentOrigin,
-                attributes: [NSAttributedString.Key.font: font],
-                context: nil).size.width
-    }
-
-    static func textHeight(with font: UIFont, from width: CGFloat, by text: String) -> CGFloat {
-        NSString(string: text)
-            .boundingRect(
-                with: CGSize(
-                    width: width,
-                    height: CGFloat.greatestFiniteMagnitude),
-                options: .usesLineFragmentOrigin,
-                attributes: [NSAttributedString.Key.font: font],
-                context: nil).size.height
-    }
 }

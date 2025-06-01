@@ -109,6 +109,26 @@ extension APIRequest {
 
     public func send(
         decisions: [APIDecision]? = nil,
+        queue: DispatchQueue,
+        onSuccess: ((Response) -> Void)? = nil,
+        onError: ((Error) -> Void)? = nil)
+    {
+        client.send(
+            self,
+            decisions: decisions,
+            queue: queue,
+            handler: {
+                switch $0 {
+                case .success(let response):
+                    onSuccess?(response)
+                case .failure(let error):
+                    onError?(error)
+                }
+            })
+    }
+
+    public func send(
+        decisions: [APIDecision]? = nil,
         queue: DispatchQueue)
         async throws -> Response
     {

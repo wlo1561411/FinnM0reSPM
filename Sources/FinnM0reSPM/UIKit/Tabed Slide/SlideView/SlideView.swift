@@ -411,3 +411,81 @@ extension SlideView {
         viewController?.removeFromParent()
     }
 }
+
+// MARK: - Preview
+
+#if swift(>=5.9)
+
+private class TestController: UIViewController {
+    let index: Int
+
+    init(index: Int) {
+        self.index = index
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        let label = UILabel()
+        label.textAlignment = .center
+        label.text = "\(index)"
+
+        view.addSubview(label)
+        label.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+        }
+
+        print(index, "viewDidLoad")
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        print(index, "viewWillAppear")
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        print(index, "viewWillDisappear")
+    }
+}
+
+private class SlideViewTest: UIViewController, SlideViewDataSource {
+    let slideView = SlideView()
+
+    init() {
+        super.init(nibName: nil, bundle: nil)
+
+        slideView.dataSource = self
+
+        view.addSubview(slideView)
+        slideView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+            make.height.equalTo(200)
+        }
+
+        slideView.setup(cacheSize: 5, at: self)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    func numberOfViewController(_ slideView: SlideView) -> Int {
+        5
+    }
+
+    func viewController(_ slideView: SlideView, at index: Int) -> UIViewController {
+        TestController(index: index)
+    }
+}
+
+@available(iOS 17.0, *)
+#Preview {
+    return SlideViewTest()
+}
+#endif

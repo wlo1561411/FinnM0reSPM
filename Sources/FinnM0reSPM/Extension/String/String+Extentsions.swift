@@ -26,8 +26,7 @@ extension String {
     public func formated(_ arguments: [CVarArg?] = []) -> String {
         if arguments.count > 0 {
             return String(format: self, arguments: arguments.compactMap { $0 })
-        }
-        else {
+        } else {
             return self
         }
     }
@@ -43,7 +42,9 @@ extension String {
                     range.lowerBound,
                     offsetBy: offset,
                     limitedBy: endIndex)
-            else { break }
+            else {
+                break
+            }
 
             indices.append(distance(from: startIndex, to: range.lowerBound))
             position = index(after: after)
@@ -90,12 +91,10 @@ extension String {
             if let suffix {
                 if key >= count - suffix {
                     temp += "\(value)"
-                }
-                else {
+                } else {
                     temp += "*"
                 }
-            }
-            else {
+            } else {
                 temp += "\(value)"
             }
 
@@ -111,14 +110,13 @@ extension String {
     }
 
     public var digits: Int? {
-        let components = components(separatedBy: ".")
-
-        if components.count == 2 {
-            return components[1].count
-        } else if components.count == 1 {
-            return 0
-        } else {
+        guard let dotIndex = firstIndex(of: ".")
+        else {
             return nil
         }
+
+        let decimalPart = self[index(after: dotIndex)...]
+
+        return decimalPart.count
     }
 }

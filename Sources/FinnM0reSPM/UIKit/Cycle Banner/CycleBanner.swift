@@ -204,15 +204,15 @@ extension CycleBanner {
     }
 
     private func performDidScroll() {
-        guard let minX = flowLayout
-            .layoutAttributesForItem(at: [0, _currentIndex])?
-            .frame
-            .minX
+        guard
+            let minX = flowLayout
+                .layoutAttributesForItem(at: [0, _currentIndex])?
+                .frame
+                .minX,
+            minX == collectionView.contentOffset.x
         else { return }
-        
-        if minX == collectionView.contentOffset.x {
-            delegate?.didScroll?(to: currentIndex)
-        }
+
+        delegate?.didScroll?(to: currentIndex)
     }
 }
 
@@ -284,7 +284,7 @@ extension CycleBanner:
         }
     }
 
-    private final class Test: UIView, CycleBannerDataSource, CycleBannerDelegate {
+    private final class CycleBannerTest: UIView, CycleBannerDataSource, CycleBannerDelegate {
         let banner = CycleBanner()
 
         init() {
@@ -338,6 +338,6 @@ extension CycleBanner:
 
     @available(iOS 17.0, *)
     #Preview {
-        Test()
+        CycleBannerTest()
     }
 #endif

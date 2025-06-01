@@ -1,6 +1,6 @@
 import UIKit
 
-open class VerticalCollectionViewLayout: BaseCollectionViewFlowLayout {
+public class VerticalCollectionViewLayout: BaseCollectionViewFlowLayout {
     public var numberOfItemsPerColumn = 2
     public var itemLayoutSize: NSCollectionLayoutSize = .init(widthDimension: .absolute(0), heightDimension: .absolute(0))
     public var spacing: CGFloat = 0

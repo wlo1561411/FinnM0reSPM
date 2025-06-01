@@ -33,74 +33,52 @@ extension NumberFormatStrategy {
     }
 
     func format(value: any Numeric) -> String {
-        defaultFormat(value: value)
+        format(value: value, strategy: self)
     }
 }
 
 // MARK: - Format
 
 extension NumberFormatStrategy {
+    /// workaround
+    ///
     /// 避免 NumberFormatter 原生行為把小數自己丟掉
     var digitsForPrecision: Int {
         14
     }
 
-    func defaultFormat(value: any Numeric, configure: ((NumberFormatter) -> Void)? = nil) -> String {
-        if let decimal = value as? Decimal {
-            return defaultFormat(value: decimal, configure: configure)
-        } else if let double = value as? Double {
-            return defaultFormat(value: double, configure: configure)
-        } else if let int = value as? Int {
-            return defaultFormat(value: Double(int), configure: configure)
+    func format(value: any Numeric, strategy: NumberFormatStrategy) -> String {
+        let scale = strategy.maximumOption.digits(value: value)
+
+        var converted: Decimal = 0
+
+        switch value {
+        case let decimal as Decimal:
+            converted = PrecisionHandler.precision(decimal, scale: scale)
+        case let double as Double:
+            converted = PrecisionHandler.precision(Decimal(double), scale: scale)
+        case let int as Int:
+            converted = Decimal(int)
+        default:
+            return "\(value)"
         }
-        return "0"
+
+        return format(decimal: converted, strategy: strategy)
     }
 
-    /// 精度較低
-    func defaultFormat(value: Double, configure: ((NumberFormatter) -> Void)? = nil) -> String {
+    private func format(decimal: Decimal, strategy: NumberFormatStrategy) -> String {
         let formatter = NumberFormatter()
-        formatter.apply(value: Decimal(value), strategy: self)
-        configure?(formatter)
-        return formatter.string(from: .init(value: value)) ?? "0"
-    }
+        formatter.apply(decimal: decimal, strategy: self)
 
-    /// 精度較高
-    func defaultFormat(value: Decimal, configure: ((NumberFormatter) -> Void)? = nil) -> String {
-        guard let digits = "\(value)".digits
-        else { return "0" }
-
-        let formatter = NumberFormatter()
-        formatter.apply(value: value, strategy: self)
-        configure?(formatter)
-
-        let formattedString = formatter.string(from: value as NSDecimalNumber) ?? "0"
-
-        if digits > digitsForPrecision, digits >= formatter.maximumFractionDigits {
-            return processPrecision(value: value, formatter: formatter)
-        } else {
-            return formattedString
+        guard let digitCount = "\(decimal)".digits
+        else {
+            return formatter.string(from: decimal as NSDecimalNumber) ?? "0"
         }
-    }
 
-    // NumberFormatter 只用於分组(如果有)，不處理小數
-    private func processPrecision(value: Decimal, formatter: NumberFormatter) -> String {
-        let originalString = "\(value)"
-        let components = originalString.components(separatedBy: ".")
-
-        if components.count == 2 {
-            let integerPart = components[0]
-            let fullDecimalPart = components[1]
-
-            let limitedDecimalPart = String(fullDecimalPart.prefix(formatter.maximumFractionDigits))
-
-            if let intValue = Int(integerPart),
-               let formattedInteger = formatter.string(from: NSNumber(value: intValue)) {
-                return "\(formattedInteger).\(limitedDecimalPart)"
-            } else {
-                return originalString
-            }
+        if digitCount > digitsForPrecision, digitCount >= formatter.maximumFractionDigits {
+            return PrecisionHandler.trim(value: decimal as Decimal, formatter: formatter)
         } else {
-            return originalString
+            return formatter.string(from: decimal as NSDecimalNumber) ?? "0"
         }
     }
 }
@@ -108,12 +86,12 @@ extension NumberFormatStrategy {
 // MARK: - NumberFormatter
 
 extension NumberFormatter {
-    fileprivate func apply(value: Decimal, strategy: NumberFormatStrategy) {
+    fileprivate func apply(decimal: Decimal, strategy: NumberFormatStrategy) {
         roundingMode = strategy.roundingMode
         locale = .init(identifier: "zh_CN")
 
         minimumFractionDigits = strategy.minimumFractionDigits
-        maximumFractionDigits = max(strategy.maximumOption.digits(value: value), minimumFractionDigits)
+        maximumFractionDigits = max(strategy.maximumOption.digits(value: decimal), minimumFractionDigits)
 
         if let configuration = strategy.currencyConfiguration {
             numberStyle = .currency
