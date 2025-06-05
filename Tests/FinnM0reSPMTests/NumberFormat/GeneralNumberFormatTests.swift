@@ -22,8 +22,8 @@ extension GeneralNumberFormatTests {
             strategy: .general(
                 minimumFractionDigits: 0,
                 maximumOption: .value(0),
-                currencyConfiguration: .init()))
-        let expect = "1,000"
+                currencyConfiguration: .init(symbol: "$")))
+        let expect = "$1,000"
 
         XCTAssertEqual(result, expect)
     }

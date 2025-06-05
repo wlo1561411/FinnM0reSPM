@@ -112,7 +112,7 @@ final class LocalizationTests: XCTestCase {
         let localizer = Localizer(
             wrappedValue: UIButton(),
             contents:
-            LocalizationContentBuilder(provider: mockProvider)
+            LocalizationContentBuilder()
                 .enabled("enabled")
                 .disabled("disabled")
                 .contents)
@@ -136,7 +136,7 @@ final class LocalizationTests: XCTestCase {
 
         let localizer = ReplaceableLocalizer(
             wrappedValue: UIButton(),
-            contents: LocalizationContentBuilder(provider: mockProvider)
+            contents: LocalizationContentBuilder()
                 .enabled("welcome", arguments: ["Finn"])
                 .contents)
 
