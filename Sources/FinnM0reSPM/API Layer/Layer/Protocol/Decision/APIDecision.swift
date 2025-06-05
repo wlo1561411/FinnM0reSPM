@@ -8,7 +8,7 @@ public protocol APIDecision {
     ///   - data: 收到的回應內容
     ///   - response: 收到的回應
     /// - Returns: `true` 則執行此決策；反之則判斷下一個決策
-    func shouldApply<Request: APIRequest>(request: Request, data: Data, response: HTTPURLResponse) -> Bool
+    func shouldApply<Request: APILayer.Request>(request: Request, data: Data, response: HTTPURLResponse) -> Bool
 
     /// 執行決策
     /// - Parameters:
@@ -16,7 +16,7 @@ public protocol APIDecision {
     ///   - data: 收到的回應內容
     ///   - response: 收到的回應
     ///   - closure: 完成決策後的動作
-    func apply<Request: APIRequest>(
+    func apply<Request: APILayer.Request>(
         request: Request,
         data: Data,
         response: HTTPURLResponse,

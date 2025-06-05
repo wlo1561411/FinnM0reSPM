@@ -20,8 +20,8 @@ import Foundation
 ///         _label.update(by: LocalizationContentFactory.general(..., arguments: ...))
 ///
 @propertyWrapper
-final class Localizer<T: Localizable>: LocalizerObserver {
-    private var contents: [LocalizationContent]
+final class Localizer<T: Localizable>: LocalizationObserver {
+    private var contents: [LocalizationContent] = []
     private var cancellable: AnyCancellable?
 
     var wrappedValue: T
@@ -30,10 +30,15 @@ final class Localizer<T: Localizable>: LocalizerObserver {
     init(wrappedValue: T,
          key: String,
          arguments: [String] = []) {
-        self.contents = LocalizationContentFactory.general(key, arguments: arguments)
-        self.wrappedValue = wrappedValue
+        defer {
+            self.contents = LocalizationContentBuilder()
+                .single(key, arguments: arguments)
+                .contents
 
-        wrappedValue.updateLocalization(by: contents)
+            wrappedValue.updateLocalization(by: contents)
+        }
+
+        self.wrappedValue = wrappedValue
 
         super.init()
     }
@@ -50,7 +55,9 @@ final class Localizer<T: Localizable>: LocalizerObserver {
 
     /// 更新單一狀態 content
     func update(key: String, arguments: [String] = []) {
-        contents = LocalizationContentFactory.general(key, arguments: arguments)
+        contents = LocalizationContentBuilder(provider: provider)
+            .single(key, arguments: arguments)
+            .contents
 
         wrappedValue.updateLocalization(by: contents)
     }

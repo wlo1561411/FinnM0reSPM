@@ -10,7 +10,7 @@ private let dateFormatter: ISO8601DateFormatter = {
 
 extension APILayer {
     struct DebugLogDecision: APILogDecision {
-        func shouldApply(request: some APIRequest, logInfo _: APILogInfo) -> Bool {
+        func shouldApply(request: some APILayer.Request, logInfo _: APILogInfo) -> Bool {
             #if DEBUG
                 request.isEnableDebugLog
             #else
@@ -18,7 +18,7 @@ extension APILayer {
             #endif
         }
 
-        func apply(request _: some APIRequest, logInfo: APILogInfo) {
+        func apply(request _: some APILayer.Request, logInfo: APILogInfo) {
             var values: [String] = []
 
             values.append("")

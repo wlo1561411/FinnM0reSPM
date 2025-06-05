@@ -1,10 +1,13 @@
 import Combine
 
-class LocalizerObserver {
+class LocalizationObserver {
+    let provider: LocalizationProvider
+
     private var cancellable: AnyCancellable?
 
-    init() {
-        self.cancellable = MockLocalizableBridge.shared
+    init(provider: LocalizationProvider = LocalizationServiceContext.shared) {
+        self.provider = provider
+        self.cancellable = provider
             .onLanguageChanged
             .sink { [weak self] in
                 self?.handleLanguageChanged()

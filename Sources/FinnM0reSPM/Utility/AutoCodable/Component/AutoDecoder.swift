@@ -147,6 +147,6 @@ extension LosslessStringConvertible {
 
 extension FloatingPoint where Self: LosslessStringConvertible {
     fileprivate var decimal: Decimal? {
-        .init(string: string, locale: Locale(identifier: "zh_Hans_CN"))
+        .init(string: string, locale: Locale.current)
     }
 }

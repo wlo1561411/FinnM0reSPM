@@ -31,24 +31,20 @@ public final class DecodableDefault<Value> {
 
     public convenience init(
         _ defaultValue: Value? = nil,
-        path: AutoDecodePath? = nil) 
+        path: String = "")
         where Value: Decodable
     {
-        self.init(defaultValue, path: path) { input in
+        let decoder = AutoDecoder<Value>(configuration: { input in
             try input.decoder.decode(
                 Value.self,
                 path: input.context.preferredPath,
                 target: input.target)
-        }
-    }
+        })
 
-    convenience init(
-        _ defaultValue: Value? = nil,
-        path: AutoDecodePath? = nil,
-        configuration: @escaping (AutoDecodeInput) throws -> Value)
-    {
-        let decoder = AutoDecoder<Value>(configuration: configuration)
-        self.init(defaultValue, path: path, decoder: decoder)
+        self.init(
+            defaultValue,
+            path: path.isEmpty ? nil : .init(type: .key(path)),
+            decoder: decoder)
     }
 
     init(

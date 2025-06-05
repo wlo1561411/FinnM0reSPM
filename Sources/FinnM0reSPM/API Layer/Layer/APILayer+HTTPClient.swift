@@ -9,7 +9,7 @@ extension APILayer {
         ///   - request: API 請求結構
         ///   - decisions: 收到回應後需執行的決策。如果為 nil，則使用預設決策
         ///   - handler: 執行決策後的結果
-        public func send<Request: APIRequest>(
+        public func send<Request: APILayer.Request>(
             _ request: Request,
             decisions: [APIDecision]? = nil,
             queue: DispatchQueue,
@@ -74,7 +74,7 @@ extension APILayer {
             }
         }
 
-        private func handleDecision<Request: APIRequest>(
+        private func handleDecision<Request: APILayer.Request>(
             _ request: Request,
             data: Data,
             response: HTTPURLResponse,

@@ -3,6 +3,8 @@ import Foundation
 /// 專案通用的最大小數位數
 let generalMaximumFractionDigits = 8
 
+private let formatter = NumberFormatter()
+
 protocol NumberFormatStrategy {
     /// 預設為 .down
     var roundingMode: NumberFormatter.RoundingMode { get }
@@ -67,7 +69,6 @@ extension NumberFormatStrategy {
     }
 
     private func format(decimal: Decimal, strategy: NumberFormatStrategy) -> String {
-        let formatter = NumberFormatter()
         formatter.apply(decimal: decimal, strategy: self)
 
         guard let digitCount = "\(decimal)".digits

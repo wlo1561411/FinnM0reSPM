@@ -8,12 +8,12 @@ extension APILayer {
             self.leftCount = leftCount
         }
 
-        public func shouldApply(request _: some APIRequest, data _: Data, response: HTTPURLResponse) -> Bool {
+        public func shouldApply(request _: some APILayer.Request, data _: Data, response: HTTPURLResponse) -> Bool {
             let isStatusCodeValid = (200..<300).contains(response.statusCode)
             return isStatusCodeValid == false && leftCount > 0
         }
 
-        public func apply<Request: APIRequest>(
+        public func apply<Request: APILayer.Request>(
             request: Request,
             data _: Data,
             response _: HTTPURLResponse,

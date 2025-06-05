@@ -1,54 +1,55 @@
 import Foundation
 
 /// API 請求結構協議
-public protocol APIRequest {
-    /// 收到正常回應的格式
-    associatedtype Response: Codable
+extension APILayer {
+    public protocol Request {
+        /// 收到正常回應的格式
+        associatedtype Response: Codable
 
-    /// API Server 路徑
-    var baseURL: URL? { get }
-    /// API 路徑
-    var path: String { get }
-    /// API HTTP 方法
-    var method: APILayer.HTTPMethod { get }
-    /// 請求參數
-    var parameters: APIParameterConvertible { get set }
-    /// 參數格式
-    var contentType: APILayer.ContentType { get }
-    /// 額外的標頭
-    var extraHeader: [String: String] { get }
-    /// 連線優先級
-    var priority: APILayer.RequestPriority { get }
-    /// 請求超時設定
-    var timeout: TimeInterval { get }
-    /// 重新請求次數
-    var retryCount: Int { get }
-    /// 請求端口
-    var client: APILayer.HTTPClient { get }
-    /// 是否 print local log
-    var isEnableDebugLog: Bool { get }
-    /// 「調整」請求參數的組合器
-    var parameterAdapters: [APIParameterAdapter] { get }
-    /// 「建構」請求的組合器
-    var adapters: [APIRequestAdapter] { get }
-    /// 收到回應後，「依序」要執行的決策
-    var decisions: [APIDecision] { get }
-    /// 處理是否要 print local log 或是 post log
-    var logDecisions: [APILogDecision] { get }
-    /// 建立出 LogInfo 讓 logDecisions 使用
-    func buildLogInfo(
-        request: URLRequest,
-        originalRequestDate: Date,
-        realRequestDate: Date,
-        responseDate: Date,
-        response: HTTPURLResponse?,
-        data: Data?,
-        error: Error?) -> APILogInfo
+        /// API Server 路徑
+        var baseURL: URL? { get }
+        /// API 路徑
+        var path: String { get }
+        /// API HTTP 方法
+        var method: HTTPMethod { get }
+        /// 請求參數
+        var parameters: APIParameterConvertible { get set }
+        /// 參數格式
+        var contentType: ContentType { get }
+        /// 額外的標頭
+        var extraHeader: [String: String] { get }
+        /// 連線優先級
+        var priority: RequestPriority { get }
+        /// 請求超時設定
+        var timeout: TimeInterval { get }
+        /// 重新請求次數
+        var retryCount: Int { get }
+        /// 請求端口
+        var client: HTTPClient { get }
+        /// 是否 print local log
+        var isEnableDebugLog: Bool { get }
+        /// 「調整」請求參數的組合器
+        var parameterAdapters: [APIParameterAdapter] { get }
+        /// 「建構」請求的組合器
+        var adapters: [APIRequestAdapter] { get }
+        /// 收到回應後，「依序」要執行的決策
+        var decisions: [APIDecision] { get }
+        /// 處理是否要 print local log 或是 post log
+        var logDecisions: [APILogDecision] { get }
+        /// 建立出 LogInfo 讓 logDecisions 使用
+        func buildLogInfo(request: URLRequest,
+                          originalRequestDate: Date,
+                          realRequestDate: Date,
+                          responseDate: Date,
+                          response: HTTPURLResponse?,
+                          data: Data?,
+                          error: Error?) -> APILogInfo
+    }
 }
 
 // MARK: - Default Implement
 
-extension APIRequest {
+extension APILayer.Request {
     public var url: URL? {
         URL(string: path, relativeTo: baseURL)
     }
@@ -95,11 +96,9 @@ extension APIRequest {
         ]
     }
 
-    public func send(
-        decisions: [APIDecision]? = nil,
-        queue: DispatchQueue,
-        handler: @escaping (Result<Response, Error>) -> Void)
-    {
+    public func send(decisions: [APIDecision]? = nil,
+                     queue: DispatchQueue,
+                     handler: @escaping (Result<Response, Error>) -> Void) {
         client.send(
             self,
             decisions: decisions,
@@ -107,12 +106,10 @@ extension APIRequest {
             handler: handler)
     }
 
-    public func send(
-        decisions: [APIDecision]? = nil,
-        queue: DispatchQueue,
-        onSuccess: ((Response) -> Void)? = nil,
-        onError: ((Error) -> Void)? = nil)
-    {
+    public func send(decisions: [APIDecision]? = nil,
+                     queue: DispatchQueue,
+                     onSuccess: ((Response) -> Void)? = nil,
+                     onError: ((Error) -> Void)? = nil) {
         client.send(
             self,
             decisions: decisions,
@@ -127,11 +124,9 @@ extension APIRequest {
             })
     }
 
-    public func send(
-        decisions: [APIDecision]? = nil,
-        queue: DispatchQueue)
-        async throws -> Response
-    {
+    public func send(decisions: [APIDecision]? = nil,
+                     queue: DispatchQueue)
+        async throws -> Response {
         try await withCheckedThrowingContinuation { continuation in
             client.send(
                 self,
@@ -148,16 +143,14 @@ extension APIRequest {
         }
     }
 
-    public func buildLogInfo(
-        request: URLRequest,
-        originalRequestDate: Date,
-        realRequestDate: Date,
-        responseDate: Date,
-        response: HTTPURLResponse?,
-        data: Data?,
-        error: Error?)
-        -> APILogInfo
-    {
+    public func buildLogInfo(request: URLRequest,
+                             originalRequestDate: Date,
+                             realRequestDate: Date,
+                             responseDate: Date,
+                             response: HTTPURLResponse?,
+                             data: Data?,
+                             error: Error?)
+        -> APILogInfo {
         APILayer.DefaultLogInfo(
             request: request,
             originalRequestDate: originalRequestDate,
@@ -171,7 +164,7 @@ extension APIRequest {
 
 // MARK: - Extension
 
-extension APIRequest {
+extension APILayer.Request {
     mutating func attachMoreParameter() throws {
         parameters = try parameterAdapters
             .reduce(parameters) {
@@ -180,7 +173,9 @@ extension APIRequest {
     }
 
     func buildRequest() throws -> URLRequest {
-        guard let url else { throw URLError(.badURL) }
+        guard let url else {
+            throw URLError(.badURL)
+        }
         let request = URLRequest(url: url)
         return try adapters
             .reduce(request) {

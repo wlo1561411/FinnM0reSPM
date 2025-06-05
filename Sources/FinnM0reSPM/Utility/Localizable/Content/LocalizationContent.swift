@@ -5,10 +5,10 @@ protocol LocalizationContent {
     /// key
     var key: String { get }
     /// arguments
-    var arguments: any CVarArg { get }
+    var arguments: [CVarArg] { get }
 
-    /// 多語言橋接
-    var bridge: LocalizableBridge { get }
+    /// 獲取多語言
+    var provider: LocalizationProvider { get }
 
     /// 創建時當下的 localized text
     /// 主要是用來做 replacing
@@ -21,41 +21,9 @@ protocol LocalizationContent {
 // MARK: - Default Implement
 
 extension LocalizationContent {
-    var bridge: LocalizableBridge {
-        MockLocalizableBridge.shared
-    }
-
     /// 根據 key, arguments 轉換成當下語言的 text
     var localized: String {
-        bridge.localized(key: key, arguments: arguments)
-    }
-}
-
-// MARK: - Factory
-
-struct LocalizationContentFactory {
-    /// 建立單一狀態 LocalizationContent
-    static func general(_ key: String, arguments: [String] = []) -> [LocalizationContent] {
-        [GeneralLocalizationContent(key: key, arguments: arguments)]
-    }
-
-    /// 建立多狀態 LocalizationContent
-    static func stateful(isEnable: GeneralLocalizationContent,
-                         isDisable: GeneralLocalizationContent? = nil,
-                         isSelected: GeneralLocalizationContent? = nil) -> [LocalizationContent] {
-        var contents: [StatefulLocalizationContent] = [
-            .init(key: isEnable.key, arguments: isEnable.arguments, state: .normal)
-        ]
-
-        if let isDisable {
-            contents.append(.init(key: isDisable.key, arguments: isDisable.arguments, state: .disabled))
-        }
-
-        if let isSelected {
-            contents.append(.init(key: isSelected.key, arguments: isSelected.arguments, state: .selected))
-        }
-
-        return contents
+        provider.localized(key: key, arguments: arguments)
     }
 }
 
@@ -66,37 +34,46 @@ struct LocalizationContentFactory {
 /// 只有單一狀態
 struct GeneralLocalizationContent: LocalizationContent {
     let key: String
-    let arguments: any CVarArg
+    let arguments: [CVarArg]
+    let provider: LocalizationProvider
 
-    var currentLocalized: String = ""
+    var currentLocalized = ""
 
-    init(key: String, arguments: any CVarArg) {
+    init(key: String,
+         arguments: [CVarArg],
+         provider: LocalizationProvider) {
         self.key = key
         self.arguments = arguments
+        self.provider = provider
         self.currentLocalized = localized
     }
 
     func refresh() -> GeneralLocalizationContent {
-        .init(key: key, arguments: arguments)
+        .init(key: key, arguments: arguments, provider: provider)
     }
 }
 
 /// 多狀態 LocalizationContent
 struct StatefulLocalizationContent: LocalizationContent {
     let key: String
-    let arguments: any CVarArg
+    let arguments: [CVarArg]
+    let provider: LocalizationProvider
     let state: UIControl.State
 
-    var currentLocalized: String = ""
+    var currentLocalized = ""
 
-    init(key: String, arguments: any CVarArg, state: UIControl.State) {
+    init(key: String,
+         arguments: [CVarArg],
+         provider: LocalizationProvider,
+         state: UIControl.State) {
         self.key = key
         self.arguments = arguments
+        self.provider = provider
         self.state = state
         self.currentLocalized = localized
     }
 
     func refresh() -> StatefulLocalizationContent {
-        .init(key: key, arguments: arguments, state: state)
+        .init(key: key, arguments: arguments, provider: provider, state: state)
     }
 }

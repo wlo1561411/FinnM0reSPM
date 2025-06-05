@@ -5,7 +5,7 @@ public extension CGFloat {
 }
 
 public struct UIAdaptedFloat {
-    private static let comparedFloat: CGFloat = 375
+    public static var comparedFloat: CGFloat = 375
 
     /// UI 佈局相關的 value，需用此方法調用，達到螢幕調用效果
     public static func from(_ x: CGFloat) -> CGFloat {

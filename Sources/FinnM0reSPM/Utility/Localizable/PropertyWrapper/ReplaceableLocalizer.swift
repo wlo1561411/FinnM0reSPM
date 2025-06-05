@@ -26,8 +26,8 @@ import Foundation
 ///         _label.replace(by: LocalizationContentFactory.general(..., arguments: ...))
 ///
 @propertyWrapper
-final class ReplaceableLocalizer<T: Localizable>: LocalizerObserver {
-    private var contents: [LocalizationContent]
+final class ReplaceableLocalizer<T: Localizable>: LocalizationObserver {
+    private var contents: [LocalizationContent] = []
     private var cancellable: AnyCancellable?
 
     var wrappedValue: T
@@ -39,12 +39,17 @@ final class ReplaceableLocalizer<T: Localizable>: LocalizerObserver {
          key: String,
          arguments: [String] = [],
          updateWhenInit: Bool = true) {
-        self.contents = LocalizationContentFactory.general(key, arguments: arguments)
-        self.wrappedValue = wrappedValue
+        defer {
+            self.contents = LocalizationContentBuilder()
+                .single(key, arguments: arguments)
+                .contents
 
-        if updateWhenInit {
-            wrappedValue.updateLocalization(by: contents)
+            if updateWhenInit {
+                wrappedValue.updateLocalization(by: contents)
+            }
         }
+
+        self.wrappedValue = wrappedValue
 
         super.init()
     }
@@ -68,7 +73,9 @@ final class ReplaceableLocalizer<T: Localizable>: LocalizerObserver {
     func replace(key: String, arguments: [String] = []) {
         let previous = contents
 
-        contents = LocalizationContentFactory.general(key, arguments: arguments)
+        contents = LocalizationContentBuilder(provider: provider)
+            .single(key, arguments: arguments)
+            .contents
 
         wrappedValue.replaceLocalization(by: previous, by: contents)
     }

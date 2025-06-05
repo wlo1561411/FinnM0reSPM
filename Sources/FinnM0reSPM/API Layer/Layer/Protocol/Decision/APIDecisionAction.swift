@@ -1,7 +1,7 @@
 import Foundation
 
 /// 執行決策後的動作
-public enum APIDecisionAction<Request: APIRequest> {
+public enum APIDecisionAction<Request: APILayer.Request> {
     /// 繼續下一個決策
     case `continue`(Data, HTTPURLResponse)
     /// 帶入新的決策，重新進行請求

@@ -4,9 +4,13 @@ import Foundation
 
 extension PaginationTests {
     struct PagedList<ListItem: AutoCodable>: AutoCodable, CountablePaged {
-        @DecodableDefault(0) var pageNum: Int
-        @DecodableDefault(false) var isLastPage: Bool
-        @DecodableDefault([], path: .init(type: .key("list"))) var items: [ListItem]
+        @DecodableDefault(0)
+        var pageNum: Int
+        @DecodableDefault(false)
+        var isLastPage: Bool
+        @DecodableDefault([], path: "list")
+        var items: [ListItem]
+
         init() { }
     }
 
