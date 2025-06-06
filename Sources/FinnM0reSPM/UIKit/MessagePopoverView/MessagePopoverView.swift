@@ -2,8 +2,6 @@ import Combine
 import SnapKit
 import UIKit
 
-/// TODO: 只有一個 text 會顯示不出來
-/// 目前 workaround 處理
 public class MessagePopoverView: UIView {
     private let selectorView = UIView()
 
@@ -163,16 +161,18 @@ extension MessagePopoverView {
         selectorView.addSubview(collectionView)
         collectionView.snp.makeConstraints { make in
             make.top.equalTo(triangleView.snp.bottom)
+            make.height.equalTo(38 + 3)
+            make.width.equalTo(100)
             make.leading.trailing.bottom.equalToSuperview()
         }
 
         addSubview(selectorView)
         selectorView.snp.makeConstraints { make in
-            make.height.equalTo(38 + 3)
-            make.width.equalTo(100)
             // 這個沒有意義, 只是讓他可以完成佈局
             make.top.leading.equalToSuperview()
         }
+
+        layoutIfNeeded()
     }
 
     private func setupCollectionView() {
@@ -185,9 +185,10 @@ extension MessagePopoverView {
         collectionView.dataSource = self
         collectionView.register(SeparatorCell.self, forCellWithReuseIdentifier: "SeparatorCell")
         collectionView.register(ItemCell.self, forCellWithReuseIdentifier: "ItemCell")
-        collectionView.register(EmptyCell.self, forCellWithReuseIdentifier: "EmptyCell")
 
-        flowLayout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
+        // horizontal 在如果只有一筆資料會略過 cellForItem
+        // 故這邊先寫 1, 確保 cellForItem 在一筆資料時一定會執行
+        flowLayout.estimatedItemSize = .init(width: 1, height: 1)
         flowLayout.scrollDirection = .horizontal
         flowLayout.minimumLineSpacing = .leastNonzeroMagnitude
         flowLayout.minimumInteritemSpacing = .leastNonzeroMagnitude
@@ -195,8 +196,7 @@ extension MessagePopoverView {
 
     private func bindUpdate() {
         viewModel.bind(didUpdatedData: { [weak self] in
-            guard let self else { return }
-            collectionView.reloadData()
+            self?.collectionView.reloadData()
         })
     }
 
@@ -207,8 +207,7 @@ extension MessagePopoverView {
             .removeDuplicates()
             .receiveOnMainIfNeeded()
             .sink { [weak self] width in
-                guard let self else { return }
-                self.selectorView.snp.updateConstraints { make in
+                self?.collectionView.snp.updateConstraints { make in
                     make.width.equalTo(width)
                 }
             }
@@ -274,12 +273,7 @@ extension MessagePopoverView:
 
         var cell: UICollectionViewCell?
 
-        if text == nil, indexPath.row == 0 {
-            cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: "EmptyCell",
-                for: indexPath)
-        }
-        else if
+        if
             let text,
             let itemCell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: "ItemCell",

@@ -26,6 +26,8 @@ extension PopoverStrategy where Self == PopoverPullableStrategy {
 public final class PopoverPullableStrategy: PopoverStrategy {
     public enum `Type` {
         /// 可以自由拉動
+        ///
+        /// `實作的 ViewController` 不能固定高度
         case freeform(_ height: Height)
         /// 只能往下拉
         case normal(_ height: Height)
@@ -88,24 +90,14 @@ public final class PopoverPullableStrategy: PopoverStrategy {
     public enum Height {
         /// minimum: 以 **整個螢幕的高度** 計算出來的高度乘上百分比
         /// maximum: 會限制計算出來的高度就是最高高度, 但不會超過 controller 的 safe area
-        case percentage(minimum: Int, maximum: Int)
+        case percentage(minimum: Int, maximum: Int = 100)
         /// minimum: 最低高度
         /// maximum: 最高高度, 但不會超過 controller 的 safe area
-        case value(minimum: CGFloat, maximum: CGFloat)
+        case value(minimum: CGFloat, maximum: CGFloat = UIScreen.main.bounds.height)
         /// 會推滿到整頁高度, 但不包含 controller 的 safe area top inset
         case fullPage
         /// content 的自適應高度
         case selfSizing
-
-        /// 給不需要設定 maximum
-        static func percentage(minimum: Int) -> Height {
-            .percentage(minimum: minimum, maximum: 100)
-        }
-
-        /// 給不需要設定 maximum
-        static func value(minimum: CGFloat) -> Height {
-            .value(minimum: minimum, maximum: UIDevice.current.height)
-        }
     }
 
     public let backgroundColorAlpha: CGFloat

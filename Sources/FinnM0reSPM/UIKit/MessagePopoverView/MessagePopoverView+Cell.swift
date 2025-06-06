@@ -14,9 +14,10 @@ extension MessagePopoverView {
 
             contentView.addSubview(line)
             line.snp.makeConstraints { make in
-                make.width.equalTo(2)
+                make.width.equalTo(1)
                 make.height.equalTo(14)
-                make.edges.centerY.equalToSuperview()
+                make.top.bottom.equalToSuperview().inset(12)
+                make.leading.trailing.equalToSuperview()
             }
         }
 
@@ -40,7 +41,6 @@ extension MessagePopoverView {
 
             contentView.addSubview(titleLabel)
             titleLabel.snp.makeConstraints { make in
-                make.height.equalTo(38)
                 make.top.bottom.equalToSuperview()
                 make.leading.trailing.equalToSuperview().inset(8)
             }
@@ -48,16 +48,6 @@ extension MessagePopoverView {
 
         required init?(coder _: NSCoder) {
             fatalError("init(coder:) has not been implemented")
-        }
-    }
-
-    class EmptyCell: UICollectionViewCell {
-        override func preferredLayoutAttributesFitting(_ layoutAttributes: UICollectionViewLayoutAttributes)
-            -> UICollectionViewLayoutAttributes
-        {
-            let attributes = super.preferredLayoutAttributesFitting(layoutAttributes)
-            attributes.frame.size.width = 0
-            return attributes
         }
     }
 }

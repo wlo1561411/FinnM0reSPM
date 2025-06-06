@@ -25,7 +25,7 @@ extension MessagePopoverView {
 extension MessagePopoverView.ViewModel {
     /// 插入分隔線
     private func adjustSource(_ texts: [String]) -> [String?] {
-        var insertedSeparator: [String?] = [nil]
+        var insertedSeparator: [String?] = []
 
         texts.enumerated().forEach {
             insertedSeparator.append($0.element)
@@ -35,7 +35,7 @@ extension MessagePopoverView.ViewModel {
                 insertedSeparator.append(nil)
             }
         }
-
+        print(insertedSeparator)
         return insertedSeparator
     }
 

@@ -31,13 +31,13 @@ public final class PopoverWrapperViewController: UIViewController {
     private(set) var isPresented = false
 
     init(
-        strategy: PopoverStrategy?,
+        strategy: PopoverStrategy,
         contentController: some PopoverPresentable,
         onPresented: (() -> Void)?,
         onClosed: (() -> Void)?)
     {
         self.contentController = contentController
-        self.strategy = strategy ?? contentController.defaultStrategy
+        self.strategy = strategy
         self.onPresented = onPresented
         self.onClosed = onClosed
         super.init(nibName: nil, bundle: nil)
