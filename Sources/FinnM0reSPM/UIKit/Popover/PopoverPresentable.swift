@@ -102,29 +102,6 @@ extension UIViewController {
         }
     }
 
-    private class PullablePopoverDemo: PopoverContentViewController, PopoverPresentable {
-        var defaultStrategy: PopoverStrategy { .pullable(.freeform(.percentage(minimum: 20))) }
-
-        override func viewDidLoad() {
-            super.viewDidLoad()
-
-            view.backgroundColor = .systemPink
-
-            UITextView().sr
-                .text("Hello, World!")
-                .textAlignment(.center)
-                .textColor(.white)
-                .backgroundColor(.clear)
-                .round(10)
-                .add(to: view)
-                .makeConstraints { make in
-//                    make.height.equalTo(500)
-                    make.top.equalToSuperview().inset(20)
-                    make.bottom.leading.trailing.equalToSuperview()
-                }
-        }
-    }
-
     private class AlertPopoverDemo: PopoverContentViewController, PopoverPresentable {
         var defaultStrategy: PopoverStrategy { .alert(size: .minimum(.init(width: 200, height: 200))) }
 
@@ -143,6 +120,44 @@ extension UIViewController {
                 .makeConstraints { make in
                     make.size.equalTo(500)
                     make.edges.equalToSuperview()
+                }
+        }
+    }
+
+    private class PullablePopoverDemo: PopoverContentViewController, PopoverPresentable {
+        var defaultStrategy: PopoverStrategy { .pullable(.freeform(.percentage(minimum: 20))) }
+
+        private var cancellables: Set<AnyCancellable> = []
+
+        override func viewDidLoad() {
+            super.viewDidLoad()
+
+            view.backgroundColor = .systemPink
+
+            UITextView().sr
+                .text("Hello, World!")
+                .textAlignment(.center)
+                .textColor(.white)
+                .backgroundColor(.clear)
+                .round(10)
+                .add(to: view)
+                .makeConstraints { make in
+//                    make.height.equalTo(500)
+                    make.top.equalToSuperview().inset(20)
+                    make.bottom.leading.trailing.equalToSuperview()
+                }
+
+            UIButton().sr
+                .title("Update Height")
+                .titleColor(.white)
+                .backgroundColor(.gray)
+                .add(to: view)
+                .makeConstraints { make in
+                    make.height.equalTo(40)
+                    make.leading.trailing.bottom.equalToSuperview()
+                }
+                .onTap(store: &cancellables) { [weak self] _ in
+                    self?.manualUpdate()
                 }
         }
     }

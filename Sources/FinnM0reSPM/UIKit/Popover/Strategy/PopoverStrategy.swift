@@ -55,7 +55,6 @@ public protocol PopoverStrategy {
     /// 手動更新高度, 有需要再實作
     func manualUpdate(
         height: CGFloat,
-
         with view: UIView,
         at controller: UIViewController)
 }
